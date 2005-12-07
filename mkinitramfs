@@ -11,8 +11,8 @@ errors_to="2>/dev/null"
 while getopts "d:ko:r:" flag; do
 	case $flag in
 	d)
-		CONFDIR="${OPTAGS}"
-		if [ ! d "${CONFDIR}" ]; then
+		CONFDIR="${OPTARG}"
+		if [ ! -d "${CONFDIR}" ]; then
 			echo "${0}: ${CONFDIR}: Not a directory" >&2
 			exit 1
 		fi
@@ -116,21 +116,16 @@ fi
 # symlinks.
 
 ln -s /usr/lib/klibc/bin/* ${DESTDIR}/bin
-ln -s /usr/lib/klibc/lib/* ${DESTDIR}/lib
+ln -s /usr/lib/klibc/lib/klibc-*.so ${DESTDIR}/lib
 copy_exec /usr/share/initramfs-tools/init /init
 cp -a /usr/share/initramfs-tools/scripts/* ${DESTDIR}/scripts
-for f in $(cd /etc/mkinitramfs/scripts && \
+for f in $(cd ${CONFDIR}/scripts && \
 	find . \( -name '*.dpkg*' -prune -o -name '*~' -prune \) \
 		-o -type f -print); do
 	mkdir --parents ${DESTDIR}/scripts/$(dirname ${f})
-cp -p /etc/mkinitramfs/scripts/${f} ${DESTDIR}/scripts/$(dirname ${f})
+cp -p ${CONFDIR}/scripts/${f} ${DESTDIR}/scripts/$(dirname ${f})
 done
 copy_exec ${CONFDIR}/initramfs.conf /conf
-cp -a /etc/udev ${DESTDIR}/etc
-
-# Hack until udev is built with klibc
-copy_exec /sbin/udev /sbin
-copy_exec /sbin/udevstart /sbin
 
 # Busybox
 rm ${DESTDIR}/bin/sh
@@ -143,7 +138,7 @@ copy_exec /sbin/modprobe /sbin
 copy_exec /sbin/depmod /sbin
 copy_exec /sbin/rmmod /sbin
 mkdir -p ${DESTDIR}/etc/modprobe.d
-copy_exec /etc/modprobe.d/aliases /etc/modprobe.d
+cp -a /etc/modprobe.d/* ${DESTDIR}/etc/modprobe.d
 
 # Raid
 copy_exec /sbin/mdadm /sbin
@@ -153,7 +148,7 @@ copy_exec /sbin/mdrun /sbin
 copy_exec /lib/lvm-200/vgchange /sbin
 
 run_scripts /usr/share/initramfs-tools/hooks
-run_scripts /etc/mkinitramfs/hooks
+run_scripts ${CONFDIR}/hooks
 
 # Apply DSDT to initramfs
 if [ -e ${CONFDIR}/DSDT.aml ]; then

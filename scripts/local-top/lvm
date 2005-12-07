@@ -26,7 +26,7 @@ case ${vg} in
 		;;
 esac
 	
-modprobe -q dm-mod
+modprobe -Qb dm-mod
 
 # Split volume group from logical volume.
 vg=$(echo ${vg} | sed -e 's#\(.*\)\([^-]\)-[^-].*#\1\2#')

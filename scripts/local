@@ -8,9 +8,9 @@ mountroot ()
 	[ "$quiet" != "y" ] && log_end_msg
 
 	# Get the root filesystem type
-	if [ ! -e "${ROOT}" ]; then
+	while [ ! -e "${ROOT}" ]; do
 		panic "ALERT!  ${ROOT} does not exist.  Dropping to a shell!"
-	fi
+	done
 
 	eval $(fstype < ${ROOT})
 
@@ -25,7 +25,7 @@ mountroot ()
 	fi
 
 	# FIXME This has no error checking
-	modprobe ${FSTYPE}
+	modprobe -Qb ${FSTYPE}
 
 	# FIXME This has no error checking
 	# Mount root
