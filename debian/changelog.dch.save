@@ -1,57 +1,11 @@
-initramfs-tools (0.40ubuntu8) dapper; urgency=low
-
-  * Call modprobe everywhere with "-Qb" to silence messages and allow user
-    blacklisting.
-  * Copy the entire /etc/modprobe.d directory to the initramfs, so we can
-    pick up all user blacklists and options.
-  * Remove the slumber for SCSI/USB devices from the local filesystem mount
-    script, udev's init-premount script will take care of this when
-    necessary.
-
- -- Scott James Remnant <scott@ubuntu.com>  Wed,  7 Dec 2005 16:18:12 +0000
-
-initramfs-tools (0.40ubuntu7) dapper; urgency=low
-
-  * remove "sleep 3" from the nfs script before the nfsmount command,
-    its a leftover from debugging in breezy and slows down thin client 
-    booting unnecessary
-
- -- Oliver Grawert <ogra@ubuntu.com>  Fri,  2 Dec 2005 11:45:05 +0100
-
-initramfs-tools (0.40ubuntu6) dapper; urgency=low
-
-  * When panicking, fork an interactive subshell rather than execing it, so
-    that if the user fixes things up and exits, we continue rather than
-    panic the kernel.
-  * Call update-initramfs in postinst to regenerate the latest initramfs on
-    upgrades
-
- -- Matt Zimmerman <mdz@ubuntu.com>  Thu,  1 Dec 2005 22:23:09 -0800
-
-initramfs-tools (0.40ubuntu5) dapper; urgency=low
-
-  * Wait up to 10 seconds for the root device to appear before failing,
-    allowing SCSI and USB controllers time to settle.  There's almost
-    certainly a more elegant way to do this generically for all mountroot
-    functions, but for now this will suffice.
-
- -- Scott James Remnant <scott@ubuntu.com>  Thu,  1 Dec 2005 21:28:55 +0000
-
-initramfs-tools (0.40ubuntu4) dapper; urgency=low
-
-  * Mount /dev with mode 0755.
-
- -- Scott James Remnant <scott@ubuntu.com>  Thu,  1 Dec 2005 19:30:06 +0000
-
 initramfs-tools (0.40ubuntu3) dapper; urgency=low
 
-  "A true friend stabs you in the front."
-  - Oscar Wilde 
+  "<infinity> A version tested by someone with a ppc64 machine?...
+   That's a novel idea."
 
-  * hooks/acpid: Rename to ...
-  * hooks/thermal: ... this.  Add therm_pm72 for ppc64 systems.
+  * 
 
- -- Jeff Bailey <jbailey@ubuntu.com>  Wed, 30 Nov 2005 22:25:01 -0500
+ -- Jeff Bailey <jbailey@ubuntu.com>  Wed, 30 Nov 2005 22:14:32 -0500
 
 initramfs-tools (0.40ubuntu2) dapper; urgency=low
 

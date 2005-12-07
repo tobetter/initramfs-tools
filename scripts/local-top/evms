@@ -26,6 +26,6 @@ case ${evms} in
 		;;
 esac
 	
-modprobe -q dm-mod
+modprobe -Qb dm-mod
 
 /sbin/evms_activate
