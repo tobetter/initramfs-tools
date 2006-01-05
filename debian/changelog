@@ -1,3 +1,12 @@
+initramfs-tools (0.40ubuntu9) dapper; urgency=low
+
+  * Make some changes to cope with the new and improved klibc packaging:
+    - Add a force to the deletion of ${DESTDIR}/bin/sh, to avoid errors.
+    - Cope with libklibc moving from /usr/lib/klibc/lib to /lib.
+    - Bump dependency on klibc-utils to one new enough for the above.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu,  5 Jan 2006 15:13:15 +1100
+
 initramfs-tools (0.40ubuntu8) dapper; urgency=low
 
   * Call modprobe everywhere with "-Qb" to silence messages and allow user
