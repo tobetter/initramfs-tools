@@ -1,3 +1,28 @@
+initramfs-tools (0.40ubuntu12) dapper; urgency=low
+
+  * Oops, move the progress state file into the new directory too.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon,  9 Jan 2006 21:26:44 +1100
+
+initramfs-tools (0.40ubuntu11) dapper; urgency=low
+
+  * Move the state directory from /dev/initramfs to /dev/.initramfs
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon,  9 Jan 2006 21:17:50 +1100
+
+initramfs-tools (0.40ubuntu10) dapper; urgency=low
+
+  * Create the /dev/initramfs directory as soon as we mount /dev, so other
+    packages that need a playground in /dev can do so in a uniform location.
+  * Update the usplash progress bar every time we are asked to output a
+    success or failure value from an init action, and write our progress to
+    /dev/initramfs for sysv-init to gather up and pick up where we left off.
+  * Export $DPKG_ARCH in both mkinitramfs (for use by hooks) and initramfs.
+  * Use $DPKG_ARCH in the thermal hook/script to divide the x86 stuff from
+    the powerpc stuff, not because we have to, but as an example to others.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon,  9 Jan 2006 10:51:51 +1100
+
 initramfs-tools (0.40ubuntu9) dapper; urgency=low
 
   * Make some changes to cope with the new and improved klibc packaging:
