@@ -15,9 +15,13 @@ prereqs)
 	;;
 esac
 
-# For ACPI systems
-modprobe -Qb fan
-modprobe -Qb thermal
-
-# For ppc64 systems
-modprobe -Qb therm_pm72
+case "$DPKG_ARCH" in
+# load the right modules
+powerpc|ppc64)
+	modprobe -Qb therm_pm72
+	;;
+i386|amd64|ia64)
+	modprobe -Qb fan
+	modprobe -Qb thermal
+	;;
+esac
