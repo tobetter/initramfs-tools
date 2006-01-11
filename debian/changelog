@@ -1,3 +1,12 @@
+initramfs-tools (0.40ubuntu13) dapper; urgency=low
+
+  * Default to taking over other initramfs images in Ubuntu, as this is
+    more consistent with what our packaging expects to be able to do.
+  * Make "update-initramfs -u" try to find the running kernel before it
+    attempts to search the symbolic link list and its own sha1 list.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 11 Jan 2006 16:25:20 +1100
+
 initramfs-tools (0.40ubuntu12) dapper; urgency=low
 
   * Oops, move the progress state file into the new directory too.
