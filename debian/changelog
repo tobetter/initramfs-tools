@@ -1,3 +1,17 @@
+initramfs-tools (0.40ubuntu16) dapper; urgency=low
+
+  * Bump klibc-utils dependency to (>= 1.1.16-1), for hppa and ia64.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 19 Jan 2006 04:00:39 +1100
+
+initramfs-tools (0.40ubuntu15) dapper; urgency=low
+
+  * Drop the udev dependency, so we always get configured before udev.
+    We can get away with this now that udev hooks/scripts have been split
+    into the udev package proper.  This should close Malone bug #28808.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 18 Jan 2006 22:50:27 +1100
+
 initramfs-tools (0.40ubuntu14) dapper; urgency=low
 
   * If copy_exec is asked to copy to the same location twice, check if
