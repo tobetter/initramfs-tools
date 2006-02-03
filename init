@@ -39,6 +39,14 @@ for x in $(cat /proc/cmdline); do
 		;;
 	root=*)
 		ROOT=${x#root=}
+		case $ROOT in
+		LABEL=*)
+			ROOT="/dev/disks/by-label/${ROOT#LABEL=}"
+			;;
+		UUID=*)
+			ROOT="/dev/disks/by-uuid/${ROOT#UUID=}"
+			;;
+		esac
 		;;
 	nfsroot=*)
 		NFSROOT=${x#nfsroot=}
