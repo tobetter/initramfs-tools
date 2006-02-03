@@ -1,3 +1,20 @@
+initramfs-tools (0.40ubuntu18) dapper; urgency=low
+
+  * Add support for selecting root by UUID or LABEL with syntax such as:
+    root=LABEL=myrootfs or root=UUID=92addf34-0f02-4a0e-bfb2-cbaa1e907b77
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri,  3 Feb 2006 15:55:01 +0000
+
+initramfs-tools (0.40ubuntu17) dapper; urgency=low
+
+  * Make auto_add_modules take an argument, so you can use it to add only
+    some of the auto* modules (like "net" or "ide"), and create a "netboot"
+    option that only includes base and net (Closes launchpad.net/26426) 
+  * Change the nfs script to use "mount -o nolock" instead of "nfsmount",
+    to fix some timeouts for ltsp NFS roots (Closes launchpad.net/19196)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 31 Jan 2006 11:55:11 +0000
+
 initramfs-tools (0.40ubuntu16) dapper; urgency=low
 
   * Bump klibc-utils dependency to (>= 1.1.16-1), for hppa and ia64.
