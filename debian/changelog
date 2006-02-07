@@ -1,3 +1,9 @@
+initramfs-tools (0.40ubuntu20) dapper; urgency=low
+
+  * Add ... to end of strings to match main boot sequence.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue,  7 Feb 2006 11:07:50 +0000
+
 initramfs-tools (0.40ubuntu19) dapper; urgency=low
 
   * Change the first of many "Loading modules" to "Loading essential drivers"
