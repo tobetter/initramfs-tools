@@ -1,3 +1,10 @@
+initramfs-tools (0.40ubuntu19) dapper; urgency=low
+
+  * Change the first of many "Loading modules" to "Loading essential drivers"
+    to improve debugging when people say it breaks at that stage.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue,  7 Feb 2006 11:05:15 +0000
+
 initramfs-tools (0.40ubuntu18) dapper; urgency=low
 
   * Add support for selecting root by UUID or LABEL with syntax such as:
