@@ -90,7 +90,7 @@ run_scripts /scripts/init-top
 parse_numeric ${ROOT}
 
 maybe_break modules
-log_begin_msg "Loading modules"
+log_begin_msg "Loading essential drivers"
 load_modules
 log_end_msg
 
