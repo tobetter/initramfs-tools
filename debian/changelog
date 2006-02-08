@@ -1,3 +1,10 @@
+initramfs-tools (0.40ubuntu21) dapper; urgency=low
+
+  * Don't update the progress bar once udev has taken /dev away;
+    after all, we can't contact usplash anyway at this point.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed,  8 Feb 2006 14:34:10 +0000
+
 initramfs-tools (0.40ubuntu20) dapper; urgency=low
 
   * Add ... to end of strings to match main boot sequence.
