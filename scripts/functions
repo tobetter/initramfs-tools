@@ -40,6 +40,8 @@ log_end_msg()
 
 update_progress()
 {
+	[ -d /dev/.initramfs ] || return
+
 	if [ -z "$PROGRESS_STATE" ]; then
 		export PROGRESS_STATE=0
 	fi
