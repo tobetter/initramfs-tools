@@ -22,6 +22,7 @@ esac
 case "$DPKG_ARCH" in
 # copy the right modules
 powerpc|ppc64)
+	manual_add_modules i2c-keywest
 	manual_add_modules therm_pm72
 	;;
 i386|amd64|ia64)

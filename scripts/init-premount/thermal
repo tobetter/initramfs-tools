@@ -18,6 +18,7 @@ esac
 case "$DPKG_ARCH" in
 # load the right modules
 powerpc|ppc64)
+	modprobe -Qb i2c-keywest
 	modprobe -Qb therm_pm72
 	;;
 i386|amd64|ia64)

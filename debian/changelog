@@ -1,3 +1,14 @@
+initramfs-tools (0.40ubuntu22) dapper; urgency=low
+
+  * Add mptspi to the list of SCSI modules put in the initramfs by default,
+    which is required for some LSI Logic controllers and for the VMware SCSI
+    controller in recent VMware versions (See launchpad.net/{27187,31229})
+  * Fix typo of /dev/disk/by-*, which I wrote as /dev/disks/by-{uuid,label}
+  * Load i2c-keywest before loading therm_pm72 in the PowerPC thermal hook,
+    since the latter sometimes needs the former (Closes launchpad.net/27269)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 14 Feb 2006 23:28:35 +1100
+
 initramfs-tools (0.40ubuntu21) dapper; urgency=low
 
   * Don't update the progress bar once udev has taken /dev away;
