@@ -41,10 +41,10 @@ for x in $(cat /proc/cmdline); do
 		ROOT=${x#root=}
 		case $ROOT in
 		LABEL=*)
-			ROOT="/dev/disks/by-label/${ROOT#LABEL=}"
+			ROOT="/dev/disk/by-label/${ROOT#LABEL=}"
 			;;
 		UUID=*)
-			ROOT="/dev/disks/by-uuid/${ROOT#UUID=}"
+			ROOT="/dev/disk/by-uuid/${ROOT#UUID=}"
 			;;
 		esac
 		;;
