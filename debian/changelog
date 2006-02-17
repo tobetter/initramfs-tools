@@ -1,3 +1,14 @@
+initramfs-tools (0.40ubuntu23) dapper; urgency=low
+
+  * Grow a conf.d directory for config snippets, and toss the RESUME option
+    in there, to stop editing our own conffile in our maintainer scripts.
+  * Add a cleverly hackish preinst that will pull the RESUME setting from
+    old config files, migrate it to conf.d/resume, and reset that part of the
+    conffile to a factory fresh state.  This should fix the unwanted conffile
+    prompt in breezy->dapper upgrades for people who made no local changes.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 17 Feb 2006 15:34:53 +1100
+
 initramfs-tools (0.40ubuntu22) dapper; urgency=low
 
   * Add mptspi to the list of SCSI modules put in the initramfs by default,
