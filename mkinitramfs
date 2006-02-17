@@ -34,6 +34,13 @@ shift $((${OPTIND} - 1))
 . /usr/share/initramfs-tools/hook-functions
 
 . ${CONFDIR}/initramfs.conf
+EXTRA_CONF=''
+for i in ${CONFDIR}/conf.d/*; do
+	EXTRA_CONF="${EXTRA_CONF} $(basename $i | grep '^[a-z0-9][a-z0-9\._-]*$' | grep -v '\.dpkg-.*$')";
+done
+for i in ${EXTRA_CONF}; do
+. ${CONFDIR}/conf.d/${i}
+done
 
 if [ x${outfile} = x ]; then
 	usage
@@ -96,7 +103,7 @@ export DPKG_ARCH
 # Private, used by 'catenate_cpiogz'.
 export __TMPCPIOGZ
 
-for d in bin conf etc lib modules sbin scripts; do
+for d in bin conf/conf.d etc lib modules sbin scripts; do
     mkdir -p ${DESTDIR}/${d}
 done
 
@@ -135,6 +142,9 @@ cp -p ${CONFDIR}/scripts/${f} ${DESTDIR}/scripts/$(dirname ${f})
 done
 echo "DPKG_ARCH=${DPKG_ARCH}" > ${DESTDIR}/conf/arch.conf
 copy_exec ${CONFDIR}/initramfs.conf /conf
+for i in ${EXTRA_CONF}; do
+	copy_exec ${CONFDIR}/conf.d/${i} /conf/conf.d
+done
 
 # Busybox
 rm -f ${DESTDIR}/bin/sh
