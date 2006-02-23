@@ -1,3 +1,9 @@
+initramfs-tools (0.40ubuntu24) dapper; urgency=low
+
+  * Add support for LSI Logic's Fusion MPT SAS and FC controllers as well.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 23 Feb 2006 23:27:16 +1100
+
 initramfs-tools (0.40ubuntu23) dapper; urgency=low
 
   * Grow a conf.d directory for config snippets, and toss the RESUME option
