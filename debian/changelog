@@ -1,3 +1,11 @@
+initramfs-tools (0.40ubuntu25) dapper; urgency=low
+
+  * Move the "loop waiting for the root filesystem" code from the udev
+    premount script to the local mountroot() function where it truly
+    belongs.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed, 22 Mar 2006 16:28:46 +0000
+
 initramfs-tools (0.40ubuntu24) dapper; urgency=low
 
   * Add support for LSI Logic's Fusion MPT SAS and FC controllers as well.
