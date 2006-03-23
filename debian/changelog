@@ -1,3 +1,12 @@
+initramfs-tools (0.40ubuntu26) dapper; urgency=low
+
+  * Add raid10 module to the generic module list (launchpad.net/28028)
+  * Add cpqarray to the scsi module list (launchpad.net/{26632,35202})
+  * Unset debug before we run the real init (launchpad.net/24095)
+  * Add the gdth module to the default scsi list (launchpad.net/31542)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 24 Mar 2006 04:33:44 +1100
+
 initramfs-tools (0.40ubuntu25) dapper; urgency=low
 
   * Move the "loop waiting for the root filesystem" code from the udev
