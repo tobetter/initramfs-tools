@@ -122,6 +122,5 @@ done
 
 maybe_break init
 
-# Unset the problematic debug variable and chain to real filesystem
-unset debug
+# Chain to real filesystem
 exec run-init ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console

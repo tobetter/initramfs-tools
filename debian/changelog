@@ -1,11 +1,15 @@
+initramfs-tools (0.40ubuntu27) dapper; urgency=low
+
+  * Drop the evms, lvm and md local-top scripts; they're all provided by
+    their own packages now.  This makes the depdencies rather nicer.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Thu, 23 Mar 2006 18:04:48 +0000
+
 initramfs-tools (0.40ubuntu26) dapper; urgency=low
 
-  * Add raid10 module to the generic module list (launchpad.net/28028)
-  * Add cpqarray to the scsi module list (launchpad.net/{26632,35202})
-  * Unset debug before we run the real init (launchpad.net/24095)
-  * Add the gdth module to the default scsi list (launchpad.net/31542)
+  * Make the md and evms local-top scripts pre-requisite the udev one.
 
- -- Adam Conrad <adconrad@ubuntu.com>  Fri, 24 Mar 2006 04:33:44 +1100
+ -- Scott James Remnant <scott@ubuntu.com>  Thu, 23 Mar 2006 17:54:32 +0000
 
 initramfs-tools (0.40ubuntu25) dapper; urgency=low
 

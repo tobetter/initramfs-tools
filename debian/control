@@ -7,7 +7,7 @@ Standards-Version: 3.6.2.0
 
 Package: initramfs-tools
 Architecture: all
-Depends: klibc-utils (>= 1.1.16-1), busybox-initramfs, cpio, mdadm, lvm2 (>= 2.01.04-5)
+Depends: klibc-utils (>= 1.1.16-1), busybox-initramfs, cpio
 Description: tools for generating an initramfs
  This package contains tools to create and boot an initramfs for prepackaged
  2.6 Linux kernel. The initramfs is an cpio archive. At boot time, the kernel
