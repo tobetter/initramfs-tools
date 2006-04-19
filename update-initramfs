@@ -167,15 +167,15 @@ create()
 update()
 {
 	if [ -z "${version}" ]; then
-		set_current_version
-	fi
-
-	if [ -z "${version}" ]; then
 		set_linked_version
 	fi
 
 	if [ -z "${version}" ]; then
 		set_highest_version
+	fi
+
+	if [ -z "${version}" ]; then
+		set_current_version
 	fi
 
 	if [ "${version}" = "all" ]; then
