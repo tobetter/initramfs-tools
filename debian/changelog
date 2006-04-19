@@ -1,3 +1,12 @@
+initramfs-tools (0.40ubuntu29) dapper; urgency=low
+
+  * Make "update-initramfs -u" try to find the running kernel *after* it
+    attempts to search the symbolic link list and its own sha1 list.
+    Using this as a fallback, rather than the default, should solve most
+    upgrade issues, where people found their initramfs was half-baked.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 19 Apr 2006 13:51:35 +1000
+
 initramfs-tools (0.40ubuntu28) dapper; urgency=low
 
   * Add raid10 module to the generic module list (launchpad.net/28028)
