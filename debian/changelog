@@ -1,3 +1,29 @@
+initramfs-tools (0.40ubuntu30) dapper; urgency=low
+
+  * This release brought to you by Fujitsu hard drives, which have forced
+    me to rewrite all my most recent initramfs-tools changes from memory.
+  * Include arcmsr module in the scsi module list (launchpad.net/40075)
+  * Abstract out the kernel minversion checking stuff into the function
+    library, so we can reuse it to check minversion requirements for hook
+    scripts as well (such as udev, which requires >= 2.6.15 in dapper)
+  * Bump the kernel minversion to 2.6.15 on hppa and ia64, since they used
+    initrd-tools with their 2.6.12 kernels in breezy, not initramfs-tools.
+  * If mkinitramfs fails due to minversion not being met, don't bail out
+    of update-initramfs, but just exit 0, so upgrades don't halt on it.
+  * Conditionalise the use of lvm and md in mkinitramfs so it's a no-op if
+    you don't have those packages installed, but allows for smooth upgrades
+    if you have older versions that don't ship their own hooks yet.
+  * Make prereqs conditional on the script/hook actually existing.  From
+    now on, this means that 'PREREQ="udev"' means "run udev first, iff it
+    happens to be installed".  Having the files exist on the filesystem if
+    you have a HARD dependency should be enforced with package dependencies.
+  * Add ohci1394 and sbp2 to the scsi module list (launchpad.net/37479)
+  * Move framebuffer setup from usplash to scripts/local-top/framebuffer
+    so that people booting with vga=1234 but no splash will still get a
+    framebuffer instead of a useless black console (launchpad.net/27669)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 16 May 2006 19:51:08 +1000
+
 initramfs-tools (0.40ubuntu29) dapper; urgency=low
 
   * Make "update-initramfs -u" try to find the running kernel *after* it
