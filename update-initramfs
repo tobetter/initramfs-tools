@@ -63,8 +63,17 @@ set_initramfs()
 generate_initramfs()
 {
 	verbose "Generating ${initramfs}"
-	mkinitramfs -o ${initramfs} ${version}
-	set_sha1
+	if mkinitramfs -o ${initramfs} ${version}; then
+		set_sha1
+	else
+		mkinitramfs_return="$?"
+		if [ "$mkinitramfs_return" = "2" ]; then
+			# minversion wasn't met, exit 0
+			exit 0
+		fi
+		verbose "mkinitramfs failed for ${initramfs}"
+		exit $mkinitramfs_return
+	fi
 }
 
 compare_sha1()

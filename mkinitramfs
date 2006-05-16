@@ -54,10 +54,11 @@ else
 	version="${1}"
 fi
 
-if dpkg --compare-versions "${version}" lt 2.6.12; then
-	echo "Kernel version too old.  initramfs-tools requires at least 2.6.12."
-	exit 1
-fi
+# Check that we're using a new enough kernel version, first for ourselves,
+# then for each of the hooks, which can have a MINKVER variable defined
+check_minkver ${version}
+check_minkver ${version} /usr/share/initramfs-tools/hooks
+check_minkver ${version} ${CONFDIR}/hooks
 
 case ${version} in
 /lib/modules/*/[!/]*)
@@ -159,12 +160,22 @@ copy_exec /sbin/rmmod /sbin
 mkdir -p ${DESTDIR}/etc/modprobe.d
 cp -a /etc/modprobe.d/* ${DESTDIR}/etc/modprobe.d
 
-# Raid
-copy_exec /sbin/mdadm /sbin
-copy_exec /sbin/mdrun /sbin
+# FIXME: Remove this Raid block after Dapper releases
+if [ -x /sbin/mdadm -a -x /sbin/mdrun -a ! -f /usr/share/initramfs-tools/hooks/md ]; then
+	copy_exec /sbin/mdadm /sbin
+	copy_exec /sbin/mdrun /sbin
+	for x in md linear raid0 raid1 raid5 raid6 raid10; do
+		manual_add_modules ${x}
+	done
+fi
 
-# LVM
-copy_exec /lib/lvm-200/vgchange /sbin
+# FIXME: Remove this LVM block after Dapper releases
+if [ -x /sbin/vgchange -a -d /lib/lvm-200 -a ! -f /usr/share/initramfs-tools/hooks/lvm ]; then
+	copy_exec /lib/lvm-200/vgchange /sbin
+	for x in dm_mod dm_snapshot; do
+		manual_add_modules ${x}
+	done
+fi
 
 run_scripts /usr/share/initramfs-tools/hooks
 run_scripts ${CONFDIR}/hooks
