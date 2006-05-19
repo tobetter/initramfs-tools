@@ -1,3 +1,10 @@
+initramfs-tools (0.40ubuntu31) dapper; urgency=low
+
+  * scripts/local-premount/resume: Print a message when a resume is about to
+    begin (LP#41137)
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Fri, 19 May 2006 15:14:53 -0700
+
 initramfs-tools (0.40ubuntu30) dapper; urgency=low
 
   * This release brought to you by Fujitsu hard drives, which have forced
