@@ -1,3 +1,9 @@
+initramfs-tools (0.40ubuntu32) dapper; urgency=low
+
+  * Revert 0.40ubuntu31.  This isn't as trivial as it should be.
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Sun, 21 May 2006 10:17:50 -0700
+
 initramfs-tools (0.40ubuntu31) dapper; urgency=low
 
   * scripts/local-premount/resume: Print a message when a resume is about to
