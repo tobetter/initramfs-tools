@@ -1,4 +1,4 @@
-.TH INITRAMFS.CONF 5  "$Date: 2005/09/13 $" "" "initramfs.conf manual"
+.TH INITRAMFS.CONF 5  "$Date: 2005/12/06 $" "" "initramfs.conf manual"
 
 .SH NAME
 initramfs.conf \- configuration file for mkinitramfs
@@ -26,24 +26,11 @@ The default setting is \fImost\fP.
 
 \fImost\fP adds all the framebuffer, acpi, file system, ide, sata, scsi and usb drivers.
 
-\fInetboot\fP adds the base modules, network modules, but skips block devices.
-
 \fIdep\fP tries to guess which modules are necessary for the running box.
 
+\fInetboot\fP adds the base modules, network modules, but skips block devices.
+
 \fIlist\fP includes only modules from the additional modules list.
-
-.TP
-\fB RESUME
-Optional setting of the swap partition to resume from.
-The resume= passed on the command line of your boot loader 
-will override this setting.  By default, this is set in
-/etc/mkinitramfs/conf.d/resume if the initramfs-tools package
-was able to guess a sane default.
-
-.TP
-\fB BUSYBOX
-If this is set to \fIy\fP then \fBbusybox\fP will be included on the
-initramfs image. You MUST use the -static version.
 
 .SH NFS VARIABLES
 .TP
@@ -63,7 +50,7 @@ Otherwise you need to specify \fIHOST:MOUNT\fP.
 
 .SH SEE ALSO
 
-.BR mkinitramfs (8)
+.BR initramfs-tools (8), mkinitramfs (8), update-initramfs (8)
 
 .SH AUTHOR
 The initramfs-tools are written by Jeff Bailey <jbailey@raspberryginger.com>.

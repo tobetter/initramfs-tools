@@ -14,11 +14,12 @@ usage()
 Usage: ${0} [OPTION]...
 
 Options:
- -k [version]	Specify kernel version or ALL
+ -k [version]	Specify kernel version or all
  -c		Create a new initramfs
  -u		Update an existing initramfs
  -d		Remove an existing initramfs
  -t		Take over a custom initramfs with this one
+ -b		Set alternate boot directory
  -v		Be verbose
  -h		This message
 
@@ -62,8 +63,12 @@ set_initramfs()
 
 generate_initramfs()
 {
-	verbose "Generating ${initramfs}"
-	if mkinitramfs -o ${initramfs} ${version}; then
+	echo "update-initramfs: Generating ${initramfs}"
+	OPTS="-o"
+	if [ "${verbose}" = 1 ]; then
+		OPTS="-v $OPTS"
+	fi
+	if mkinitramfs "${OPTS}" "${initramfs}" "${version}"; then
 		set_sha1
 	else
 		mkinitramfs_return="$?"
@@ -76,32 +81,52 @@ generate_initramfs()
 	fi
 }
 
+# only run lilo if no grub is around
+run_bootloader()
+{
+	if [ -x /sbin/grub -o -e /boot/grub/menu.lst ]; then
+		if [ -e /etc/lilo.conf ]; then
+			echo
+			echo "WARNING: grub and lilo installed."
+			echo "If you use grub as bootloader everything is fine."
+			echo "If you use lilo as bootloader you must run lilo!"
+			echo
+		fi
+		return 0
+	fi
+	if [ -e /etc/lilo.conf ]; then
+		lilo -t > /dev/null
+		if [ $? -eq 0 ]; then
+			lilo
+		fi
+	fi
+}
+
 compare_sha1()
 {
-	sha1sum ${initramfs} | diff ${STATEDIR}/${version} - >/dev/null 2>&1
+	sha1sum "${initramfs}" | diff "${STATEDIR}/${version}" - >/dev/null 2>&1
 	return $?
 }
 
 # Note that this must overwrite so that updates work.
 set_sha1()
 {
-	sha1sum ${initramfs} > ${STATEDIR}/${version}
+	sha1sum "${initramfs}" > "${STATEDIR}/${version}"
 }
 
 delete_sha1()
 {
-	rm -f ${STATEDIR}/${version}
+	rm -f "${STATEDIR}/${version}"
 }
 
 get_sorted_versions()
 {
 	version_list=""
 
-	for gsv_x in ${STATEDIR}/*; do
-		gsv_x=$(basename ${gsv_x})
+	for gsv_x in "${STATEDIR}"/*; do
+		gsv_x="$(basename "${gsv_x}")"
 		if [ "${gsv_x}" = '*' ]; then
-			verbose "Nothing to do, exiting."
-			exit 0
+			return 0
 		fi
 		worklist=""
 		for gsv_i in $version_list; do
@@ -115,7 +140,7 @@ get_sorted_versions()
 		if [ "${gsv_x}" != "" ]; then
 			worklist="${worklist} ${gsv_x}"
 		fi
-		version_list=${worklist}
+		version_list="${worklist}"
 	done
 
 	verbose "Available versions: ${version_list}"
@@ -123,7 +148,7 @@ get_sorted_versions()
 
 set_current_version()
 {
-	if [ -f /boot/vmlinu?-`uname -r` ]; then
+	if [ -f /boot/initrd.img-`uname -r` ]; then
 		version=`uname -r`
 	fi
 }
@@ -131,11 +156,11 @@ set_current_version()
 set_linked_version()
 {
 	if [ -L /initrd.img ]; then
-		linktarget=$(basename $(readlink /initrd.img))
+		linktarget="$(basename "$(readlink /initrd.img)")"
 	fi
 
 	if [ -L /boot/initrd.img ]; then
-		linktarget=$(basename $(readlink /boot/initrd.img))
+		linktarget="$(basename "$(readlink /boot/initrd.img)")"
 	fi
 
 	if [ -z "${linktarget}" ]; then
@@ -161,11 +186,11 @@ create()
 	set_initramfs
 
 	if [ "${takeover}" = 0 ]; then
-		if version_exists ${version}; then
+		if version_exists "${version}"; then
 			panic "Cannot create version ${version}: already exists"
 		fi
 	
-		if [ -e ${initramfs} ]; then
+		if [ -e "${initramfs}" ]; then
 			panic "${initramfs} already exists, cannot create."
 		fi
 	fi
@@ -187,16 +212,25 @@ update()
 		set_current_version
 	fi
 
+	if [ -z "${version}" ]; then
+		verbose "Nothing to do, exiting."
+		exit 0
+	fi
+
 	if [ "${version}" = "all" ]; then
 		: FIXME check for --yes, and if not ask are you sure
 		get_sorted_versions
+		if [ -z "${version_list}" ]; then
+			verbose "Nothing to do, exiting."
+			exit 0
+		fi
 		for u_version in ${version_list}; do
 			if [ "${verbose}" = "1" ]; then
 				vflag="-v"
 			fi
 			# Don't stop if one version doesn't work.
 			set +e
-			${0} ${vflag} -u -k ${u_version}
+			"${0}" -u -k "${u_version}" ${vflag}
 			set -e
 		done
 		exit 0
@@ -208,6 +242,8 @@ update()
 
 	generate_initramfs
 
+	run_bootloader
+
 }
 
 delete()
@@ -218,11 +254,11 @@ delete()
 
 	set_initramfs
 
-	if [ ! -e ${initramfs} ]; then
+	if [ ! -e "${initramfs}" ]; then
 		panic "Cannot delete ${initramfs}, doesn't exist."
 	fi
 	
-	if ! version_exists ${version}; then
+	if ! version_exists "${version}"; then
 		panic "Cannot delete version ${version}: Not created by this utility."
 	fi
 
@@ -252,7 +288,7 @@ takeover=1
 
 ##
 
-while getopts "k:cudyvht" flag; do
+while getopts "k:cudyvtb:h?" flag; do
 	case "${flag}" in
 	k)
 		version="${OPTARG}"	
@@ -275,7 +311,14 @@ while getopts "k:cudyvht" flag; do
 	t)
 		takeover="1"
 		;;
-	h)
+	b)
+		BOOTDIR="${OPTARG}"
+		if [ ! -d "${BOOTDIR}" ]; then
+			echo "Error: ${BOOTDIR} is not a directory."
+			exit 1
+		fi
+		;;
+	h|?)
 		usage
 		;;
 	esac

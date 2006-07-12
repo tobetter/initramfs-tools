@@ -59,8 +59,10 @@ panic()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
+	modprobe -q i8042
+	modprobe -q atkbd
 	echo $@
-	FS1='(initramfs) ' /bin/sh </dev/console >/dev/console 2>&1
+	PS1='(initramfs) ' /bin/sh </dev/console >/dev/console 2>&1
 }
 
 maybe_break()
@@ -168,6 +170,10 @@ call_scripts()
 {
 	for cs_x in ${runlist}; do
 		${initdir}/${cs_x}
+		# allow boot scripts to modify exported boot paramaters
+		if [ -e /conf/param.conf ]; then
+			. /conf/param.conf
+		fi
 	done
 }
 
@@ -210,23 +216,26 @@ check_minkver()
 	done
 }
 
-# Load custom modules
+# Load custom modules first
 load_modules()
 {
 	if [ -e /conf/modules ]; then
 		cat /conf/modules | while read m; do
-			if [ -z "$m" ] \
-			    || expr "$m" : "#" >/dev/null \
-			    || expr "$m" : "[ \t]+#?" > /dev/null
-			then
-				continue;
-			else
-				modprobe -Qb $m
+			# Skip empty lines
+			if [ -z "$m" ];  then 
+				continue
 			fi
+			# Skip comments - d?ash removes whitespace prefix
+			com=$(printf "%.1s" "${m}")
+			if [ "$com" = "#" ]; then
+				continue
+			fi
+			modprobe -q $m
 		done
 	fi
 }
 
+# lilo compatibility
 parse_numeric() {
 	case $1 in
 	"")
@@ -238,6 +247,10 @@ parse_numeric() {
 	*:*)
 		minor=${1#*:}
 		major=${1%:*}
+		;;
+	[0-9][0-9][0-9])
+		minor=$((0x${1#?}))
+		major=$((0x${1%??}))
 		;;
 	*)
 		minor=$((0x${1#??}))
