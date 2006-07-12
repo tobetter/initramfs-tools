@@ -25,6 +25,9 @@ for x in ${MODULESDIR}/initrd/*; do
 	x=${x##*/}
 	x=${x%.*}
 	case ${x} in
+	'*')
+		break
+		;;
 	*fb)
 		fbcon=y
 		;;
