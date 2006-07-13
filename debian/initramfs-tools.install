@@ -5,5 +5,6 @@ scripts			usr/share/initramfs-tools
 conf/initramfs.conf	etc/initramfs-tools
 hooks			usr/share/initramfs-tools
 hook-functions		usr/share/initramfs-tools
+conf/modules		usr/share/initramfs-tools
 update-initramfs	usr/sbin
 debian/bug		usr/share/bug/initramfs-tools
