@@ -1,3 +1,13 @@
+initramfs-tools (0.69ubuntu3) edgy; urgency=low
+
+  * debian/initramfs-tools.install, debian/initramfs-tools.preinst,
+    debian/initramfs-tools.postinst: Copy default modules file in the
+    postinst (when it's actually available) rather than in the preinst (when
+    it isn't). Copy it from /usr/share/initramfs-tools/ rather than from
+    /usr/share/doc/initramfs-tools/examples/, per policy.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Thu, 13 Jul 2006 10:04:26 +0100
+
 initramfs-tools (0.69ubuntu2) edgy; urgency=low
 
   * debian/initramfs-tools.preinst: Make sure /etc/initramfs-tools and

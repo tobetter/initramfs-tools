@@ -56,10 +56,4 @@ case "$1" in
 	;;
 esac
 
-
-if [ ! -e /etc/initramfs-tools/modules ]; then
-	mkdir -p /etc/initramfs-tools
-	cp /usr/share/doc/initramfs-tools/examples/modules /etc/initramfs-tools/
-fi
-
 #DEBHELPER#
