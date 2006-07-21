@@ -23,6 +23,15 @@ if [ ! -e "${resume}" ]; then
 	exit
 fi
 
+case $resume in
+    LABEL=*)
+	resume="/dev/disk/by-label/${resume#LABEL=}"
+	;;
+    UUID=*)
+	resume="/dev/disk/by-uuid/${resume#UUID=}"
+	;;
+esac
+
 if [ -e /sys/power/resume ]; then
 	major=$((0x$(stat -c%t ${resume})))
 	minor=$((0x$(stat -c%T ${resume})))
