@@ -1,3 +1,10 @@
+initramfs-tools (0.69ubuntu4) edgy; urgency=low
+
+  * scripts/local-premount/suspend: Check for UUID= or LABEL= on the
+    start of $resume, and use /dev/disk/by-{uuid,label} if found.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 21 Jul 2006 17:58:34 +0100
+
 initramfs-tools (0.69ubuntu3) edgy; urgency=low
 
   * debian/initramfs-tools.install, debian/initramfs-tools.preinst,
@@ -6,7 +13,7 @@ initramfs-tools (0.69ubuntu3) edgy; urgency=low
     it isn't). Copy it from /usr/share/initramfs-tools/ rather than from
     /usr/share/doc/initramfs-tools/examples/, per policy.
 
- -- Colin Watson <cjwatson@ubuntu.com>  Thu, 13 Jul 2006 10:04:26 +0100
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 21 Jul 2006 17:58:07 +0100
 
 initramfs-tools (0.69ubuntu2) edgy; urgency=low
 
