@@ -1,3 +1,17 @@
+initramfs-tools (0.69ubuntu5) edgy; urgency=low
+
+  * Add dependency on libvolumeid0 so we can get the vol_id tool.
+  * On fresh installation, after finding the active swap partition, store
+    the UUID if possible.
+  * On upgrade from dapper, rewrite the RESUME= line to use the UUID of the
+    partition if possible.
+
+  * Fix bug in previous patch, should check for UUID= or LABEL= before
+    testing the existance of the "file".
+  * Also force stat to dereference the /dev/disk/by-* symlinks.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Mon, 24 Jul 2006 22:58:49 +0100
+
 initramfs-tools (0.69ubuntu4) edgy; urgency=low
 
   * scripts/local-premount/suspend: Check for UUID= or LABEL= on the
@@ -13,7 +27,7 @@ initramfs-tools (0.69ubuntu3) edgy; urgency=low
     it isn't). Copy it from /usr/share/initramfs-tools/ rather than from
     /usr/share/doc/initramfs-tools/examples/, per policy.
 
- -- Scott James Remnant <scott@ubuntu.com>  Fri, 21 Jul 2006 17:58:07 +0100
+ -- Colin Watson <cjwatson@ubuntu.com>  Thu, 13 Jul 2006 10:04:26 +0100
 
 initramfs-tools (0.69ubuntu2) edgy; urgency=low
 

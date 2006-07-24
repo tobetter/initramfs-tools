@@ -9,6 +9,10 @@ case "$1" in
 
 		# First time install.  Can we autodetect the RESUME partition?
 		RESUME=$(tail -n $(($(wc -l /proc/swaps | awk ' { print $1 } ') - 1)) /proc/swaps | sort -rk3 | head -n 1 | awk ' { print $1 } ')
+		UUID=$(/sbin/vol_id -u "$RESUME" || true)
+		if [ -n "$UUID" ]; then
+			RESUME="UUID=$UUID"
+		fi
 
 		# Inhertic initrd-tools settings if possible.
 		if [ -e /etc/mkinitrd/mkinitrd.conf ]; then
