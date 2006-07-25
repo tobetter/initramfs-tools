@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu6) edgy; urgency=low
+
+  * Change dependency to one on volumeid.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 25 Jul 2006 14:04:28 +0100
+
 initramfs-tools (0.69ubuntu5) edgy; urgency=low
 
   * Add dependency on libvolumeid0 so we can get the vol_id tool.
