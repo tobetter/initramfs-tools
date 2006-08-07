@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu7) edgy; urgency=low
+
+  * Don't load vga16fb
+
+ -- Matthew Garrett <mjg59@srcf.ucam.org>  Mon,  7 Aug 2006 21:04:59 +0100
+
 initramfs-tools (0.69ubuntu6) edgy; urgency=low
 
   * Change dependency to one on volumeid.

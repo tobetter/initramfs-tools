@@ -27,13 +27,10 @@ for x in $(cat /proc/cmdline); do
 	esac
 done
 
-if [ $SPLASH = "true" -o $VESA = "true" ]; then
+if [ $VESA = "true" ]; then
 	modprobe -Q fbcon
-	if [ $VESA = "true" ]; then
-		modprobe -Q vesafb
-	else
-		modprobe -Q vga16fb
-	fi
+	modprobe -Q vesafb
+
 	mknod /dev/fb0 c 29 0
 	for i in 0 1 2 3 4 5 6 7 8; do
 		mknod /dev/tty$i c 4 $i
