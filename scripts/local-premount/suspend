@@ -32,6 +32,10 @@ if [ ! -e "${resume}" ]; then
 	exit
 fi
 
+if [ -e /sbin/resume ]; then
+        /sbin/resume ${resume}
+fi
+
 if [ -e /sys/power/resume ]; then
 	major=$((0x$(stat -L -c%t ${resume})))
 	minor=$((0x$(stat -L -c%T ${resume})))

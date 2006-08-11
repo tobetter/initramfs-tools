@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu8) edgy; urgency=low
+
+  * Add support for calling uswsusp
+
+ -- Matthew Garrett <mjg59@srcf.ucam.org>  Fri, 11 Aug 2006 09:53:30 +0100
+
 initramfs-tools (0.69ubuntu7) edgy; urgency=low
 
   * Don't load vga16fb
