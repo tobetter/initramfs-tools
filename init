@@ -4,8 +4,8 @@ mkdir /sys
 mkdir /proc
 mkdir /tmp
 mkdir -p /var/lock
-mount -t sysfs none /sys
-mount -t proc none /proc
+mount -t sysfs none /sys -onodev,noexec,nosuid
+mount -t proc none /proc -onodev,noexec,nosuid
 
 # Note that this only becomes /dev on the real filesystem if udev's scripts
 # are used; which they will be, but it's worth pointing out

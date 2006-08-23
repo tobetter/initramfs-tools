@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu9) edgy; urgency=low
+
+  * Mount /proc and /sys with more restrictive mount options. Ubuntu: #54530.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed, 23 Aug 2006 11:29:35 +0200
+
 initramfs-tools (0.69ubuntu8) edgy; urgency=low
 
   * Add support for calling uswsusp
