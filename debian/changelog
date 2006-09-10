@@ -1,3 +1,11 @@
+initramfs-tools (0.69ubuntu11) edgy; urgency=low
+
+  * since we ship /usr/share/initramfs-tools/conf.d as well as
+    /etc/initramfs-tools/conf.d, make sure mkinitramfs also reads from both,
+    not only from the /etc location
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Sun, 10 Sep 2006 11:50:14 +0200
+
 initramfs-tools (0.69ubuntu10) edgy; urgency=low
 
   * Create framebuffer device nodes unconditionally
