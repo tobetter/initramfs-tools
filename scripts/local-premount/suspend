@@ -2,6 +2,8 @@
 
 PREREQ=""
 
+set -x
+
 prereqs()
 {
 	echo "$PREREQ"
@@ -33,7 +35,12 @@ if [ ! -e "${resume}" ]; then
 fi
 
 if [ -e /sbin/resume ]; then
-        /sbin/resume ${resume}
+	if [ -f /etc/usplash.conf ]; then
+        	. /etc/usplash.conf
+		/sbin/resume -x "$xres" -y "$yres" ${resume}
+	else
+        	/sbin/resume ${resume}
+	fi
 fi
 
 if [ -e /sys/power/resume ]; then
