@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu13) edgy; urgency=low
+
+  * Fix a typo that prevented the passing of the resolution to uswsusp
+
+ -- Matthew Garrett <mjg59@srcf.ucam.org>  Fri, 15 Sep 2006 22:09:24 +0100
+
 initramfs-tools (0.69ubuntu12) edgy; urgency=low
 
   * Add support for high-res uswsusp
