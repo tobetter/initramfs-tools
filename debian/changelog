@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu12) edgy; urgency=low
+
+  * Add support for high-res uswsusp
+
+ -- Matthew Garrett <mjg59@srcf.ucam.org>  Fri, 15 Sep 2006 21:46:29 +0100
+
 initramfs-tools (0.69ubuntu11) edgy; urgency=low
 
   * since we ship /usr/share/initramfs-tools/conf.d as well as
