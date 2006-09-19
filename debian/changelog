@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu14) edgy; urgency=low
+
+  * Remove stray "set -x" from scripts/local-premount/suspend.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 20 Sep 2006 08:35:05 +1000
+
 initramfs-tools (0.69ubuntu13) edgy; urgency=low
 
   * Fix a typo that prevented the passing of the resolution to uswsusp
