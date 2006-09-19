@@ -2,8 +2,6 @@
 
 PREREQ=""
 
-set -x
-
 prereqs()
 {
 	echo "$PREREQ"
