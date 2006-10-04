@@ -1,3 +1,10 @@
+initramfs-tools (0.69ubuntu15) edgy; urgency=low
+
+  * Add jmicron module to ide list.
+    - Malone #63085
+
+ -- Ben Collins <bcollins@ubuntu.com>  Wed,  4 Oct 2006 09:21:08 -0400
+
 initramfs-tools (0.69ubuntu14) edgy; urgency=low
 
   * Remove stray "set -x" from scripts/local-premount/suspend.
