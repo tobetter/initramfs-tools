@@ -160,9 +160,10 @@ auto_add_modules()
 	ide)
 		for x in ide-cd ide-disk ide-generic aec62xx alim15x3 \
 		amd74xx atiixp atuuxo cmd64x cs5520 cs5530 cy82c693 \
-		generic hpt34x hpt366 it821x ns87415 opti621 pdc202xx_new \
-		pdc202xx_old piix rz1000 sc1200 serverworks siimage \
-		sis5513 slc82c105 slc90e66 triflex trm290 via82cxxx; do
+		generic hpt34x hpt366 it821x jmicron ns87415 opti621 \
+		pdc202xx_new pdc202xx_old piix rz1000 sc1200 serverworks \
+		siimage sis5513 slc82c105 slc90e66 triflex trm290 \
+		via82cxxx; do
 			manual_add_modules "${x}"
 		done
 	;;
