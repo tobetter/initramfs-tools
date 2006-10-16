@@ -1,3 +1,15 @@
+initramfs-tools (0.69ubuntu16) edgy; urgency=low
+
+  * Bring in preinst fixes from Debian, including s/configure/install/ in
+    preinst, since preinst is never called with "configure", and checking
+    for /proc/swaps before we blindly try to read it to determine RESUME.
+  * Do away with the bogus '-n "$2"' test in preinst, since "install" can
+    be called without any arguments at all (and often is, on a clean setup)
+  * On upgrades, revert the RESUME mangling that dapper's d-i did to our
+    config file, avoiding spurious conffile prompts (launchpad.net/63693)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 16 Oct 2006 17:23:41 +1000
+
 initramfs-tools (0.69ubuntu15) edgy; urgency=low
 
   * Add jmicron module to ide list.

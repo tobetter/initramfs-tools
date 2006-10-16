@@ -3,18 +3,19 @@
 set -e
 
 case "$1" in
-	configure)
-	if [ -n "$2" ]; then
+	install)
 		mkdir -p /etc/initramfs-tools/conf.d
 
 		# First time install.  Can we autodetect the RESUME partition?
-		RESUME=$(tail -n $(($(wc -l /proc/swaps | awk ' { print $1 } ') - 1)) /proc/swaps | sort -rk3 | head -n 1 | awk ' { print $1 } ')
-		UUID=$(/sbin/vol_id -u "$RESUME" || true)
-		if [ -n "$UUID" ]; then
-			RESUME="UUID=$UUID"
+		if [ -r /proc/swaps ]; then
+			RESUME=$(tail -n $(($(wc -l /proc/swaps | awk ' { print $1 } ') - 1)) /proc/swaps | sort -rk3 | head -n 1 | awk ' { print $1 } ')
+			UUID=$(/sbin/vol_id -u "$RESUME" || true)
+			if [ -n "$UUID" ]; then
+				RESUME="UUID=$UUID"
+			fi
 		fi
 
-		# Inhertic initrd-tools settings if possible.
+		# Inherit initrd-tools settings if possible.
 		if [ -e /etc/mkinitrd/mkinitrd.conf ]; then
 			 . /etc/mkinitrd/mkinitrd.conf
 		fi
@@ -24,7 +25,7 @@ case "$1" in
 
 		# Add initrd-tools modules, while trying to minimize prompting
 		if [ -e /etc/mkinitrd/modules ]; then
-			cp /etc/mkinitrd/modules /etc/initramfs-tools
+			cp /etc/mkinitrd/modules /etc/initramfs-tools/
 			sed -i \
 			  -e 's/\/etc\/mkinitrd\/modules: Kernel modules to load for initrd./List of modules that you want to include in your initramfs./g' \
 			  -e 's/mkinitrd/update-initramfs/g' \
@@ -42,7 +43,6 @@ case "$1" in
 		if [ -e /etc/mkinitrd/DSDT ]; then
 			cp /etc/mkinitrd/DSDT /etc/initramfs-tools/DSDT.aml
 		fi
-	fi
 	;;
 	upgrade)
 	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "0.61"; then
@@ -54,6 +54,15 @@ case "$1" in
 			exit 1
 		fi
 		if [ -d /etc/mkinitramfs ]; then
+			# Reverting automatic edits to conffiles is perfectly acceptable. :P
+			if [ -f /etc/mkinitramfs/initramfs.conf ]; then
+				. /etc/mkinitramfs/initramfs.conf
+			fi
+			if [ -n ${RESUME} ]; then
+				mkdir -p /etc/mkinitramfs/conf.d
+				echo "RESUME=${RESUME}" > /etc/mkinitramfs/conf.d/resume
+				sed -i -e "s/RESUME=.*/#RESUME=/" /etc/mkinitramfs/initramfs.conf
+			fi
 			mv /etc/mkinitramfs /etc/initramfs-tools
 		fi
 	fi
