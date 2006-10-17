@@ -1,3 +1,13 @@
+initramfs-tools (0.69ubuntu17) edgy; urgency=low
+
+  [ Tollef Fog Heen ]
+  * Load vga16fb on amd64.
+
+  [ Adam Conrad ]
+  * ... but only when booting with a splash.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 17 Oct 2006 12:29:35 +1000
+
 initramfs-tools (0.69ubuntu16) edgy; urgency=low
 
   * Bring in preinst fixes from Debian, including s/configure/install/ in

@@ -13,16 +13,16 @@ prereqs)
 	;;
 esac
 
-SPLASH=false;
-VESA=false;
+SPLASH=false
+VESA=false
 
 for x in $(cat /proc/cmdline); do
 	case $x in
 	splash*)
-		SPLASH=true;
+		SPLASH=true
 		;;
 	vga=*)
-		VESA=true;
+		VESA=true
 		;;
 	esac
 done
@@ -35,4 +35,9 @@ done
 if [ $VESA = "true" ]; then
 	modprobe -Q fbcon
 	modprobe -Q vesafb
+else
+    if [ "$DPKG_ARCH" = "amd64" ] && [ "$SPLASH" = "true" ]; then
+	modprobe -Q fbcon
+	modprobe -Q vga16fb
+    fi
 fi
