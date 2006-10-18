@@ -61,7 +61,7 @@ case "$1" in
 			if [ -n ${RESUME} ]; then
 				mkdir -p /etc/mkinitramfs/conf.d
 				echo "RESUME=${RESUME}" > /etc/mkinitramfs/conf.d/resume
-				sed -i -e "s/RESUME=.*/#RESUME=/" /etc/mkinitramfs/initramfs.conf
+				sed -i -e "s/^RESUME=.*/#RESUME=/" /etc/mkinitramfs/initramfs.conf
 			fi
 			mv /etc/mkinitramfs /etc/initramfs-tools
 		fi
