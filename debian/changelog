@@ -1,3 +1,11 @@
+initramfs-tools (0.69ubuntu18) edgy; urgency=low
+
+  * Anchor regex in sed command to revert conffile edits, to avoid
+    double-commenting RESUME= and causing a conffile prompt on upgrades
+    (Closes: LP#66599)
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Wed, 18 Oct 2006 04:54:45 -0700
+
 initramfs-tools (0.69ubuntu17) edgy; urgency=low
 
   [ Tollef Fog Heen ]
