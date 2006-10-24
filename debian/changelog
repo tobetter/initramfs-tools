@@ -1,3 +1,13 @@
+initramfs-tools (0.69ubuntu19) edgy; urgency=low
+
+  * Check for "modules.dep" before running depmod, not "modules.depmod"
+    which won't ever exist.  This caused depmod to be run after live
+    filesystem generation without the restricted modules available, it
+    could also randomly cause the same to happen on upgrades depending
+    on the order packages are configured.  Ubuntu: #60938.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 24 Oct 2006 18:51:09 +0100
+
 initramfs-tools (0.69ubuntu18) edgy; urgency=low
 
   * Anchor regex in sed command to revert conffile edits, to avoid
