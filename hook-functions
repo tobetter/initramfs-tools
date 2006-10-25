@@ -172,7 +172,7 @@ auto_add_modules()
 		aic79xx aic7xxx arcmsr ata_piix atari_scsi atp870u BusLogic \
 		cciss ch cpqarray dac960 dc395x dmx3191d dpt_i2o eata fdomain \
 		gdth ibmvscsic initio ipr ips isp1020 lpfc max_scsi mac53c94 \
-		megaraid megaraid_mbox megaraid_mm mesh mptfc mptscsih \
+		megaraid megaraid_mbox megaraid_mm megaraid_sas mesh mptfc mptscsih \
 		mptsas mptspi nsp32 osst qla1280 qla2100 qla2200 qla2300 \
 		qla2322 qla2xxx qla6312 qlogicfas408 qlogicfc sata_mv \
 		sata_nv sata_promise sata_qstor sata_sil sata_sis sata_svw \
