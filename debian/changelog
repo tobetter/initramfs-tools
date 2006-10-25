@@ -1,3 +1,10 @@
+initramfs-tools (0.69ubuntu20) edgy; urgency=low
+
+  * Add the LSI Logic MegaRAID SAS Driver (megaraid_sas) to the SCSI
+    module list, common on newer Dell PowerEdge servers, among others.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 25 Oct 2006 18:16:15 +1000
+
 initramfs-tools (0.69ubuntu19) edgy; urgency=low
 
   * Check for "modules.dep" before running depmod, not "modules.depmod"
