@@ -1,3 +1,14 @@
+initramfs-tools (0.69ubuntu21) feisty; urgency=low
+
+  * update-initramfs: Fix it so -v actually works (bad quoting).
+  * hook-functions: Split sata and pata out of scsi into an ata section for
+    auto module adding.
+  * Make use of copy_module_dir for ata, scsi and ide, so we don't have to
+    keep a hard list. This does increase the size of the initrd, but that's
+    only because we are including modules that should be included anyway.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Wed, 22 Nov 2006 22:11:48 -0500
+
 initramfs-tools (0.69ubuntu20) edgy; urgency=low
 
   * Add the LSI Logic MegaRAID SAS Driver (megaraid_sas) to the SCSI
