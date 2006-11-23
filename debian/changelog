@@ -1,3 +1,10 @@
+initramfs-tools (0.69ubuntu22) feisty; urgency=low
+
+  * For copy_module_dir, actually call manual_module for each one, so deps are
+    taken care of.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu, 23 Nov 2006 02:10:29 -0500
+
 initramfs-tools (0.69ubuntu21) feisty; urgency=low
 
   * update-initramfs: Fix it so -v actually works (bad quoting).

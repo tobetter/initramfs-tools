@@ -101,9 +101,9 @@ copy_modules_dir()
 	if [ -n "${verbose}" -a "${verbose}" = "y" ]; then
 		echo "Copying module directory ${1}"
 	fi
-	tmpdir_modbase="${DESTDIR}/lib/modules/${version}"
-	mkdir -p "$(dirname "${tmpdir_modbase}/${1}")"
-	cp -a "${MODULESDIR}/${1}" "${tmpdir_modbase}/${1}"
+	for x_mod in $(find "${MODULESDIR}/${1}" -name '*.ko' -print); do
+		manual_add_modules `basename ${x_mod} .ko`
+	done
 }
 
 dep_add_modules()
