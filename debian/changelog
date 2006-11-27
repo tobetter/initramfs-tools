@@ -1,3 +1,11 @@
+initramfs-tools (0.69ubuntu23) feisty; urgency=low
+
+  * If all_generic_ide is passed on the kernel command-line, load the
+    ata_generic module with the option of the same name.  This allows users
+    to force their IDE card to work. 
+
+ -- Scott James Remnant <scott@ubuntu.com>  Mon, 27 Nov 2006 15:39:04 +0000
+
 initramfs-tools (0.69ubuntu22) feisty; urgency=low
 
   * For copy_module_dir, actually call manual_module for each one, so deps are
