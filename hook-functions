@@ -168,6 +168,9 @@ auto_add_modules()
 	;;
 	scsi)
 		copy_modules_dir kernel/drivers/scsi
+		for x in mptfc mptsas mptscsih mptspi; do
+			manual_add_modules "${x}"
+		done
 	;;
 	ata)
 		copy_modules_dir kernel/drivers/ata
