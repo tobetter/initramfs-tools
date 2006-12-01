@@ -181,6 +181,11 @@ auto_add_modules()
 		sd_mod sym53c8xx tmscsim zfcp; do
 			manual_add_modules "${x}"
 		done
+        qla_firmware=$(echo /lib/firmware/$version/ql*_fw.bin)
+        qla_firmware=${qla_firmware%% *}
+        if [ -f "$qla_firmware" ]; then 
+            (cd /; tar cf - lib/firmware/$version/ql*_fw.bin) | (cd $DESTDIR; tar xf -)
+        fi
 	;;
 	ieee1394)
 		for x in ohci1394 sbp2; do
