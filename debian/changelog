@@ -1,3 +1,11 @@
+initramfs-tools (0.69ubuntu26) feisty; urgency=low
+
+  * Add some firmware handling functions in hoot-functions.
+  * Add qla2xxx firmware to auto and dep targets (dep checks if qla2xxx module
+    is loaded).
+
+ -- Ben Collins <bcollins@ubuntu.com>  Fri,  1 Dec 2006 12:07:26 -0500
+
 initramfs-tools (0.69ubuntu25) feisty; urgency=low
 
   * hook-functions: Put mptfc, mptsas, mptscsih, and mptspi back in for scsi
