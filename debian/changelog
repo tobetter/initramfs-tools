@@ -1,3 +1,9 @@
+initramfs-tools (0.69ubuntu20.0edgy1) edgy-proposed; urgency=low
+
+  * Inlcude qla2xxx firmware in initramfs (LP: #74004)
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Thu, 30 Nov 2006 19:47:17 -0800
+
 initramfs-tools (0.69ubuntu20) edgy; urgency=low
 
   * Add the LSI Logic MegaRAID SAS Driver (megaraid_sas) to the SCSI
