@@ -11,12 +11,19 @@ mountroot ()
 	# to deal with removable devices
 	if [ ! -e "${ROOT}" ]; then
 		log_begin_msg "Waiting for root file system..."
+
+		# Default delay is 180s
+		if [ -z "${ROOTDELAY}" ]; then
+			slumber=180
+		else
+			slumber=${ROOTDELAY}
+		fi
 		if [ -x /sbin/usplash_write ]; then
-			/sbin/usplash_write "TIMEOUT 180" || true
+			/sbin/usplash_write "TIMEOUT ${slumber}" || true
 		fi
 
-		slumber=1800
-		while [ ${slumber} -gt 0 -a ! -e "${ROOT}" ]; do
+		slumber=$(( ${slumber} * 10 ))
+		while [ ${slumber} -gt 0 ] && [ ! -e "${ROOT}" ]; do
 			/bin/sleep 0.1
 			slumber=$(( ${slumber} - 1 ))
 		done
@@ -33,11 +40,21 @@ mountroot ()
 
 	# We've given up, but we'll let the user fix matters if they can
 	while [ ! -e "${ROOT}" ]; do
+		echo "	Check root= bootarg cat /proc/cmdline"
+		echo "	or missing modules, devices: cat /proc/modules ls /dev"
 		panic "ALERT!  ${ROOT} does not exist.  Dropping to a shell!"
 	done
 
-	# Get the root filesystem type
-	eval $(fstype < ${ROOT})
+	# Get the root filesystem type if not set
+	if [ -z "${ROOTFSTYPE}" ]; then
+		eval $(fstype < ${ROOT})
+	else
+		FSTYPE=${ROOTFSTYPE}
+	fi
+	if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
+		FSTYPE=$(/lib/udev/vol_id -t ${ROOT})
+		[ -z "$FSTYPE" ] && FSTYPE="unknown"
+	fi
 
 	[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/local-premount"
 	run_scripts /scripts/local-premount

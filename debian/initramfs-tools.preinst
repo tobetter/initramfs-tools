@@ -32,7 +32,7 @@ case "$1" in
 			  -e '/# This file should/,/one per line\./d' \
 			  -e 's/Comments begin with.*/Syntax:  module_name [args ...]/' \
 			  -e 's/^#  ext2$/# raid1/' \
-			  -e 's/^#  wd io=0x300$/# sd_mod/'
+			  -e 's/^#  wd io=0x300$/# sd_mod/' \
 			  -e '/^ide-generic/d' \
 			  -e '/^ide-disk/d' \
 			  -e '/^ext2/d' \

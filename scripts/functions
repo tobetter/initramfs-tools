@@ -2,23 +2,23 @@
 
 _log_msg()
 {
-    if [ "$quiet" = "y" ]; then return; fi
-    echo "$@"
+	if [ "$quiet" = "y" ]; then return; fi
+	echo "$@"
 }
 
 log_success_msg()
 {
-    _log_msg "Success: $@"
+	_log_msg "Success: $@"
 }
 
 log_failure_msg()
 {
-    _log_msg "Failure: $@"
+	_log_msg "Failure: $@"
 }
 
 log_warning_msg()
 {
-    _log_msg "Warning: $@"
+	_log_msg "Warning: $@"
 }
 
 log_begin_msg()
@@ -59,10 +59,14 @@ panic()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
+	# Disallow console access
+	if [ "${panic}" = 0 ]; then
+		reboot
+	fi
 	modprobe -q i8042
 	modprobe -q atkbd
 	echo $@
-	PS1='(initramfs) ' /bin/sh </dev/console >/dev/console 2>&1
+	PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
 
 maybe_break()
@@ -84,7 +88,7 @@ set_initlist()
 		if [ ! -x ${si_x} ]; then
 			continue
 		fi
-		initlist="${initlist} $(basename ${si_x})"
+		initlist="${initlist} ${si_x#${initdir}/}"
 	done
 }
 
@@ -117,7 +121,7 @@ get_prereqs()
 
 count_unsatisfied()
 {
-	set - ${@}
+	set -- ${@}
 	return ${#}
 }
 
@@ -126,7 +130,7 @@ pop_list_item()
 {
 	item=${1}
 	shift
-	set - ${@}
+	set -- ${@}
 	unset tmppop
 	# Iterate
 	for pop in ${@}; do
@@ -143,7 +147,7 @@ reduce_prereqs()
 {
 	unset runlist
 	set_initlist
-	set - ${initlist}
+	set -- ${initlist}
 	i=$#
 	# Loop until there's no more in the queue to loop through
 	while [ ${i} -ne 0 ]; do
@@ -160,8 +164,7 @@ reduce_prereqs()
 			fi
 		done
 		if [ ${i} -eq ${oldi} ]; then
-			echo "PANIC: Circular dependancy.  Exiting." >&2
-			exit 1
+			panic "PANIC: Circular dependancy.  Exiting."
 		fi
 	done
 }
@@ -169,6 +172,10 @@ reduce_prereqs()
 call_scripts()
 {
 	for cs_x in ${runlist}; do
+		# mkinitramfs verbose output
+		if [ "${verbose}" = "y" ]; then
+			echo "Calling hook ${cs_x}"
+		fi
 		${initdir}/${cs_x}
 		# allow boot scripts to modify exported boot paramaters
 		if [ -e /conf/param.conf ]; then
@@ -222,7 +229,7 @@ load_modules()
 	if [ -e /conf/modules ]; then
 		cat /conf/modules | while read m; do
 			# Skip empty lines
-			if [ -z "$m" ];  then 
+			if [ -z "$m" ];  then
 				continue
 			fi
 			# Skip comments - d?ash removes whitespace prefix
@@ -248,13 +255,10 @@ parse_numeric() {
 		minor=${1#*:}
 		major=${1%:*}
 		;;
-	[0-9][0-9][0-9])
-		minor=$((0x${1#?}))
-		major=$((0x${1%??}))
-		;;
 	*)
-		minor=$((0x${1#??}))
-		major=$((0x${1%??}))
+		value=$(( 0x${1} ))
+		minor=$(( ${value} % 256 ))
+		major=$(( ${value} / 256 ))
 		;;
 	esac
 
