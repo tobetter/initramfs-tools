@@ -1,3 +1,13 @@
+initramfs-tools (0.85dubuntu2) feisty; urgency=low
+
+  * When calling busybox for links, use full path (BUSYBOXDIR).
+  * Leave kinit and gzip (from klibc).
+  * Do not create busybox links.
+  * Symlink /bin/sh to busybox.
+  * Remove suspend script, superseded by the resume script.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Wed, 20 Dec 2006 18:45:59 -0500
+
 initramfs-tools (0.85dubuntu1) feisty; urgency=low
 
   * Merge from debian unstable, remaining changes:
