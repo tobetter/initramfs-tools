@@ -196,8 +196,6 @@ fi
 # klibc
 ln -s /usr/lib/klibc/bin/* ${DESTDIR}/bin
 ln -s /lib/klibc-*.so ${DESTDIR}/lib
-rm -f ${DESTDIR}/bin/kinit ${DESTDIR}/bin/gzip
-
 copy_exec /usr/share/initramfs-tools/init /init
 cp -a /usr/share/initramfs-tools/scripts/* "${DESTDIR}/scripts"
 for f in $(cd ${CONFDIR}/scripts && \
@@ -228,12 +226,7 @@ if [ "x${BUSYBOX}" = "xn" ]; then
 else
 	rm -f ${DESTDIR}/bin/sh
 	copy_exec ${BUSYBOXDIR}/busybox /bin/busybox
-	rm -f ${DESTDIR}/bin/busybox
-	cp ${BUSYBOXDIR}/busybox ${DESTDIR}/bin/busybox
-	for cmd in `busybox | sed -n '/adjtimex/,$p' \
-		| sed  -e 's/[[:space:]]*//g; s/,$//; s/,/\n/g; /busybox/d'`; do
-		ln -f ${DESTDIR}/bin/busybox ${DESTDIR}/bin/${cmd}
-	done
+	ln -s ${BUSYBOXDIR}/busybox ${DESTDIR}/bin/sh
 fi
 
 # Modutils
