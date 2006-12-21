@@ -1,3 +1,17 @@
+initramfs-tools (0.85dubuntu5) feisty; urgency=low
+
+  * Actually remove lvm script.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu, 21 Dec 2006 11:55:02 -0500
+
+initramfs-tools (0.85dubuntu4) feisty; urgency=low
+
+  * Remove duplicate "rm .../modules" from postrm.
+  * Remove duplicate check_minkver() from scripts/functions. Now implemented
+    in hook-functions.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu, 21 Dec 2006 11:17:26 -0500
+
 initramfs-tools (0.85dubuntu3) feisty; urgency=low
 
   * init-top/framebuffer: Only load vga16fb on amd64.
