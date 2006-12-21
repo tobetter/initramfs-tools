@@ -1,3 +1,10 @@
+initramfs-tools (0.85dubuntu3) feisty; urgency=low
+
+  * init-top/framebuffer: Only load vga16fb on amd64.
+  * lvm: Remove, conflicts with lvm-common package.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu, 21 Dec 2006 08:25:06 -0500
+
 initramfs-tools (0.85dubuntu2) feisty; urgency=low
 
   * When calling busybox for links, use full path (BUSYBOXDIR).
