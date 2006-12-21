@@ -56,14 +56,13 @@ parse_video_opts()
 FB=""
 OPTS=""
 
-SPLASH=false;
-VESA=false;
-
 for x in $(cat /proc/cmdline); do
 	case $x in
 	splash*)
-		FB="vga16fb";
-		OPTS="";
+		if [ "$DPKG_ARCH" = "amd64" ]; then
+			FB="vga16fb";
+			OPTS="";
+		fi
 		;;
 	vga=*)
 		FB="vesafb";
