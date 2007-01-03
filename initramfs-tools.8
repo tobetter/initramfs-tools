@@ -1,22 +1,22 @@
-.TH INITRAMFS-TOOLS 8  "Date: 2005/12/06" "" "mkinitramfs script overview"
+.TH INITRAMFS-TOOLS 8  "Date: 2006/10/14" "" "mkinitramfs script overview"
 
 .SH NAME
 initramfs-tools \- an introduction to writing scripts for mkinitramfs
 
 .SH DESCRIPTION
-initramfs-tools has one main script and two different sets of subscripts which 
+initramfs-tools has one main script and two different sets of subscripts which
 will be used during different phases of execution. Each of these will be
 discussed separately below with the help of an imaginary tool which performs a
 frobnication of a lvm partition prior to mounting the root partition.
 
 .SS Hook scripts
-These are used when an initramfs image is created and not included in the 
+These are used when an initramfs image is created and not included in the
 image itself. They can however cause files to be included in the image.
 
 .SS Boot scripts
-These are included in the initramfs image and normally executed during 
+These are included in the initramfs image and normally executed during
 kernel boot in the early user-space before the root partition has been
-mounted. 
+mounted.
 
 initramfs-tools uses shell variable names for handling dependencies.
 Notice that `-' is not a valid shell variable name and thus should
@@ -29,18 +29,44 @@ arguments which influence the boot procedure:
 
 .SS Boot options
 
+The init and root are usually passed by the boot loader for local boot.
+The other parameters are optional.
+
 .TP
 \fB \fI init
 the binary to hand over execution to on the root fs after the initramfs scripts are done.
 
 .TP
 \fB \fI root
-the device node to mount as the rootfs.
+the device node to mount as the root file system.
+
+.TP
+\fB \fI rootdelay
+set delay in seconds. Determines how long mountroot waits for root to appear.
+
+.TP
+\fB \fI rootflags
+set the file system mount option string.
+
+.TP
+\fB \fI rootfstype
+set the root file system type.
 
 .TP
 \fB \fI nfsroot
 can be either "auto" to try to get the relevant information from DHCP or a
-string of the form NFSSERVER:NFSPATH 
+string of the form NFSSERVER:NFSPATH or NFSSERVER:NFSPATH:NFSOPTS.
+Use root=/dev/nfs for NFS to kick to in.
+
+.TP
+\fB \fI ip
+tells how to configure the ip adress. Allows to specify an different
+NFS server than the DHCP server. See Documentation/nfsroot.txt in
+any recent linux source for details. Optional paramater for NFS root.
+
+.TP
+\fB \fI cryptopts
+passes the args for cryptoroot. Set by the cryptsetup boot hooks.
 
 .TP
 \fB \fI boot
@@ -50,27 +76,35 @@ either local or NFS (affects which initramfs scripts are run, see the "Subdirect
 \fB \fI resume
 On install initramfs-tools tries to autodetect the resume partition. On success
 the RESUME variable is written to /etc/initramfs-tools/conf.d/resume.
-The boot variable overrides it.
+The boot variable noresume overrides it.
 
 .TP
 \fB \fI quiet
-reduces the amount of text output to the console during boot
+reduces the amount of text output to the console during boot.
 
 .TP
 \fB \fI ro
-mounts the rootfs read-only
+mounts the rootfs read-only.
 
 .TP
 \fB \fI rw
-mounts the rootfs read-write
+mounts the rootfs read-write.
+
+.TP
+\fB \fI panic
+sets an timeout on panic. Currently only zero value supported.
 
 .TP
 \fB \fI debug
-generates lots of output to /tmp/initramfs.debug
+generates lots of output. It writes a log to /tmp/initramfs.debug.
+Instead when invoked with an arbitrary argument output is written to console.
+Use for example "debug=vc".
 
 .TP
 \fB \fI break
 spawns a shell in the initramfs image at chosen run-time
+(top, modules, premount, mount, bottom, init).
+The default is premount without any arg.
 
 
 .SH HOOK SCRIPTS
@@ -79,7 +113,7 @@ Hooks can be found in two places: /usr/share/initramfs-tools/hooks and
 /etc/initramfs-tools/hooks. They are executed during generation of the
 initramfs-image and are responsible for including all the necessary components
 in the image itself. No guarantees are made as to the order in which the
-different scripts are executed unless the prereqs are setup in the script. 
+different scripts are executed unless the prereqs are setup in the script.
 
 .SS Header
 In order to support prereqs, each script should begin with the following lines:
@@ -113,7 +147,7 @@ the lvm hook script is run before your custom script.
 /usr/share/initramfs-tools/hook-functions contains a number of functions which
 deal with some common tasks in a hook script:
 .TP
-\fB \fI 
+\fB \fI
 manual_add_modules
 adds a module (and any modules which it depends on) to the initramfs image.
 .RS
@@ -155,7 +189,7 @@ initramfs image.
 .RS
 .PP
 .B Example:
-copy_modules_dir kernel/drivers/pci/foobar
+copy_modules_dir kernel/drivers/ata
 .RE
 
 .SS Including binaries
@@ -163,7 +197,7 @@ If you need to copy binaries to the initramfs module, a command like this
 should be used:
 .PP
 .RS
-copy_exec /sbin/mdadm "${DESTDIR}/sbin"
+copy_exec /sbin/mdadm /sbin
 .RE
 
 mkinitramfs will automatically detect which libraries the executable depends on
@@ -389,7 +423,7 @@ if [ ! -e "/dev/mapper/frobb" ]; then
 	panic "Frobnication device not found"
 fi
 
-log_begin_msg "Starting frobnication"		
+log_begin_msg "Starting frobnication"
 /sbin/frobnicate "/dev/mapper/frobb" || panic "Frobnication failed"
 log_end_msg
 
@@ -398,25 +432,27 @@ exit 0
 .RE
 
 .SH DEBUG
-It is easy to check the generated initramfs for its content. One may need 
+It is easy to check the generated initramfs for its content. One may need
 to double-check if it contains the relevant binaries, libs or modules:
 .RS
 .nf
 mkdir tmp/initramfs
 cd tmp/initramfs
-gunzip -c -9 /boot/initrd.img-2.6.15-1-686 | \\
+gunzip -c -9 /boot/initrd.img-2.6.18-1-686 | \\
 cpio -i -d -H newc --no-absolute-filenames
 .fi
 .RE
 
 
 .SH AUTHOR
-The initramfs-tools are written by Jeff Bailey <jbailey@ubuntu.com>.
+The initramfs-tools are written by Maximilian Attems <maks@sternwelten.at>,
+Jeff Bailey <jbailey@raspberryginger.com> and numerous others.
 .PP
 This manual was written by David  H\[:a]rdeman <david@2gen.com>,
 updated by Maximilian Attems <maks@sternwelten.at>.
 
 .SH SEE ALSO
 .BR
-initramfs.conf (5), mkinitramfs (8), update-initramfs(8)
-
+.IR initramfs.conf (5),
+.IR mkinitramfs (8),
+.IR update-initramfs(8).

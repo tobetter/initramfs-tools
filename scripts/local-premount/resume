@@ -20,10 +20,10 @@ if [ "x${resume}" = "x" ]; then
 fi
 
 case $resume in
-    LABEL=*)
+	LABEL=*)
 	resume="/dev/disk/by-label/${resume#LABEL=}"
 	;;
-    UUID=*)
+	UUID=*)
 	resume="/dev/disk/by-uuid/${resume#UUID=}"
 	;;
 esac
@@ -32,17 +32,7 @@ if [ ! -e "${resume}" ]; then
 	exit
 fi
 
-if [ -e /sbin/resume ]; then
-	if [ -f /etc/usplash.conf ]; then
-        	. /etc/usplash.conf
-		/sbin/resume -x "$xres" -y "$yres" ${resume}
-	else
-        	/sbin/resume ${resume}
-	fi
-fi
-
 if [ -e /sys/power/resume ]; then
-	major=$((0x$(stat -L -c%t ${resume})))
-	minor=$((0x$(stat -L -c%T ${resume})))
-	echo ${major}:${minor} >/sys/power/resume
+	# hardcode path, uswsusp ships an resume binary too
+	/bin/resume ${resume}
 fi
