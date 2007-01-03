@@ -40,7 +40,8 @@ add_modules_from_file()
 
 manual_add_modules()
 {
-	for mam_x in $(modprobe --set-version="${version}" --show-depends "${1}" 2>/dev/null | awk '/^insmod/ { print $2 }'); do
+	for mam_x in $(modprobe --set-version="${version}" --ignore-install \
+	--show-depends "${1}" 2>/dev/null | awk '/^insmod/ { print $2 }'); do
 		# Prune duplicates
 		if [ -e "${DESTDIR}/${mam_x}" ]; then
 			continue
@@ -48,10 +49,25 @@ manual_add_modules()
 
 		mkdir -p "${DESTDIR}/$(dirname "${mam_x}")"
 		ln -s "${mam_x}" "${DESTDIR}/$(dirname "${mam_x}")"
-		if [ -n "${verbose}" -a "${verbose}" = "y" ]; then
+		if [ -n "${verbose}" ] && [ "${verbose}" = "y" ]; then
 			echo "Adding module ${mam_x}"
 		fi
 	done
+}
+
+manual_add_firmware()
+{
+	for x_firm in $(find "/lib/firmware/${version}" -name "${1}" -print); do
+		if [ -e "${DESTDIR}/${x_firm}" ]; then
+			continue
+		fi
+
+		mkdir -p "${DESTDIR}/$(dirname "${x_firm}")"
+		ln -s "${x_firm}" "${DESTDIR}/$(dirname "${x_firm}")"
+		if [ -n "${verbose}" -a "${verbose}" = "y" ]; then
+			echo "Adding firmware ${x_firm}"
+		fi
+        done
 }
 
 # $1 is source
@@ -65,6 +81,9 @@ copy_exec() {
 		fi
 	else
 		ln -s ${1} ${DESTDIR}/${2}
+		if [ -n "${verbose}" ] && [ "${verbose}" = "y" ]; then
+			echo "Adding binary ${1}"
+		fi
 	fi
 
 	# Copy the dependant libraries
@@ -88,6 +107,9 @@ copy_exec() {
 		mkdir -p ${DESTDIR}/${dirname}
 		if [ ! -e ${DESTDIR}/${dirname}/${libname} ]; then
 			ln -s ${x} ${DESTDIR}/${dirname}
+			if [ -n "${verbose}" ] && [ "${verbose}" = "y" ]; then
+				echo "Adding library ${x}"
+			fi
 		fi
 	done
 }
@@ -98,7 +120,7 @@ copy_modules_dir()
 	if ! [ -d "${MODULESDIR}/${1}" ]; then
 		return;
 	fi
-	if [ -n "${verbose}" -a "${verbose}" = "y" ]; then
+	if [ -n "${verbose}" ] && [ "${verbose}" = "y" ]; then
 		echo "Copying module directory ${1}"
 	fi
 	for x_mod in $(find "${MODULESDIR}/${1}" -name '*.ko' -print); do
@@ -134,6 +156,9 @@ dep_add_modules()
 
 	if [ -e /sys/bus/scsi/devices/ ]; then
 		manual_add_modules sd_mod
+		if [ -e /sys/module/qla2xxx/ ]; then
+			auto_add_firmware scsi
+		fi
 	fi
 
 	if [ -e /sys/bus/i2o/devices/ ]; then
@@ -141,6 +166,20 @@ dep_add_modules()
 	fi
 }
 
+
+auto_add_firmware()
+{
+	case "$1" in
+	scsi)
+		for x in 100 200 300 322 400; do
+			manual_add_firmware "ql2${x}_fw.bin"
+		done
+	;;
+	*)
+		auto_add_firmware scsi
+	;;
+	esac
+}
 
 # The modules "most" classes added per default to the initramfs
 auto_add_modules()
@@ -154,9 +193,10 @@ auto_add_modules()
 	;;
 	net)
 		for x in 3c59x 8139cp 8139too 8390 b44 bmac bnx2 defxx \
-		dl2k e1000 e100 epic100 eql fealnx famachi forcedeth \
-		hp100 mace mv643xx_eth natsemi ne2k-pci netconsole \
-		ns83820 pcnet32 r8169 s2io sis900 skge slhc starfire \
+		dl2k e1000 e100 ehea epic100 ep93xx_eth eql fealnx \
+		famachi forcedeth  hp100 mace mv643xx_eth myri10ge \
+		natsemi ne2k-pci netconsole ns83820 pcnet32 qla3xxx \
+		r8169 s2io sis900 skge slhc smc911x starfire \
 		sundance sungem sungem_phy sunhme tg3 tlan de2104x \
 		de4x5 dmfe tulip winbond-840 xircom_cb xircom_tulip_cb \
 		typhon via-rhine via-velocity yellowfin; do
@@ -168,6 +208,13 @@ auto_add_modules()
 	;;
 	scsi)
 		copy_modules_dir kernel/drivers/scsi
+		for x in mptfc mptsas mptscsih mptspi; do
+			manual_add_modules "${x}"
+		done
+		auto_add_firmware scsi
+	;;
+	ata)
+		copy_modules_dir kernel/drivers/ata
 	;;
 	ata)
 		copy_modules_dir kernel/drivers/ata
@@ -223,7 +270,6 @@ check_minkver()
 {
 	curversion=${1}
 	initdir=${2}
-	set_initlist
 	if [ -z ${initdir} ]; then
 		DPKG_ARCH=`dpkg --print-installation-architecture`
 		case ${DPKG_ARCH} in
@@ -239,8 +285,10 @@ check_minkver()
 			echo "W: not generating requested initramfs for kernel ${curversion}" >&2
 			exit 2
 		fi
+		return 0
 	fi
-	[ -z ${initdir} ] || for cm_x in ${initlist}; do
+	set_initlist
+	for cm_x in ${initlist}; do
 		tmp=$(eval echo $(grep ^MINKVER ${initdir}/${cm_x} | cut -d'=' -f2))
 		if dpkg --compare-versions "${curversion}" lt "${tmp}"; then
 			echo "W: ${cm_x} hook script requires at least kernel version ${tmp}" >&2

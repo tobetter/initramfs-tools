@@ -10,7 +10,7 @@ errors_to="2>/dev/null"
 BUSYBOXDIR="/usr/lib/initramfs-tools/bin/"
 # BUSYBOXDIR="/bin"
 
-OPTIONS=`getopt -o d:ko:r:v -n "$0" -- "$@"`
+OPTIONS=`getopt -o d:ko:r:v --long supported-host-version:,supported-target-version: -n "$0" -- "$@"`
 
 # Check for non-GNU getopt
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
@@ -28,8 +28,7 @@ while true; do
 		fi
 		;;
 	-o)
-		touch $2
-		outfile="$(readlink -f "$2")"
+		outfile="$2"
 		shift 2
 		;;
 	-k)
@@ -44,6 +43,14 @@ while true; do
 		verbose="y"
 		shift
 		;;
+	--supported-host-version)
+		supported_host_version="$2"
+		shift 2
+		;;
+	--supported-target-version)
+		supported_target_version="$2"
+		shift 2
+		;;
 	--)
 		shift
 		break
@@ -55,26 +62,47 @@ while true; do
 	esac
 done
 
+if [ -n "$supported_host_version" ] || [ -n "$supported_target_version" ]; then
+	if [ -n "$supported_host_version" ]; then
+		host_upstream_version="${supported_host_version%%-*}"
+	fi
+	if [ -n "$supported_target_version" ]; then
+		target_upstream_version="${supported_target_version%%-*}"
+		if dpkg --compare-versions "$target_upstream_version" lt "2.6.12"; then
+			exit 2
+		fi
+	fi
+	echo "Depreciation warning: use ramdisk=mkinitramfs-kpkg."
+	exit 0
+fi
+
 # For dependency ordered mkinitramfs hook scripts.
 . /usr/share/initramfs-tools/scripts/functions
 . /usr/share/initramfs-tools/hook-functions
 
 . "${CONFDIR}/initramfs.conf"
 EXTRA_CONF=''
-for i in ${CONFDIR}/conf.d/* /usr/share/initramfs-tools/conf.d/*; do
+for i in /usr/share/initramfs-tools/conf.d/* ${CONFDIR}/conf.d/*; do
 	EXTRA_CONF="${EXTRA_CONF} $(basename $i | grep '^[a-z0-9][a-z0-9\._-]*$' | grep -v '\.dpkg-.*$')";
 done
 for i in ${EXTRA_CONF}; do
-        if [ -e  ${CONFDIR}/conf.d/${i} ]; then
-	        . ${CONFDIR}/conf.d/${i}
-        elif [ -e  /usr/share/initramfs-tools/conf.d/${i} ]; then
-            . /usr/share/initramfs-tools/conf.d/${i}
-        fi
+	if [ -e  ${CONFDIR}/conf.d/${i} ]; then
+		. ${CONFDIR}/conf.d/${i}
+	elif [ -e  /usr/share/initramfs-tools/conf.d/${i} ]; then
+		. /usr/share/initramfs-tools/conf.d/${i}
+	fi
 done
+
+if [ -n "${UMASK}" ]; then
+	umask "${UMASK}"
+fi
 
 if [ -z "${outfile}" ]; then
 	usage
 fi
+
+touch "$outfile"
+outfile="$(readlink -f "$outfile")"
 
 # And by "version" we really mean path to kernel modules
 # This is braindead, and exists to preserve the interface with mkinitrd
@@ -92,18 +120,18 @@ check_minkver ${version} ${CONFDIR}/hooks
 
 case "${version}" in
 /lib/modules/*/[!/]*)
-        ;;
+	;;
 /lib/modules/[!/]*)
-        version="${version#/lib/modules/}"
-        version="${version%%/*}"
-        ;;
+	version="${version#/lib/modules/}"
+	version="${version%%/*}"
+	;;
 esac
 
 case "${version}" in
 */*)
-        echo "$PROG: ${version} is not a valid kernel version" >&2
-        exit 1
-        ;;
+	echo "$PROG: ${version} is not a valid kernel version" >&2
+	exit 1
+	;;
 esac
 
 if [ -d "${outfile}" ]; then
@@ -138,8 +166,8 @@ export verbose
 # Private, used by 'catenate_cpiogz'.
 export __TMPCPIOGZ
 
-for d in bin conf/conf.d etc lib modules sbin scripts; do
-    mkdir -p "${DESTDIR}/${d}"
+for d in bin conf/conf.d etc lib modules sbin scripts ${MODULESDIR}; do
+	mkdir -p "${DESTDIR}/${d}"
 done
 
 # MODULES=list case.  Always honour.
@@ -165,6 +193,7 @@ fi
 # Have to do each file, because cpio --dereference doesn't recurse down
 # symlinks.
 
+# klibc
 ln -s /usr/lib/klibc/bin/* ${DESTDIR}/bin
 ln -s /lib/klibc-*.so ${DESTDIR}/lib
 copy_exec /usr/share/initramfs-tools/init /init
@@ -178,9 +207,17 @@ done
 echo "DPKG_ARCH=${DPKG_ARCH}" > ${DESTDIR}/conf/arch.conf
 copy_exec "${CONFDIR}/initramfs.conf" /conf
 for i in ${EXTRA_CONF}; do
-	copy_exec "${CONFDIR}/conf.d/${i}" /conf/conf.d
+	if [ -e "${CONFDIR}/conf.d/${i}" ]; then
+		copy_exec "${CONFDIR}/conf.d/${i}" /conf/conf.d
+	elif [ -e "/usr/share/initramfs-tools/conf.d/${i}" ]; then
+		copy_exec "/usr/share/initramfs-tools/conf.d/${i}" /conf/conf.d
+	fi
 done
-echo "ROOT=${ROOT}" > ${DESTDIR}/conf/conf.d/root
+
+# ROOT hardcoding
+if [ -n "${ROOT}" ]; then
+	echo "ROOT=${ROOT}" > ${DESTDIR}/conf/conf.d/root
+fi
 
 # Busybox
 if [ "x${BUSYBOX}" = "xn" ]; then
@@ -188,6 +225,7 @@ if [ "x${BUSYBOX}" = "xn" ]; then
 	echo "Warning: Busybox is required for successful boot!"
 else
 	rm -f ${DESTDIR}/bin/sh
+	rm -f ${DESTDIR}/bin/busybox
 	copy_exec ${BUSYBOXDIR}/busybox /bin/busybox
 	ln -s ${BUSYBOXDIR}/busybox ${DESTDIR}/bin/sh
 fi
@@ -202,15 +240,46 @@ cp -a /etc/modprobe.d/* "${DESTDIR}/etc/modprobe.d"
 run_scripts /usr/share/initramfs-tools/hooks
 run_scripts "${CONFDIR}"/hooks
 
+# FIXME: Remove this Raid block after Etch releases
+if [ -x /sbin/mdadm ] && [ ! -f /usr/share/initramfs-tools/hooks/mdadm ]; then
+	# use mkinitrd magic for Sarge backwards compat
+	rootraiddev="$(df / | sed -rne 's,^(/dev/[^[:space:]]+).*,\1,p')"
+	echo "rootraiddev=${rootraiddev}" > ${DESTDIR}/conf/mdrun.conf
+	mdadm=$(mdadm --detail "${rootraiddev}")
+	echo "${mdadm}" | awk '
+		$1 == "Number" && $2 == "Major" { start = 1; next }
+		$1 == "UUID" { print "uuid=" $3; next }
+		!start { next }
+		$2 == 0 && $3 == 0 { next }
+		{ devices = devices " " $NF }
+		END { print "devices='\''" devices "'\''" }' \
+		>> ${DESTDIR}/conf/mdrun.conf
+	copy_exec /sbin/mdadm /sbin
+	for x in md linear multipath raid0 raid1 raid456 raid5 raid6 raid10; do
+		manual_add_modules ${x}
+	done
+fi
+[ -x /sbin/mdrun ] && copy_exec /sbin/mdrun /sbin
+
+# FIXME: Remove this LVM block after Etch releases
+if [ -x /sbin/vgchange ] && [ -d /lib/lvm-200 ] \
+	&& [ ! -f /usr/share/initramfs-tools/hooks/lvm2 ]; then
+	copy_exec /lib/lvm-200/vgchange /sbin
+	for x in dm_mod dm_snapshot dm_mirror; do
+		manual_add_modules ${x}
+	done
+fi
+
 # Apply DSDT to initramfs
 if [ -e "${CONFDIR}/DSDT.aml" ]; then
 	copy_exec "${CONFDIR}/DSDT.aml" /
 fi
 
+[ "${verbose}" = y ] && echo "Building cpio ${outfile} initramfs"
 (cd "${DESTDIR}" && find . | cpio --quiet --dereference -o -H newc | gzip -9 >"${outfile}") || exit 1
 
 if [ -s "${__TMPCPIOGZ}" ]; then
-    cat "${__TMPCPIOGZ}" >>"${outfile}" || exit 1
+	cat "${__TMPCPIOGZ}" >>"${outfile}" || exit 1
 fi
 
 if [ "${keep}" = "y" ]; then
