@@ -61,12 +61,6 @@ OPTS=""
 
 for x in $(cat /proc/cmdline); do
 	case ${x} in
-	splash*)
-		if [ "$DPKG_ARCH" = "amd64" ]; then
-			FB="vga16fb";
-			OPTS="";
-		fi
-		;;
 	vga=*)
 		FB="vesafb";
 		OPTS="";
