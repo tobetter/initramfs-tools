@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu2) feisty; urgency=low
+
+  * Don't load vga16fb on amd64 either. usplash 0.4-36 fixes things so that
+    we don't need it (LP: #67545).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed,  7 Feb 2007 09:55:05 +0000
+
 initramfs-tools (0.85eubuntu1) feisty; urgency=low
 
   * Merge from debian unstable, remaining changes:
