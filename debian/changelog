@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu3) feisty; urgency=low
+
+  * Add aic94xx firmware hooks.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Wed, 21 Feb 2007 15:34:56 -0500
+
 initramfs-tools (0.85eubuntu2) feisty; urgency=low
 
   * Don't load vga16fb on amd64 either. usplash 0.4-36 fixes things so that
