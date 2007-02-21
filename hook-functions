@@ -157,7 +157,12 @@ dep_add_modules()
 	if [ -e /sys/bus/scsi/devices/ ]; then
 		manual_add_modules sd_mod
 		if [ -e /sys/module/qla2xxx/ ]; then
-			auto_add_firmware scsi
+			for x in 100 200 300 322 400; do
+				manual_add_firmware "ql2${x}_fw.bin"
+			done
+		fi
+		if [ -e /sys/module/aic94xx/ ]; then
+			manual_add_firmware "aic94xx-seq.fw"
 		fi
 	fi
 
@@ -174,6 +179,7 @@ auto_add_firmware()
 		for x in 100 200 300 322 400; do
 			manual_add_firmware "ql2${x}_fw.bin"
 		done
+		manual_add_firmware "aic94xx-seq.fw"
 	;;
 	*)
 		auto_add_firmware scsi
