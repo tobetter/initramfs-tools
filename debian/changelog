@@ -1,3 +1,11 @@
+initramfs-tools (0.85eubuntu4) feisty; urgency=low
+
+  * Remove the 10MB size restriction from /dev; this doesn't make sense for
+    Ubuntu since we use /dev for initramfs/realfs handover and for things like
+    bootchart. 
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 27 Feb 2007 15:00:54 +0000
+
 initramfs-tools (0.85eubuntu3) feisty; urgency=low
 
   * Add aic94xx firmware hooks.
