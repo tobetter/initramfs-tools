@@ -162,12 +162,19 @@ dep_add_modules()
 			done
 		fi
 		if [ -e /sys/module/aic94xx/ ]; then
+			manual_add_modules sd_mod
 			manual_add_firmware "aic94xx-seq.fw"
 		fi
 	fi
 
 	if [ -e /sys/bus/i2o/devices/ ]; then
 		manual_add_modules i2o_block
+	fi
+
+	if [ -e /sys/bus/ps3_system_bus/ ]; then
+		for x in ps3_storage gelic_net ohci-hcd ehci-hcd; do
+			manual_add_modules "${x}"
+		done
 	fi
 }
 
@@ -205,7 +212,7 @@ auto_add_modules()
 		r8169 s2io sis900 skge slhc smc911x starfire \
 		sundance sungem sungem_phy sunhme tg3 tlan de2104x \
 		de4x5 dmfe tulip winbond-840 xircom_cb xircom_tulip_cb \
-		typhon via-rhine via-velocity yellowfin; do
+		typhon via-rhine via-velocity yellowfin gelic_net; do
 			manual_add_modules "${x}"
 		done
 	;;
@@ -222,8 +229,8 @@ auto_add_modules()
 	ata)
 		copy_modules_dir kernel/drivers/ata
 	;;
-	ata)
-		copy_modules_dir kernel/drivers/ata
+	block)
+		copy_modules_dir kernel/drivers/block
 	;;
 	ieee1394)
 		for x in ohci1394 sbp2; do
@@ -249,6 +256,7 @@ auto_add_modules()
 		auto_add_modules i2o
 		auto_add_modules dasd
 		auto_add_modules ieee1394
+		auto_add_modules block
 	;;
 	esac
 }
