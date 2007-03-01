@@ -1,3 +1,14 @@
+initramfs-tools (0.85eubuntu5) feisty; urgency=low
+
+  * Copy all of drivers/block/ to initramfs. Can't believe we didn't do this
+    before.
+  * Add init-premount hook to manually load modules for ps3. These modules do
+    not have aliases or auto-load features, so have to do it by hand
+    (ps3-system-bus).
+  * For auto module inclusions, detect when we need to pack ps3 modules.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu,  1 Mar 2007 16:45:48 -0500
+
 initramfs-tools (0.85eubuntu4) feisty; urgency=low
 
   * Remove the 10MB size restriction from /dev; this doesn't make sense for
