@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu6) feisty; urgency=low
+
+  * hook-functions: Add udf to dep_add_modules and auto_add_modules.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 23 Mar 2007 19:47:51 +0000
+
 initramfs-tools (0.85eubuntu5) feisty; urgency=low
 
   * Copy all of drivers/block/ to initramfs. Can't believe we didn't do this
