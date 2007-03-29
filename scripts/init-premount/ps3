@@ -19,10 +19,11 @@ case "$DPKG_ARCH" in
 powerpc|ppc64)
 	# For PS3's we know these devices will exist, and we'll need them
 	if grep -q PS3 /proc/cpuinfo; then
-		modprobe -q ps3_storage
-		modprobe -q gelic_net
-		modprobe -q ohci-hcd
-		modprobe -q ehci-hcd
+		modprobe -Qb ps3_storage
+		modprobe -Qb gelic_net
+		modprobe -Qb ohci-hcd
+		modprobe -Qb ehci-hcd
+		modprobe -Qb snd_ps3
 	fi
 	;;
 esac

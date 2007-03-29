@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu7) feisty; urgency=low
+
+  * Use -Qb for ppc thermal modprobe's
+  * Add snd_ps3 to ps3 module loads. Use -Qb here too.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu, 29 Mar 2007 19:54:40 -0400
+
 initramfs-tools (0.85eubuntu6) feisty; urgency=low
 
   * hook-functions: Add udf to dep_add_modules and auto_add_modules.
