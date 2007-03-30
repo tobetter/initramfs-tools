@@ -77,6 +77,9 @@ for x in $(cat /proc/cmdline); do
 	nfsroot=*)
 		NFSROOT="${x#nfsroot=}"
 		;;
+	netboot=*)
+		NETBOOT="${x#netboot=}"
+		;;
 	ip=*)
 		IPOPTS="${x#ip=}"
 		;;
