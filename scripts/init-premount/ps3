@@ -23,7 +23,6 @@ powerpc|ppc64)
 		modprobe -Qb gelic_net
 		modprobe -Qb ohci-hcd
 		modprobe -Qb ehci-hcd
-		modprobe -Qb snd_ps3
 	fi
 	;;
 esac
