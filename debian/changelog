@@ -1,3 +1,12 @@
+initramfs-tools (0.85eubuntu9) feisty; urgency=low
+
+  * Add patch to restore initramfs on failures. Taken from Debian's
+    initramfs-tools git repo (5dfd85f416a10b1c41ca7005de38b58715c04472).
+  * While we're here, remove snd_ps3 from autoload list on PS3. Isn't in
+    initramfs. Installer will add it to /etc/modules.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Tue, 10 Apr 2007 11:05:45 -0400
+
 initramfs-tools (0.85eubuntu8) feisty; urgency=low
 
   * Add support for the netboot variable, used by casper.  LP: #96072.
