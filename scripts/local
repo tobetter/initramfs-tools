@@ -9,7 +9,7 @@ mountroot ()
 
 	# If the root device hasn't shown up yet, give it a little while
 	# to deal with removable devices
-	if [ ! -e "${ROOT}" ]; then
+	if [ ! -e "${ROOT}" ] || ! /lib/udev/vol_id "${ROOT}" >/dev/null 2>&1; then
 		log_begin_msg "Waiting for root file system..."
 
 		# Default delay is 180s
@@ -23,9 +23,10 @@ mountroot ()
 		fi
 
 		slumber=$(( ${slumber} * 10 ))
-		while [ ${slumber} -gt 0 ] && [ ! -e "${ROOT}" ]; do
+		while [ ! -e "${ROOT}" ] || ! /lib/udev/vol_id "${ROOT}" >/dev/null 2>&1; do
 			/bin/sleep 0.1
 			slumber=$(( ${slumber} - 1 ))
+			[ ${slumber} -gt 0 ] || break
 		done
 
 		if [ ${slumber} -gt 0 ]; then

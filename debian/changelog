@@ -1,3 +1,12 @@
+initramfs-tools (0.85eubuntu10) feisty; urgency=low
+
+  * As well as waiting for the existance of the root device node, also check
+    to see whether we have a filesystem of some kind on it.  Some devices
+    nodes (devmapper/LVM/EVMS, mdadm) will exist before they can be safely
+    used.  LP: #103177.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 13 Apr 2007 10:51:27 +0100
+
 initramfs-tools (0.85eubuntu9) feisty; urgency=low
 
   * Add patch to restore initramfs on failures. Taken from Debian's
