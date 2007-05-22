@@ -1,3 +1,16 @@
+initramfs-tools (0.85eubuntu11) gutsy; urgency=low
+
+  * Allow modules specified by force_load to be blacklisted.
+  * Drop scripts/init-premount/thermal since this can be handled by using
+    force_load now.
+
+  * Make sure framebuffer modules can be blacklisted.
+
+  * Drop mdrun script, since this can be handled entirely within the udev
+    and initramfs scripts supplied by the mdadm package.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 22 May 2007 10:42:34 +0100
+
 initramfs-tools (0.85eubuntu10) feisty; urgency=low
 
   * As well as waiting for the existance of the root device node, also check
