@@ -97,10 +97,28 @@ reduce_satisfied()
 	deplist="$(render array_${1})"
 	unset tmpdeplist
 	for rs_y in ${deplist}; do
-		if [ ! -f ${initdir}/${rs_y} ]; then
-			continue
-		fi
-		tmpdeplist="${tmpdeplist} ${rs_y}"
+		case $rs_y in
+		*\|*)
+			OLD_IFS="$IFS"
+			IFS='|'
+			for rs_z in $rs_y; do
+				IFS="$OLD_IFS"
+				if [ ! -f ${initdir}/${rs_z} ]; then
+					IFS='|'
+					continue
+				fi
+				tmpdeplist="${tmpdeplist} ${rs_z}"
+				break
+			done
+			IFS="$OLD_IFS"
+			;;
+		*)
+			if [ ! -f ${initdir}/${rs_y} ]; then
+				continue
+			fi
+			tmpdeplist="${tmpdeplist} ${rs_y}"
+			;;
+		esac
 	done
 	deplist=${tmpdeplist}
 	for rs_x in ${runlist}; do
