@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu13) gutsy; urgency=low
+
+  * fix nfsroot handling if rootserver is specified with IP and colon in
+    root-path (debian bug #387808)
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Wed, 04 Jul 2007 10:19:49 +0200
+
 initramfs-tools (0.85eubuntu12) gutsy; urgency=low
 
   * Add support for alternative prerequisites, specified as e.g.
