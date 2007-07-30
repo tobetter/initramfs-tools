@@ -1,3 +1,11 @@
+initramfs-tools (0.85eubuntu15) gutsy; urgency=low
+
+  * Add support for loop=, loopflags=, and loopfstype= arguments, to allow
+    the real root filesystem to be loop-mounted from a given file on the
+    filesystem specified by root=.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 30 Jul 2007 16:46:19 +0100
+
 initramfs-tools (0.85eubuntu14) gutsy; urgency=low
   
   * Add support for sunvnet and sunvdc in hook-functions.

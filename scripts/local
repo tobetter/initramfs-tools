@@ -74,6 +74,37 @@ mountroot ()
 	# Mount root
 	mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
 
+	if [ "$LOOP" ]; then
+		mkdir -p /host
+		mount -o move ${rootmnt} /host
+
+		while [ ! -e "/host/${LOOP#/}" ]; do
+			panic "ALERT!  /host/${LOOP#/} does not exist.  Dropping to a shell!"
+		done
+
+		# Get the loop filesystem type if not set
+		if [ -z "${LOOPFSTYPE}" ]; then
+			eval $(fstype < "/host/${LOOP#/}")
+		else
+			FSTYPE="${LOOPFSTYPE}"
+		fi
+		if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
+			FSTYPE=$(/lib/udev/vol_id -t "/host/${LOOP#/}")
+			[ -z "$FSTYPE" ] && FSTYPE="unknown"
+		fi
+
+		# FIXME This has no error checking
+		modprobe -Qb loop
+		modprobe -Qb ${FSTYPE}
+
+		# FIXME This has no error checking
+		mount ${roflag} -o loop -t ${FSTYPE} ${LOOPFLAGS} "/host/${LOOP#/}" ${rootmnt}
+
+		if [ -d ${rootmnt}/host ]; then
+			mount -o move /host ${rootmnt}/host
+		fi
+	fi
+
 	[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/local-bottom"
 	run_scripts /scripts/local-bottom
 	[ "$quiet" != "y" ] && log_end_msg

@@ -71,6 +71,15 @@ for x in $(cat /proc/cmdline); do
 	rootdelay=*)
 		ROOTDELAY="${x#rootdelay=}"
 		;;
+	loop=*)
+		LOOP="${x#loop=}"
+		;;
+	loopflags=*)
+		LOOPFLAGS="-o ${x#loopflags=}"
+		;;
+	loopfstype=*)
+		LOOPFSTYPE="${x#loopfstype=}"
+		;;
 	cryptopts=*)
 		cryptopts="${x#cryptopts=}"
 		;;
