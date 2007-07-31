@@ -1,3 +1,11 @@
+initramfs-tools (0.85eubuntu16) gutsy; urgency=low
+
+  * Load thermal modules on lpia as well.  This may need to change in
+    the future to support hardware-specific features, but it's a start.
+
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 31 Jul 2007 15:30:42 +1000
+
 initramfs-tools (0.85eubuntu15) gutsy; urgency=low
 
   * Add support for loop=, loopflags=, and loopfstype= arguments, to allow

@@ -36,7 +36,7 @@ powerpc|ppc64)
 	force_load windfarm_smu_sensors
 	force_load i2c-powermac
 	;;
-i386|amd64|ia64)
+i386|amd64|ia64|lpia)
 	force_load fan
 	force_load thermal
 	;;
