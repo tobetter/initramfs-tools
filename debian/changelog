@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu17) gutsy; urgency=low
+
+  * Use dpkg-trigger (if available and operational) to save on
+    calls to update-initramfs.
+
+ -- Ian Jackson <iwj@ubuntu.com>  Thu, 16 Aug 2007 16:03:52 +0100
+
 initramfs-tools (0.85eubuntu16) gutsy; urgency=low
 
   * Load thermal modules on lpia as well.  This may need to change in

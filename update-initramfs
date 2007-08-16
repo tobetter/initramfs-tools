@@ -4,10 +4,23 @@ STATEDIR=/var/lib/initramfs-tools
 BOOTDIR=/boot
 CONF=/etc/initramfs-tools/update-initramfs.conf
 KPKGCONF=/etc/kernel-img.conf
+USETRIGGERS=true
 
 set -e
 
 [ -r ${CONF} ] && . ${CONF}
+
+if	   $USETRIGGERS						\
+	&& test x"$DPKG_MAINTSCRIPT_PACKAGE" != x		\
+	&& test $# = 1						\
+	&& test x"$1" = x-u					\
+	&& dpkg-trigger --check-supported 2>/dev/null
+then
+	if dpkg-trigger --no-await update-initramfs; then
+		echo "update-initramfs: deferring update (trigger activated)"
+		exit 0
+	fi	
+fi
 
 usage()
 {
