@@ -25,10 +25,8 @@ fi
 		
 		
 
-# Regenerate initramfs on upgrade
-if [ "$1" = "configure" ] && [ -n "$2" ]; then
-	update-initramfs -u
-fi
+# Regenerate initramfs whenever we go to dpkg state `installed'
+DPKG_MAINTSCRIPT_PACKAGE='' update-initramfs -u
 
 #DEBHELPER#
 
