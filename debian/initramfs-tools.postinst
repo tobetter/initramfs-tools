@@ -26,7 +26,16 @@ fi
 		
 
 # Regenerate initramfs whenever we go to dpkg state `installed'
-DPKG_MAINTSCRIPT_PACKAGE='' update-initramfs -u
+
+if [ "x$1" != xtriggered ] && \
+   dpkg --compare-versions "$DPKG_RUNNING_VERSION" ge '1.14.5ubuntu10~~'
+then
+	update-initramfs -u
+	# ... this activates the trigger, if triggers are working
+else
+	DPKG_MAINTSCRIPT_PACKAGE='' update-initramfs -u
+	# ... force it to actually happen
+fi
 
 #DEBHELPER#
 
