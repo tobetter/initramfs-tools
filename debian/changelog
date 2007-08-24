@@ -1,3 +1,12 @@
+initramfs-tools (0.85eubuntu18) gutsy; urgency=low
+
+  * Use dpkg-trigger even in our own postinst, unless we're doing
+    trigger processing or the running dpkg version doesn't support
+    reflexive triggers.  This reduces update-initramfs runs from two per
+    upgrade batch to one per batch.
+
+ -- Ian Jackson <iwj@ubuntu.com>  Fri, 24 Aug 2007 15:45:38 +0100
+
 initramfs-tools (0.85eubuntu17) gutsy; urgency=low
 
   * Use dpkg-trigger (if available and operational) to save on
