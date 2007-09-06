@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu19) gutsy; urgency=low
+
+  * Always mount loop-mount NTFS host filesystems read-write; ntfs-3g can't
+    remount yet.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Thu, 06 Sep 2007 23:36:24 +0100
+
 initramfs-tools (0.85eubuntu18) gutsy; urgency=low
 
   * Use dpkg-trigger even in our own postinst, unless we're doing
