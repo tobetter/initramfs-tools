@@ -61,7 +61,8 @@ mountroot ()
 	run_scripts /scripts/local-premount
 	[ "$quiet" != "y" ] && log_end_msg
 
-	if [ ${readonly} = y ]; then
+	if [ ${readonly} = y ] && \
+	   ([ -z "$LOOP" ] || [ "${FSTYPE#ntfs}" = "$FSTYPE" ]); then
 		roflag=-r
 	else
 		roflag=-w
@@ -91,6 +92,12 @@ mountroot ()
 		if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
 			FSTYPE=$(/lib/udev/vol_id -t "/host/${LOOP#/}")
 			[ -z "$FSTYPE" ] && FSTYPE="unknown"
+		fi
+
+		if [ ${readonly} = y ]; then
+			roflag=-r
+		else
+			roflag=-w
 		fi
 
 		# FIXME This has no error checking
