@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu20) gutsy; urgency=low
+
+  * Updates for ps3 modules
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu, 04 Oct 2007 10:31:53 -0400
+
 initramfs-tools (0.85eubuntu19) gutsy; urgency=low
 
   * Always mount loop-mount NTFS host filesystems read-write; ntfs-3g can't
