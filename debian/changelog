@@ -1,3 +1,12 @@
+initramfs-tools (0.40ubuntu33) dapper-proposed; urgency=low
+
+  * Add megaraid_sas to initrd:
+    - LP: #56854
+  * Include qla firmware in initrd
+    - LP: #74004
+
+ -- Ben Collins <bcollins@ubuntu.com>  Wed, 17 Oct 2007 08:50:14 -0400
+
 initramfs-tools (0.40ubuntu32) dapper; urgency=low
 
   * Revert 0.40ubuntu31.  This isn't as trivial as it should be.
