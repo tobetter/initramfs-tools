@@ -1,3 +1,10 @@
+initramfs-tools (0.40ubuntu34) dapper-proposed; urgency=low
+
+  * Added DAC960 to auto scsi modules
+    - LP: #31035
+
+ -- Ben Collins <bcollins@ubuntu.com>  Thu, 18 Oct 2007 11:12:23 -0400
+
 initramfs-tools (0.40ubuntu33) dapper-proposed; urgency=low
 
   * Add megaraid_sas to initrd:
