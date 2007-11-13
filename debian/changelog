@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu21) hardy; urgency=low
+
+  * Drop code to increment the usplash progress bar after each message,
+    instead this will be pulsating until the real system.  LP: #162397.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 13 Nov 2007 20:41:33 +0000
+
 initramfs-tools (0.85eubuntu20) gutsy; urgency=low
 
   * Updates for ps3 modules
