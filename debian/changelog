@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu22) hardy; urgency=low
+
+  * Load virtio_pci for MODULES=most.
+
+ -- Soren Hansen <soren@ubuntu.com>  Wed, 23 Jan 2008 19:27:18 +0100
+
 initramfs-tools (0.85eubuntu21) hardy; urgency=low
 
   * Drop code to increment the usplash progress bar after each message,
