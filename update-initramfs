@@ -260,8 +260,7 @@ delete_sha1()
 ro_boot_check()
 {
 	[ -r /proc/mounts ] || return 0
-	boot_opts=$(awk '/boot/{if (match($4, /ro/) && $2 == "/boot")
-		print "ro"}' /proc/mounts)
+	boot_opts=$(awk '/boot/{if (match($4, /([^a-zA-Z0-9]|^)ro([^a-zA-Z0-9]|$)/) && $2 == "/boot") print "ro"}' /proc/mounts)
 	if [ -n "${boot_opts}" ]; then
 		echo "WARNING: /boot is ro mounted."
 		echo "update-initramfs: Not updating ${initramfs}"

@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu23) hardy; urgency=low
+
+  * Fix broken test in ro_boot_check (LP: #187282).  It was matching ro
+    as a subword.
+
+ -- Evan Dandrea <evand@ubuntu.com>  Wed, 30 Jan 2008 10:35:28 -0500
+
 initramfs-tools (0.85eubuntu22) hardy; urgency=low
 
   * Load virtio_pci for MODULES=most.
