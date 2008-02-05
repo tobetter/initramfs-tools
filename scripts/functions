@@ -46,6 +46,22 @@ panic()
 	if [ "${panic}" = 0 ]; then
 		reboot
 	fi
+
+	# Call mountroot failure hooks if requested.
+	if [ "${1}" = "-r" ]; then
+		shift 1
+
+		if [ -r "/tmp/mountroot-fail.hooks" ]; then
+			while read mr_fh < /tmp/mountroot-fail.hooks; do
+				${mr_fh} mountfail
+
+				if [ "$?" -ne 0 ]; then
+					break
+				fi
+			done
+		fi
+	fi
+
 	modprobe -Qb i8042
 	modprobe -Qb atkbd
 	echo $@
@@ -234,4 +250,9 @@ parse_numeric() {
 
 	mknod /dev/root b ${major} ${minor}
 	ROOT=/dev/root
+}
+
+add_mountroot_fail_hook()
+{
+	echo "$0" >> /tmp/mountroot-fail.hooks
 }
