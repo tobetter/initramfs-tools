@@ -1,3 +1,25 @@
+initramfs-tools (0.85eubuntu24) hardy; urgency=low
+
+  * Implement the initramfs-tools part of the initramfs error handling spec
+  * update-initramfs:
+    - Make a hard link to the original initramfs image, rather than moving
+      it out of the way.
+    - Create a new initramfs image to ${initramfs}.new, to ensure we still
+      have a functional initramfs in case of failure. The original initramfs
+      only gets replaced when a new image is successfully created.
+  * scripts/functions:
+    - Added add_mountroot_fail_hook function to allow scripts in
+      init-premount to register a hook to allow extra information
+      to be given to the user, in the event of a non-existant root
+      device.
+    - The panic function now runs any registered mountroot fail hooks that
+      were previously registered, and only does so when passed the -r
+      argument from the calling function.
+  * scripts/local: Call the panic function with -r to run any registered
+    mountroot fail hooks when a root device cannot be found.
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Tue, 05 Feb 2008 13:38:51 +1100
+
 initramfs-tools (0.85eubuntu23) hardy; urgency=low
 
   * Fix broken test in ro_boot_check (LP: #187282).  It was matching ro

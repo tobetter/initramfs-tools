@@ -43,7 +43,7 @@ mountroot ()
 	while [ ! -e "${ROOT}" ]; do
 		echo "	Check root= bootarg cat /proc/cmdline"
 		echo "	or missing modules, devices: cat /proc/modules ls /dev"
-		panic "ALERT!  ${ROOT} does not exist.  Dropping to a shell!"
+		panic -r "ALERT!  ${ROOT} does not exist.  Dropping to a shell!"
 	done
 
 	# Get the root filesystem type if not set
