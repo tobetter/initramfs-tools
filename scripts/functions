@@ -52,12 +52,9 @@ panic()
 		shift 1
 
 		if [ -r "/tmp/mountroot-fail.hooks" ]; then
-			while read mr_fh < /tmp/mountroot-fail.hooks; do
+			mountroot_fail_hooks=$(cat /tmp/mountroot-fail.hooks)
+			for mr_fh in "${mountroot_fail_hooks}"; do
 				${mr_fh} mountfail
-
-				if [ "$?" -ne 0 ]; then
-					break
-				fi
 			done
 		fi
 	fi
