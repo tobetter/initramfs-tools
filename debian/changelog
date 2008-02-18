@@ -1,3 +1,13 @@
+initramfs-tools (0.85eubuntu25) hardy; urgency=low
+
+  * scripts/functions:
+    - Call all registered mountroot failure hooks, rather than
+      stopping at one that has reported a failure.
+    - Change the loop code that runs mountroot failure hooks, so we don't end up
+      in an infinite loop.
+
+ -- Luke Yelavich <luke.yelavich@canonical.com>  Mon, 18 Feb 2008 11:59:07 +1100
+
 initramfs-tools (0.85eubuntu24) hardy; urgency=low
 
   * Implement the initramfs-tools part of the initramfs error handling spec
