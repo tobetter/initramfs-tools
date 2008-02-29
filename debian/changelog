@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu26) hardy; urgency=low
+
+  * Loop for 5 seconds waiting for $suspend to show up.
+
+ -- Soren Hansen <soren@ubuntu.com>  Fri, 29 Feb 2008 15:34:35 -0500
+
 initramfs-tools (0.85eubuntu25) hardy; urgency=low
 
   * scripts/functions:

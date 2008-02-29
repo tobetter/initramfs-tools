@@ -28,8 +28,32 @@ case $resume in
 	;;
 esac
 
-if [ ! -e "${resume}" ]; then
-	exit
+if [ ! -e "${resume}" ] || ! /lib/udev/vol_id "${resume}" >/dev/null 2>&1; then
+	log_begin_msg "Waiting for resume device..."
+
+	# Default delay is 5s
+	if [ -z "${RESUMEDELAY}" ]; then
+		slumber=5
+	else
+		slumber=${RESUMEDELAY}
+	fi
+	if [ -x /sbin/usplash_write ]; then
+		/sbin/usplash_write "TIMEOUT ${slumber}" || true
+	fi
+
+	slumber=$(( ${slumber} * 10 ))
+	while [ ! -e "${resume}" ] || ! /lib/udev/vol_id "${resume}" >/dev/null 2>&1; do
+		/bin/sleep 0.1
+		slumber=$(( ${slumber} - 1 ))
+		[ ${slumber} -gt 0 ] || break
+	done
+
+	if [ ${slumber} -gt 0 ]; then
+		log_end_msg 0
+	else
+		log_end_msg 1 || true
+		exit
+	fi
 fi
 
 if [ -e /sys/power/resume ]; then
