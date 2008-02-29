@@ -71,6 +71,9 @@ for x in $(cat /proc/cmdline); do
 	rootdelay=*)
 		ROOTDELAY="${x#rootdelay=}"
 		;;
+	resumedelay=*)
+		RESUMEDELAY="${x#resumedelay=}"
+		;;
 	loop=*)
 		LOOP="${x#loop=}"
 		;;
