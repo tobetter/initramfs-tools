@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu27) hardy; urgency=low
+
+  * Copy the initramfs image to a backup file, in the event that the /boot
+    filesystem doesn't support hard links.
+
+ -- Luke Yelavich <luke.yelavich@canonical.com>  Fri, 07 Mar 2008 09:17:53 +1100
+
 initramfs-tools (0.85eubuntu26) hardy; urgency=low
 
   * Loop for 5 seconds waiting for $suspend to show up.
