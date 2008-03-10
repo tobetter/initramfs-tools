@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu28) hardy; urgency=low
+
+  * update-initramfs: remove failed ".new" initrd when creation is aborted.
+
+ -- Kees Cook <kees@ubuntu.com>  Mon, 10 Mar 2008 15:25:03 -0700
+
 initramfs-tools (0.85eubuntu27) hardy; urgency=low
 
   * Copy the initramfs image to a backup file, in the event that the /boot
