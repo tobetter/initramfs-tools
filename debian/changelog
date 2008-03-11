@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu30) hardy; urgency=low
+
+  * Fix check for "ro" on /boot
+    - LP: #197470
+
+ -- Ben Collins <bcollins@ubuntu.com>  Tue, 11 Mar 2008 14:41:15 -0400
+
 initramfs-tools (0.85eubuntu29) hardy; urgency=low
 
   * Do not honor blacklists for vga=/video= parsing. We should always load the
