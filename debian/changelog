@@ -1,3 +1,12 @@
+initramfs-tools (0.85eubuntu31) hardy; urgency=low
+
+  * debian/initramfs-tools.preinst: If /etc/mkinitramfs/initramfs.conf was not
+    modified, do not copy it over to /etc/initramfs-tools on a dapper->hardy
+    upgrade, since this causes an unnecessary dpkg conffile prompt.
+    (LP: #172853)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 13 Mar 2008 19:19:59 +0100
+
 initramfs-tools (0.85eubuntu30) hardy; urgency=low
 
   * Fix check for "ro" on /boot
