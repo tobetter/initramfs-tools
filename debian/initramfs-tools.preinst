@@ -63,6 +63,15 @@ case "$1" in
 				echo "RESUME=${RESUME}" > /etc/mkinitramfs/conf.d/resume
 				sed -i -e "s/^RESUME=.*/#RESUME=/" /etc/mkinitramfs/initramfs.conf
 			fi
+                        # Remove /etc/mkinitramfs/initramfs.conf if it was not
+                        # modified, to avoid dpkg conffile prompt on upgrades
+                        if [ -f /etc/mkinitramfs/initramfs.conf ]; then
+                            orig_md5sum="`dpkg-query -W -f='${Conffiles}' initramfs-tools | sed -n -e \"\\\\' /etc/mkinitramfs/initramfs.conf'{s/ obsolete$//;s/.* //p}\"`"
+                            cur_md5sum="`md5sum \"/etc/mkinitramfs/initramfs.conf\" | sed -e \"s/ .*//\"`"
+                            if [ "$orig_md5sum" = "$cur_md5sum" ]; then
+                                rm /etc/mkinitramfs/initramfs.conf
+                            fi
+                        fi
 			mv /etc/mkinitramfs /etc/initramfs-tools
 		fi
 	fi
