@@ -62,7 +62,7 @@ mountroot ()
 	[ "$quiet" != "y" ] && log_end_msg
 
 	if [ ${readonly} = y ] && \
-	   ([ -z "$LOOP" ] || [ "${FSTYPE#ntfs}" = "$FSTYPE" ]); then
+	   [ -z "$LOOP" ]; then
 		roflag=-r
 	else
 		roflag=-w

@@ -1,3 +1,13 @@
+initramfs-tools (0.85eubuntu33) hardy; urgency=low
+
+  * Edit scripts/local with patch from
+    https://bugs.edge.launchpad.net/wubi/+bug/201750 comment 1
+    "Cannot remount loopfiles inside of vfat"
+    "The workaround involves mounting all loopinstallations rw to begin with"
+    Closes LP: #201750
+
+ -- Jonathan Riddell <jriddell@ubuntu.com>  Mon, 17 Mar 2008 14:35:20 +0000
+
 initramfs-tools (0.85eubuntu32) hardy; urgency=low
 
   * Drop -9 to gzip call in order to save time at a very small size
