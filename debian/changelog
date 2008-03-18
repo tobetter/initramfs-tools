@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu34) hardy; urgency=low
+
+  * Wow, somehow my fix for 129910 got removed. Re-implement. DO NOT USE -Qb
+    for framebuffer. We need to ignore blacklist for forced vga= usage.
+
+ -- Ben Collins <bcollins@ubuntu.com>  Tue, 18 Mar 2008 11:46:44 -0400
+
 initramfs-tools (0.85eubuntu33) hardy; urgency=low
 
   * Edit scripts/local with patch from

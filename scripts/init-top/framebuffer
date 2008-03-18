@@ -82,8 +82,8 @@ matroxfb)
 esac
 
 if [ -n "${FB}" ]; then
-	modprobe -Qb fbcon
-	modprobe -Qb ${FB} ${OPTS}
+	modprobe -Q fbcon
+	modprobe -Q ${FB} ${OPTS}
 fi
 
 if [ -e /proc/fb ]; then
