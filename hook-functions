@@ -57,7 +57,7 @@ manual_add_modules()
 
 manual_add_firmware()
 {
-	for x_firm in $(find "/lib/firmware/${version}" -name "${1}" -print); do
+	for x_firm in $(find "/lib/firmware/${version}" -name "${1}" -print 2>/dev/null); do
 		if [ -e "${DESTDIR}/${x_firm}" ]; then
 			continue
 		fi
