@@ -1,3 +1,20 @@
+initramfs-tools (0.85eubuntu35) hardy; urgency=low
+
+  * hook-functions: Do not display find error messages if firmware directories
+    cannot be found. (LP: #153743)
+  * scripts/functions: Remove unneeded quotes. These were causing multiple
+    mountroot fail hook entries to be run as one command.
+  * scripts/local: Panic if the root device node cannot be found, or vol_id
+    can't identify the volume on the device. This allows mdadm's mountroot fail
+    hook to be reliably triggered, as the md device node exists even if the
+    array cannot be brought up.
+  * init: Add 2>&1 to the run-init line at the end of the file, to fix a long
+    outstanding bug where init has no stderr.
+  * scripts/local-premount/resume: Source /scripts/functions, thanks to
+    Nikolaus Filus for the patch. (LP: #203429)
+
+ -- Luke Yelavich <luke.yelavich@canonical.com>  Thu, 10 Apr 2008 00:48:51 +1000
+
 initramfs-tools (0.85eubuntu34) hardy; urgency=low
 
   * Wow, somehow my fix for 129910 got removed. Re-implement. DO NOT USE -Qb

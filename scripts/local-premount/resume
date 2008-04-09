@@ -28,6 +28,8 @@ case $resume in
 	;;
 esac
 
+. ./scripts/functions
+
 if [ ! -e "${resume}" ] || ! /lib/udev/vol_id "${resume}" >/dev/null 2>&1; then
 	log_begin_msg "Waiting for resume device..."
 

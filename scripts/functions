@@ -53,7 +53,7 @@ panic()
 
 		if [ -r "/tmp/mountroot-fail.hooks" ]; then
 			mountroot_fail_hooks=$(cat /tmp/mountroot-fail.hooks)
-			for mr_fh in "${mountroot_fail_hooks}"; do
+			for mr_fh in ${mountroot_fail_hooks}; do
 				${mr_fh} mountfail
 			done
 		fi
