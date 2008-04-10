@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu36) hardy; urgency=low
+
+  * Drop dependency on volumeid, it's shipped by udev again.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Thu, 10 Apr 2008 14:00:46 +0100
+
 initramfs-tools (0.85eubuntu35) hardy; urgency=low
 
   * hook-functions: Do not display find error messages if firmware directories
