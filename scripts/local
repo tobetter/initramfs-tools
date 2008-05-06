@@ -74,8 +74,23 @@ mountroot ()
 	# FIXME This has no error checking
 	# Mount root
 	mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
-
+	mountroot_status="$?"
 	if [ "$LOOP" ]; then
+		if [ "$mountroot_status" != 0 ]; then
+			if [ ${FSTYPE} = ntfs ] || [ ${FSTYPE} = vfat ]; then
+				panic "
+Could not mount the partition ${ROOT}.
+This could also happen if the file system is not clean because of an operating
+system crash, an interrupted boot process, an improper shutdown, or unplugging
+of a removable device without first unmounting or ejecting it.  To fix this,
+simply reboot into Windows, let it fully start, log in, run 'chkdsk /r', then
+gracefully shut down and reboot back into Windows. After this you should be
+able to reboot again and resume the installation.
+(filesystem = ${FSTYPE}, error code = $mountroot_status)
+"
+			fi
+		fi
+	
 		mkdir -p /host
 		mount -o move ${rootmnt} /host
 

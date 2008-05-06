@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu37) intrepid; urgency=low
+
+  * Provide a clearer error on mount failure of the Windows host
+    filesystem (LP: #226622)
+
+ -- Agostino Russo <agostino.russo@gmail.com>  Tue, 06 May 2008 23:55:47 +0100
+
 initramfs-tools (0.85eubuntu36) hardy; urgency=low
 
   * Drop dependency on volumeid, it's shipped by udev again.
