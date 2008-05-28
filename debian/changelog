@@ -1,3 +1,12 @@
+initramfs-tools (0.85eubuntu38) intrepid; urgency=low
+
+  * scripts/local: reduce timeout to 30 seconds -- corner cases (giant
+    disk arrays, clusters) will need to provide their own rootdelay=
+    boot arg.  Expanded the failure text to include a hint about the
+    "rootdelay" boot argument.
+
+ -- Kees Cook <kees@ubuntu.com>  Wed, 28 May 2008 13:17:16 -0700
+
 initramfs-tools (0.85eubuntu37) intrepid; urgency=low
 
   * Provide a clearer error on mount failure of the Windows host
