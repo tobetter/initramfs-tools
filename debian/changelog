@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu40) intrepid; urgency=low
+
+  * Add vfat support to the initramfs (LP: #236021).
+
+ -- Evan Dandrea <evand@ubuntu.com>  Fri, 30 May 2008 12:50:50 -0400
+
 initramfs-tools (0.85eubuntu38) intrepid; urgency=low
 
   * scripts/local: reduce timeout to 30 seconds -- corner cases (giant
