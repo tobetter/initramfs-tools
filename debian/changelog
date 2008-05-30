@@ -1,3 +1,9 @@
+initramfs-tools (0.85eubuntu39.1) hardy-proposed; urgency=low
+
+  * Add vfat support to the initramfs (LP: #236021).
+
+ -- Evan Dandrea <evand@ubuntu.com>  Fri, 30 May 2008 14:13:30 -0400
+
 initramfs-tools (0.85eubuntu39) hardy-proposed; urgency=low
 
   * Provide a clearer error on mount failure of the Windows host
