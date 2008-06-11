@@ -1,3 +1,10 @@
+initramfs-tools (0.85eubuntu41) intrepid; urgency=low
+
+  * Backport from Debian (required for new busybox):
+    - init: Fix mount options invocation for klibc mount.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 11 Jun 2008 18:20:44 +0100
+
 initramfs-tools (0.85eubuntu40) intrepid; urgency=low
 
   * Add vfat support to the initramfs (LP: #236021).
