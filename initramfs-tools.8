@@ -1,4 +1,4 @@
-.TH INITRAMFS-TOOLS 8  "Date: 2006/10/14" "" "mkinitramfs script overview"
+.TH INITRAMFS-TOOLS 8  "Date: 2007/07/07" "" "mkinitramfs script overview"
 
 .SH NAME
 initramfs-tools \- an introduction to writing scripts for mkinitramfs
@@ -9,6 +9,9 @@ will be used during different phases of execution. Each of these will be
 discussed separately below with the help of an imaginary tool which performs a
 frobnication of a lvm partition prior to mounting the root partition.
 
+Valid boot and hook scripts names consist solely of alphabetics, numerics
+and underscores. Other scripts are discarded.
+
 .SS Hook scripts
 These are used when an initramfs image is created and not included in the
 image itself. They can however cause files to be included in the image.
@@ -17,10 +20,6 @@ image itself. They can however cause files to be included in the image.
 These are included in the initramfs image and normally executed during
 kernel boot in the early user-space before the root partition has been
 mounted.
-
-initramfs-tools uses shell variable names for handling dependencies.
-Notice that `-' is not a valid shell variable name and thus should
-not be used as script filename.
 
 .SH INIT SCRIPT
 The script which is executed first and is in charge of running all other
@@ -73,9 +72,9 @@ Use root=/dev/nfs for NFS to kick to in.
 
 .TP
 \fB \fI ip
-tells how to configure the ip adress. Allows to specify an different
+tells how to configure the ip address. Allows to specify an different
 NFS server than the DHCP server. See Documentation/nfsroot.txt in
-any recent linux source for details. Optional paramater for NFS root.
+any recent Linux source for details. Optional paramater for NFS root.
 
 .TP
 \fB \fI cryptopts
@@ -92,6 +91,11 @@ the RESUME variable is written to /etc/initramfs-tools/conf.d/resume.
 The boot variable noresume overrides it.
 
 .TP
+\fB \fI resume_offset
+Specify the offset from the partition given by "resume=" at which the swap
+header of the swap file is located.
+
+.TP
 \fB \fI quiet
 reduces the amount of text output to the console during boot.
 
@@ -104,8 +108,14 @@ mounts the rootfs read-only.
 mounts the rootfs read-write.
 
 .TP
+\fB \fI blacklist
+disables load of specific modules.
+Use blacklist=module1,module2,module3 bootparameter.
+
+.TP
 \fB \fI panic
-sets an timeout on panic. Currently only zero value supported.
+sets an timeout on panic.
+panic=0 is a documented security feature: it disables the debug shell.
 
 .TP
 \fB \fI debug
@@ -410,7 +420,7 @@ esac
 . /usr/share/initramfs-tools/hook-functions
 # Begin real processing below this line
 
-if [ ! -x "/sbin/frobnicate" ]; then
+if [ ! \-x "/sbin/frobnicate" ]; then
 	exit 0
 fi
 
@@ -442,11 +452,11 @@ prereqs)
 esac
 
 # Begin real processing below this line
-if [ ! -x "/sbin/frobnicate" ]; then
+if [ ! \-x "/sbin/frobnicate" ]; then
 	panic "Frobnication executable not found"
 fi
 
-if [ ! -e "/dev/mapper/frobb" ]; then
+if [ ! \-e "/dev/mapper/frobb" ]; then
 	panic "Frobnication device not found"
 fi
 
@@ -465,18 +475,18 @@ to double-check if it contains the relevant binaries, libs or modules:
 .nf
 mkdir tmp/initramfs
 cd tmp/initramfs
-gunzip -c -9 /boot/initrd.img-2.6.18-1-686 | \\
-cpio -i -d -H newc --no-absolute-filenames
+gunzip \-c /boot/initrd.img\-2.6.18\-1\-686 | \\
+cpio \-i \-d \-H newc \-\-no\-absolute\-filenames
 .fi
 .RE
 
 
 .SH AUTHOR
-The initramfs-tools are written by Maximilian Attems <maks@sternwelten.at>,
+The initramfs-tools are written by Maximilian Attems <maks@debian.org>,
 Jeff Bailey <jbailey@raspberryginger.com> and numerous others.
 .PP
-This manual was written by David  H\[:a]rdeman <david@2gen.com>,
-updated by Maximilian Attems <maks@sternwelten.at>.
+This manual was written by David  H\[:a]rdeman <david@hardeman.nu>,
+updated by Maximilian Attems <maks@debian.org>.
 
 .SH SEE ALSO
 .BR

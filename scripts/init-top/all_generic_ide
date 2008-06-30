@@ -14,5 +14,5 @@ prereqs)
 esac
 
 if grep all_generic_ide /proc/cmdline 2>/dev/null; then
-	modprobe -Qb ata_generic all_generic_ide=1
+	modprobe ata_generic all_generic_ide=1
 fi

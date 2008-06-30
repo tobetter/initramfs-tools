@@ -1,4 +1,4 @@
-.TH INITRAMFS.CONF 5  "$Date: 2006/10/12 $" "" "initramfs.conf manual"
+.TH INITRAMFS.CONF 5  "$Date: 2007/01/01 $" "" "initramfs.conf manual"
 
 .SH NAME
 initramfs.conf \- configuration file for mkinitramfs
@@ -30,26 +30,39 @@ The default setting is \fImost\fP.
 
 \fInetboot\fP adds the base modules, network modules, but skips block devices.
 
-\fIlist\fP includes only modules from the additional modules list.
+\fIlist\fP includes only modules from the additional modules list to load them
+early.
 
 .TP
 \fB BUSYBOX
 Include busybox utilities for the boot scripts.
 If set to 'n'
 .B mkinitramfs
-will build an initramfs whithout busybox.
+will build an initramfs without busybox.
 Beware that many boot scripts need busybox utilities.
+
+.TP
+\fB KEYMAP
+If set to 'y', the console keymap will be loaded during the initramfs stage.
+The keymap will anyway be loaded by the initscripts later, and the packages
+that might need input will normally set this variable automatically, so there
+should normally be no need to set this.
 
 .SH NFS VARIABLES
 .TP
 \fB BOOT
 Allows to use an nfs drive as the root of the drive.
-The default is to boot of an \fIlocal\fP media (harddrive, USB stick).
+The default is to boot from \fIlocal\fP media (hard drive, USB stick).
 Set to \fInfs\fP for an NFS root share.
 
 .TP
 \fB DEVICE
 Specifies the network interface, like eth0.
+
+.TP
+\fB ROOT
+Allows optional root bootarg hardcoding, when no root bootarg can be passed.
+A root bootarg overrides that special setting.
 
 .TP
 \fB NFSROOT
@@ -58,7 +71,7 @@ Otherwise you need to specify \fIHOST:MOUNT\fP.
 
 
 .SH AUTHOR
-The initramfs-tools are written by Maximilian Attems <maks@sternwelten.at>,
+The initramfs-tools are written by Maximilian Attems <maks@debian.org>,
 Jeff Bailey <jbailey@raspberryginger.com> and numerous others.
 Loosely based on mkinitrd.conf by Herbert Xu.
 
