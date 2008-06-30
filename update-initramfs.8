@@ -30,7 +30,7 @@ happens in this early userspace.
 .TP
 \fB \-k \fI version
 Set the specific kernel version for whom the initramfs will be generated.
-For example the output of uname -r for your currently running kernel.
+For example the output of uname \-r for your currently running kernel.
 This argument is optional for update. The default is the latest kernel version.
 
 The use of "all" for the
@@ -85,7 +85,7 @@ Create the initramfs for a specific kernel:
 .B update\-initramfs -c -k 2.6.18-1-686
 
 .SH AUTHOR
-The initramfs-tools are written by Maximilian Attems <maks@sternwelten.at>,
+The initramfs-tools are written by Maximilian Attems <maks@debian.org>,
 Jeff Bailey <jbailey@raspberryginger.com> and numerous others.
 
 .SH SEE ALSO

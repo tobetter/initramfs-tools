@@ -39,11 +39,14 @@ log_end_msg()
 
 panic()
 {
+	local mountroot_fail_hooks mr_fh
+
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
 	# Disallow console access
-	if [ "${panic}" = 0 ]; then
+	if [ -n "${panic}" ]; then
+		sleep ${panic}
 		reboot
 	fi
 
@@ -59,15 +62,15 @@ panic()
 		fi
 	fi
 
-	modprobe -Qb i8042
-	modprobe -Qb atkbd
+	modprobe i8042
+	modprobe atkbd
 	echo $@
 	PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
 
 maybe_break()
 {
-	if [ x$1 = x${break} ]; then
+	if [ "${break}" = "$1" ]; then
 		panic "Spawning shell within the initramfs"
 	fi
 }
@@ -81,9 +84,32 @@ set_initlist()
 {
 	unset initlist
 	for si_x in ${initdir}/*; do
+		# skip empty dirs without warning
+		[ "${si_x}" = "${initdir}/*" ] && return
+
+		# only allow variable name chars
+		case ${si_x#${initdir}/} in
+		*[![:alnum:]_]*)
+			[ "${verbose}" = "y" ] \
+			&& echo "$si_x ignored: not alphanumeric or '_' file"
+			continue
+			;;
+		esac
+
+		# skip non executable scripts
 		if [ ! -x ${si_x} ]; then
+			[ "${verbose}" = "y" ] \
+			&& echo "$si_x ignored: not executable"
 			continue
 		fi
+
+		# skip directories
+		if [ -d ${si_x} ]; then
+			[ "${verbose}" = "y" ] \
+			&& echo "$si_x ignored: a directory"
+			continue
+		fi
+
 		initlist="${initlist} ${si_x#${initdir}/}"
 	done
 }
@@ -93,14 +119,28 @@ reduce_satisfied()
 	deplist="$(render array_${1})"
 	unset tmpdeplist
 	for rs_y in ${deplist}; do
-		case $rs_y in
+		# check if there are alternatives
+		case ${rs_y} in
 		*\|*)
 			OLD_IFS="$IFS"
-			IFS='|'
-			for rs_z in $rs_y; do
+			IFS="|"
+			for rs_z in ${rs_y}; do
 				IFS="$OLD_IFS"
-				if [ ! -f ${initdir}/${rs_z} ]; then
-					IFS='|'
+				# only allow variable name chars
+				case ${rs_z} in
+				*[![:alnum:]_]*)
+						IFS="|"
+						continue
+						;;
+				esac
+				# skip non executable scripts
+				if [ ! -x ${initdir}/${rs_z} ]; then
+					IFS="|"
+					continue
+				fi
+				# skip directories
+				if [ -d ${initdir}/${rs_z} ]; then
+					IFS="|"
 					continue
 				fi
 				tmpdeplist="${tmpdeplist} ${rs_z}"
@@ -109,7 +149,15 @@ reduce_satisfied()
 			IFS="$OLD_IFS"
 			;;
 		*)
-			if [ ! -f ${initdir}/${rs_y} ]; then
+			case ${rs_y} in
+			*[![:alnum:]_]*)
+				continue
+				;;
+			esac
+			if [ ! -x ${initdir}/${rs_y} ]; then
+				continue
+			fi
+			if [ -d ${initdir}/${rs_y} ]; then
 				continue
 			fi
 			tmpdeplist="${tmpdeplist} ${rs_y}"
@@ -160,7 +208,6 @@ pop_list_item()
 reduce_prereqs()
 {
 	unset runlist
-	set_initlist
 	set -- ${initlist}
 	i=$#
 	# Loop until there's no more in the queue to loop through
@@ -201,6 +248,7 @@ call_scripts()
 run_scripts()
 {
 	initdir=${1}
+	[ ! -d ${initdir} ] && return
 	get_prereqs
 	reduce_prereqs
 	call_scripts
@@ -220,7 +268,7 @@ load_modules()
 			if [ "$com" = "#" ]; then
 				continue
 			fi
-			modprobe -Qb $m
+			modprobe $m
 		done
 	fi
 }
@@ -245,11 +293,55 @@ parse_numeric() {
 		;;
 	esac
 
-	mknod /dev/root b ${major} ${minor}
+	mknod -m 600 /dev/root b ${major} ${minor}
 	ROOT=/dev/root
 }
 
 add_mountroot_fail_hook()
 {
 	echo "$0" >> /tmp/mountroot-fail.hooks
+}
+
+configure_networking()
+{
+	# networking already configured thus bail out
+	[ -n "${DEVICE}" ] && [ -e /tmp/net-"${DEVICE}".conf ] && return 0
+
+	# support ip options see linux sources Documentation/nfsroot.txt
+	case ${IPOPTS} in
+	none|off)
+		# Do nothing
+		;;
+	""|on|any)
+		# Bring up device
+		ipconfig ${DEVICE}
+		;;
+	dhcp|bootp|rarp|both)
+		ipconfig -c ${IPOPTS} -d ${DEVICE}
+		;;
+	*)
+		ipconfig -d $IPOPTS
+
+		# grab device entry from ip option
+		NEW_DEVICE=${IPOPTS#*:*:*:*:*:*}
+		if [ "${NEW_DEVICE}" != "${IPOPTS}" ]; then
+			NEW_DEVICE=${NEW_DEVICE%:*}
+		else
+			# wrong parse, possibly only a partial string
+			NEW_DEVICE=
+		fi
+		if [ -n "${NEW_DEVICE}" ]; then
+			DEVICE="${NEW_DEVICE}"
+		fi
+		;;
+	esac
+
+	# source ipconfig output
+	if [ -n "${DEVICE}" ]; then
+		# source specific bootdevice
+		. /tmp/net-${DEVICE}.conf
+	else
+		# source any interface as not exaclty specified
+		. /tmp/net-*.conf
+	fi
 }

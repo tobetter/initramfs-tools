@@ -6,35 +6,16 @@ if [ ! -e /etc/initramfs-tools/modules ]; then
 	cp /usr/share/initramfs-tools/modules /etc/initramfs-tools/
 fi
 
-if [ -f /etc/initramfs-tools/conf.d/resume ]; then
-	. /etc/initramfs-tools/conf.d/resume
-	case "$RESUME" in
-		UUID=*|LABEL=*)	# Already upgraded
-			;;
-		/dev/*)
-			if [ -b "$RESUME" ]; then
-				UUID=$(/sbin/vol_id -u "$RESUME" || true)
-				if [ -n "$UUID" ]; then
-					echo "RESUME=UUID=${UUID}" > /etc/initramfs-tools/conf.d/resume
-				fi
-			fi
-			;;
-	esac
-fi
-
-		
-		
-
 # Regenerate initramfs whenever we go to dpkg state `installed'
 
 if [ "x$1" != xtriggered ] && \
    dpkg --compare-versions "$DPKG_RUNNING_VERSION" ge '1.14.5ubuntu10~~'
 then
+	# this activates the trigger, if triggers are working
 	update-initramfs -u
-	# ... this activates the trigger, if triggers are working
 else
+	# force it to actually happen
 	DPKG_MAINTSCRIPT_PACKAGE='' update-initramfs -u
-	# ... force it to actually happen
 fi
 
 #DEBHELPER#

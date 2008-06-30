@@ -1,3 +1,427 @@
+initramfs-tools (0.92bubuntu1) intrepid; urgency=low
+
+  * Merge from debian unstable, remaining changes:
+    - Change Build-Depends to Build-Depends-Indep.
+    - Use busybox-initramfs for Depends.
+    - Do not source udev.conf.
+    - Set BUSBOXDIR properly.
+    - Keep kinit and gzip in initrd.
+    - Use -Qb for for module loading to honor blacklists via the use of
+      MODPROBE_OPTIONS.
+    - all_generic_ide script.
+    - Remove lvm local-top script (conflicts with lvm-common).
+    - takeover=1 in update-initramfs.
+    - Allow the mounting of a root filesystem as a loop device on top
+      of a host filesystem, used for wubi installs.
+    - Add vfat support to the initramfs.
+    - Reduce timeout to 30 seconds -- corner cases (giant
+      disk arrays, clusters) will need to provide their own rootdelay=
+      boot arg.
+    - Keep more meaningful text for no root device panic.
+    - Provide a clearer error on mount failure of the Windows host
+      filesystem.
+    - Add 2>&1 to the run-init line.
+    - Source /scripts/functions in resume script.
+    - resume UUID upgrade.
+    - Add mountroot failure support, to allow meaningful messages when
+      no root device can be found.
+    - Panic if either the root device doesn't exist, or vol_id cannot
+      identify it. Allows for mountroot failure hooks for md devices
+      to be displayed.
+    - Ignore blacklist for forced vga= usage.
+    - Loop for 5 seconds waiting for $suspend to show up, adjustable
+      with the resumedelay= command-line arg.
+    - Load virtio_pci for MODULES=most.
+    - Usplash pulsates until the real init takes over.
+    - Drop scripts/init-premount/thermal as force_load can do this
+      for us during initramfs creation.
+    - Load thermal modules on lpia.
+    - Allow for alternative PREREQS to be specified using | as the
+      separator.
+    - Add udf to auto_add_modules. It was originally added to
+      dep_add_modules, however dep_add_modules now auto-detects the
+      modules needed for the root filesystem.
+  * hook-functions:
+    - Refer to /lib/firmware/${version} where version is the kernel
+      version we are building an initramfs for.
+    - Do not copy /lib/udev/firmware.agent to the initramfs. Ubuntu's
+      udev has /lib/udev/firmware_helper instead, and the udev hook
+      copies this to the initramfs for us.
+    - Dropped the manual_add_firmware function, as initramfs-tools now
+      checks the firmware field in the module it is copying, and copies
+      the firmware required by that module if its available.
+  * Drop hooks/keymap and the KEYMAP variable setting in
+    conf/initramfs.conf as console-setup takes care of keymap loading.
+  * hooks/udevhelper: Drop, udev already copies what it needs.
+  * hooks/legacylvm: Drop, as it refers to binaries and directories our
+    lvm package doesn't have.
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Mon, 30 Jun 2008 15:54:36 +1000
+
+initramfs-tools (0.92b) unstable; urgency=low
+
+  [ maximilian attems ]
+  * update-initramfs: mbr_check() fix for /dev/md/X naming. (closes: #469312)
+    Thanks to Axel Beckert <beckert@phys.ethz.ch> for report.
+  * hook-functions: MODULES=dep fix error message.
+
+  [ Glennie Vignarajah ]
+  * initramfs-tools: Fix UUID rootfs detection with 'MODULES=dep'.
+    (closes: #483082)
+
+ -- maximilian attems <maks@debian.org>  Fri, 30 May 2008 16:31:42 +0200
+
+initramfs-tools (0.92a) unstable; urgency=high
+
+  * ps3: Add ps3_sys_manager to MODULES=dep ps3 modules.
+  * initramfs-tools.8: Document resume_offset bootparam.
+  * Documentation typo fixes and additions.
+  * init: Fix hardcoded ROOT bootcase. (closes: #478236)
+    Thanks Kevin Price <kp@kevin-price.de> for report and
+    Martin Michlmayr <tbm@cyrius.com> for debugging.
+
+ -- maximilian attems <maks@debian.org>  Tue, 29 Apr 2008 21:18:55 +0200
+
+initramfs-tools (0.92) unstable; urgency=low
+
+  Release "Ogni contrada è patria del ribelle"
+
+  [ maximilian attems ]
+  * init: export ROOTFLAGS + ROOTFSTYPE.
+  * debian/control: s/XS-Vcs/Vcs/
+  * mkinitramfs: Drop gzip -9 option. (closes: #470869)
+    Thanks Tollef Fog Heen <tfheen@err.no>.
+  * Ignore lintian warnings about empty directories.
+  * framebuffer: Let udev create fb devices.
+  * framebuffer: Leave tty devices for udev too.
+  * manpages: fix  hyphen-used-as-minus-sign
+  * init: fix mkdir usage.
+  * init: Set proper permissions of /dev/console mknod fallback.
+  * scripts/function: Use mknod directly.
+  * debian/control: Depend on latest klibc for mknod usage.
+  * scripts/functions: fix configure_networking() for multiple interfaces.
+    (closes: #467078) Thanks Michal Sojka <sojkam1@fel.cvut.cz>.
+  * ps3 nuke useless hardcoded initramfs script. (closes: #468113)
+  * resume: Add support for resume_offset swap file suspend to disk.
+    (closes: #474691) Thanks Alan Jenkins <alan-jenkins@tuffmail.co.uk>.
+  * update-initramfs: Rename function according to reliability fix.
+  * hook-functions: Add atl1, cxgb3, e1000e, igb, ipg, niu, sky2 to
+    net section of initramfs modules. (closes: #463607)
+  * hook-functions: MODULES=dep fix ps3 support.
+  * initramfs-tools.8: Small documentation fixes. (closes: #467627)
+
+  [ debian@x.ray.net ]
+  * configure_network(): do nothing if device already configured.
+    (closes: #465901)
+
+  [ Joey Hess ]
+  * update-initramfs: use dpkg-trigger. (closes: #447611)
+
+  [ Luke Yelavich ]
+  * update-initramfs: Initramfs generation reliability fixes.
+    (closes: #468112)
+
+  [ Fabio M. Di Nitto ]
+  *  hook-functions: Add support for sunvnet and sunvdc.
+
+ -- maximilian attems <maks@debian.org>  Wed, 09 Apr 2008 10:42:49 +0200
+
+initramfs-tools (0.91e) unstable; urgency=medium
+
+  [ Daniel Reichelt ]
+  * update-initramfs: fix ro-mounted /boot check (closes: #458772)
+
+ -- maximilian attems <maks@debian.org>  Tue, 12 Feb 2008 18:23:34 +0100
+
+initramfs-tools (0.91d) unstable; urgency=low
+
+  * MODULES=dep fix for new /dev/md/X naming scheme (closes: #440694).
+  * debian/control: Add versioned depends on findutils (closes: #450888).
+  * Update to newer standards version without changes.
+  * local-premount/resume: coding style fixes.
+
+ -- maximilian attems <maks@debian.org>  Wed, 26 Dec 2007 00:53:48 +0100
+
+initramfs-tools (0.91c) unstable; urgency=low
+
+  * update-initramfs: Fix ro /boot partition check (closes: #451151)
+  * init: Don't overwrite boot cmdline arg (closes: #453294)
+
+ -- maximilian attems <maks@debian.org>  Wed, 28 Nov 2007 19:49:41 +0100
+
+initramfs-tools (0.91b) unstable; urgency=low
+
+  * hooks/udevhelper: Adding all /lib/udev on initramfs if missing. Due to
+    overly strict errexit usage by udev hook functionality might be missing.
+    This is an potential Etch Lenny upgrade issue on UUID and LABEL roots.
+    Thanks Michael Prokop <mika@grml.org> for report. (closes: 431291)
+
+ -- maximilian attems <maks@debian.org>  Thu, 04 Oct 2007 12:00:33 +0200
+
+initramfs-tools (0.91a) unstable; urgency=low
+
+  * init: Fix resuming with hardcoded uppercase RESUME variable.
+    Thanks Raphael Hertzog <hertzog@debian.org> for the report.
+
+ -- maximilian attems <maks@debian.org>  Wed, 12 Sep 2007 19:06:19 +0200
+
+initramfs-tools (0.91) unstable; urgency=low
+
+  * udev_helper: Axe the modprobe ide-generic should no longer be needed
+    for kernel since Etch.
+  * debian/control: Tighten dep on latest klibc for BUSYBOX=n usage.
+    Add XS-Vcs-* fields. Mv busybox from Depends to Recommends.
+  * mkinitramfs: Cope when no busybox is around warn on md/lvm root.
+  * mkinitramfs: Kill kinit.shared too.
+  * scripts/local: Quote readonly variable. (LP: #115807)
+  * mkinitramfs, scripts/keymap: Add trailing slash on cp destination for dir.
+  * init: Call panic for debug sh if run-init fails.
+  * init-top/framebuffer: Check that fb minor is below 32.
+  * init: Export noresume if set. uswsusp and kdump need it.
+  * init: Try harder to find a valid init on rootmnt. Fixes bootfailure on
+    bogus init bootarg too.
+  * scripts/{functions,nfs}: Split networking code in separate function.
+    Thanks Vagrant Cascadian <vagrant+debianbugs@freegeek.org> for the patch.
+    (closes: #439397)
+  * update-initramfs: Don't check for ro /boot inside of a chroot.
+  * debian/script: Fix syntax of MODULES=dep block.
+  * hook-functions: Add rootfs detection for the "auto" mount output.
+    Thanks martin f krafft <madduck@debian.org> for report. (closes: #441211)
+  * init: Disable quiet on debug bootarg. Fix new init error message.
+    Thanks Michael Prokop <mika@grml.org> for the patches.
+  * hook-functions: MODULES=dep fix I2O detection. Add sys_walk_modalias()
+    to catch old style IDE.
+  * mkinitramfs: Export MODULES, allows hook scripts to act accordingly.
+    (closes: #421658) Add /usr/share/initramfs-tools/conf-hooks.d for hooks
+    options on mkinitramfs run. Do not land in initramfs.
+
+ -- maximilian attems <maks@debian.org>  Sun, 09 Sep 2007 12:26:16 +0200
+
+initramfs-tools (0.90a) unstable; urgency=high
+
+  * scripts/functions: simplify panic()
+  * mkinitramfs: Kick empty dir modules.
+  * hook-functions: Factor sys_walk_mod_add() out of dep_add_modules().
+  * init: Fix mount options invocation for klibc mount.
+  * hook-functions: Add the new firewire modules.
+
+ -- maximilian attems <maks@debian.org>  Thu, 23 Aug 2007 14:37:51 +0200
+
+initramfs-tools (0.90) unstable; urgency=low
+
+  Release "J'aim' pas le fataliste Je n'ai ni foi ni loi"
+
+  [ maximilian attems ]
+  * hook-functions: Fix xen i386 boots with optimized 2.5. (closes: 420754)
+    Thanks Marco Nenciarini <mnencia@debian.org> for patch.
+  * debian/control: Bump dep on klibc-utils from etch. (closes: 435031)
+  * scripts/functions: Implement non-zero panic bootarg. Style fix for
+    maybe_break().
+  * hook-functions: dep_add_modules() fix for md, lv, luks root.
+    (closes: #426917, #429237, #426446)
+  * debian/scripts: Add /etc/crypttab to reportbug script.  Add /sys/block
+    list for MODULES=dep to reportbug script.
+  * scripts/functions: Add error message on verbose mode about ignored files
+    in boot/hooks dir.  Thanks Kornilios Kourtis <kkourt@cslab.ece.ntua.gr>
+    for the initial patch. Fixes a double set_initlist call too. Ignore empty
+    dirs earlier too. (closes: #428729, #433459)
+  * mkinitramfs.8: Document verbose mode.
+  * debian/initramfs-tools.preinst: Inhibit /etc/initramfs-tools/conf.d/resume
+    creation in chroot for debian-live and other. (closes: #433190)
+    Thanks Kel Modderman <kel@otaku42.de> for the patch.
+  * update-initramfs: Improve "altered" error message. (closes: #436752)
+  * update-initramfs, update-initramfs.conf: update_initramfs config variable
+    is tristate. Set to 'all' to update any initramfs: $(update-initramfs -u).
+    Allows specific admin setting. (closes: #425050)
+
+  [ David Härdeman ]
+  * hook-functions: Protect all variable with local, plus coding style fixes.
+
+ -- maximilian attems <maks@debian.org>  Thu, 09 Aug 2007 21:30:29 +0200
+
+initramfs-tools (0.89) unstable; urgency=low
+  
+  Release "L'\xE9lecteur c'est notoire N'a pas tout' sa raison"
+
+  [ Joey Hess ]
+  * mkinitramfs: Include libgcc_s.so.1 on arm since glibc always tries to load
+    it for the SJLJ exception handling on that architecture. (closes: #426395)
+    Thanks to Aurelien Jarno for ack and review.
+
+  [ maximilian attems ]
+  * initramfs.conf.5: Document ROOT hardcoding.
+  * scripts/local: Use simpler fstype invocation.
+  * initramfs-tools.8, initramfs.conf.5: Fix typos. (closes: #427837, #427838)
+    Thanks "A. Costa" <agcosta@gis.net> for the patch.
+  * scripts/local: Try to warn for renamed root dev. (closes: #374611)
+  * minitramfs: Fall back to bootable default MODULES=most if unsupported
+    MODULES setting is passed. Thanks Henning Sprang <henning_sprang@gmx.de>
+    for report. (closes: #429144)
+  * hook-functions: Fix variable typo. Thanks Emanuele Rocca <ema@debian.org>.
+  * scripts/local: Revert change to use udev vol_id before fstype,
+    there are too many "wrongly" formated fs out there. fstype supports less,
+    but is more robust.
+
+ -- maximilian attems <maks@debian.org>  Wed, 04 Jul 2007 00:28:34 +0200
+
+initramfs-tools (0.88) unstable; urgency=low
+
+  [ maximilian attems ]
+  * debian/changelog: Fix missing colons in closes.
+  * hook-functions: Add a proper /sys walking dep_add_modules() for a minimal
+    initramfs on MODULES=dep. (closes: #395526)
+  * mkinitramfs.8: Add examples section, plus improve description of the
+    low-level tool and how it fits with update-initramfs.
+  * init: Ignore non-numerical panic and rootdelay bootarg.
+  * scripts/init-premount/ps3: Fix typo. (closes: #423469)
+  * scripts/nfs: Fix when root-path includes server-ip. (closes: #387808)
+    Thanks Vagrant Cascadian <vagrant+debianbugs@freegeek.org> for patch.
+
+  [ David Härdeman ]
+  * init: Remove cryptopts parsing, not official bootparam. cryptsetup scripts
+    parse /proc/cmdline themselves (even in the Etch version).
+  * hook-functions: Change copy_exec to use the same source and
+    destination path if only one argument is given.
+  * hook-functions: Document how copy_exec determines the target path.
+  * hook-functions: Add firmware loading support to manual_add_modules().
+    (closes: #355881)
+  * scripts/local: Ubuntu merge
+    - As well as waiting for the existance of the root device node, also check
+      to see whether we have a filesystem of some kind on it.  Some devices
+      nodes (devmapper/LVM/EVMS, mdadm) will exist before they can be safely
+      used. Patch by Scott James Remnant <scott@ubuntu.com>. Changed to
+      support both fstype and vol_id.
+  * hook-functions: make version check in check_minkver more robust.
+
+ -- maximilian attems <maks@debian.org>  Sun, 27 May 2007 00:52:38 +0200
+
+initramfs-tools (0.87b) unstable; urgency=low
+
+  * scripts/init-top/framebuffer: Remove vga16fb loading on splash bootarg.
+    Newer usplash > 0.4 no longer needs that.
+
+  * hooks/legacymdadm: remove only needed for partial upgrades from sarge.
+
+  *  hooks/legacylvm: Source relevant functions. (closes: 419667)
+
+ -- maximilian attems <maks@debian.org>  Tue, 17 Apr 2007 11:56:58 +0200
+
+initramfs-tools (0.87) unstable; urgency=low
+
+  [ maximilian attems ]
+  * scripts/functions: reduce_satisfied() needs to ignore the same set as
+    set_initlist() otherwise an script having a prereqs on a non-executable
+    boot script may cause circular panic. (closes: 418509)
+  * Add blacklist boot param, disabling the load of specific modules inside
+    the initramfs. Still needs to be passed via tmpfs to the rootfs.
+  * mkinitramfs, scripts/functions: Fix regexes to always use posix character
+    classes. Based on a patch by Meelis Roos <mroos@linux.ee>.
+    (closes: 419062)
+
+  [ David Härdeman ]
+  * Add support for loading keymaps. (closes: 337663)
+  * Move legacy code from mkinitramfs to separate hooks.
+  * Ubuntu merge
+    - Add PS3 module loading functionality without grep usage.
+  * debian/copyright: Update authors info.
+  * Bump standards version, no changes necessary.
+  * debian/scripts: Print settings from initramfs.conf in reportbug script.
+
+ -- maximilian attems <maks@debian.org>  Mon, 16 Apr 2007 20:21:30 +0200
+
+initramfs-tools (0.86) unstable; urgency=low
+
+  * update-initramfs: Bound the mode and version variable. (closes: 403905)
+
+  * init: Set once the MODPROBE_OPTIONS environment variable and export it.
+    Don't forget to set -b to have the modprobe.d blacklists respected.
+    Thus remove everywhere the -q modprobe switch.
+    Thanks Ben Collins <bcollins@ubuntu.com> for the suggestion.
+
+  * small trailing whitespace cleanup, display full path of kernel-img.conf
+    in bug script.
+
+  * debian/control: Add busybox-initramfs as Ubuntu busybox alternative
+    to depends. Drop the sarge busybox-cvs-static entry.
+
+  * scripts/local-top/mdrun: Drop, existed for partial upgrades from sarge.
+
+  * scripts/local: Improve panic message and printed order. (closes: 414640)
+    Thanks Vincent.McIntyre@csiro.au for patch.
+
+  * scripts/functions: Check if panic is set before using it. (closes: 406107)
+    Thanks martin f krafft <madduck@debian.org> for report.
+
+  * hook-functions: Copy all kernel/drivers/{block,ide,scsi} subdir modules
+    instead of hardcoding the list of "supported" drivers. As consequence
+    the initramfs might be larger, but none of those should be missed!
+    As bonus syncs with Ubuntu.
+
+  * init: Mount /sys and /proc nodev, noexec, nosuid - Ubuntu sync.
+
+  * update-initramfs: If update-initramfs fails, restore the backup.
+    Useful if a MINKVER set is not fulfilled. (LP: #101844)
+    Thanks Soren Hansen <sh@linux2go.dk> for patch.
+
+  * initramfs-tools.preinst: Test if $RESUME is nonzero, not if it exists,
+    fixes issue of UUID resume dev. (LP: #67932) While there remove the
+    conffile mv handling of 0.61.
+
+  * scripts/functions: set_initlist() needs to add only script names with
+    alphabetics, numerics and underscores - skip any other. Bad enough
+    backup scripts get added, but they shouldn't lead to a panic. Also skip
+    directories that might lay around.  (closes: 398347) (LP: #76131)
+
+  * initramfs-tools.8: Document valid script names.
+
+  * mkinitramfs: Don't add backup scripts to initramfs. (closes: 378682)
+    (LP: #78348)
+
+  * scripts/functions: run_scripts() return immediately if passed dir
+    does not exist. Empty dirs without boot script aren't created anymore.
+
+  * debian/copyright: Update my email, add Ben Collins, update years,
+    alphabetic authors sort + add new git tree location.
+
+  * mkinitramfs: Set PATH with /sbin to allow non-root user usage.
+    Thanks Bob Montgomery <bob.montgomery@hp.com> for the suggestion.
+    (closes: 409995)
+
+ -- maximilian attems <maks@debian.org>  Tue, 10 Apr 2007 21:45:36 +0200
+
+initramfs-tools (0.85g) unstable; urgency=high
+
+  * SECURITY scripts/functions: Set permission of created root dev in
+    parse_numeric() to 600. This bug only affects lilo boots. Thanks
+    Fabian Pietsch <fabian@canvon.dyndns.org> and Goswin von Brederlow
+    <brederlo@informatik.uni-tuebingen.de> for patch input. (closes: 417995)
+
+  * debian/control: Change Uploaders email.
+
+ -- maximilian attems <maks@debian.org>  Fri,  6 Apr 2007 09:19:13 +0200
+
+initramfs-tools (0.85f) unstable; urgency=high
+
+  Release "Au lieu d'aller voter Casse leur la margoulette"
+
+  * update-initramfs: Grub _doesn't_ clear LILO string in mbr, but the inverse
+    is done. Fix mbr_check() to first check for GRUB. Fixes accidental lilo
+    call in the case that Grub is the used bootloader. (closes: 409820)
+    Thanks Michael Prokop <mika@grml.org> for bringing up the case.
+
+  * initramfs.conf.5, mkinitramfs.5: Fix typos. Document version.
+    (closes: 405157, 405190, 405194)
+
+  * update-initramfs: Be more screamy about lilo error, people seem to
+    overlook recent lilo failures.
+
+  * scripts/init-top/framebuffer: Remove unused variables.
+
+  * init: Export ROOTDELAY to let udev boot script handle eventual rootdelay.
+    downgrades 401916
+
+ -- maximilian attems <maks@sternwelten.at>  Wed,  7 Mar 2007 23:34:17 +0100
+
 initramfs-tools (0.85eubuntu41) intrepid; urgency=low
 
   * Backport from Debian (required for new busybox):
@@ -416,7 +840,7 @@ initramfs-tools (0.85b) unstable; urgency=medium
     urgency medium.
 
   * scripts/init-top/framebuffer: Fix regression of /dev/fb0 creation,
-    modprobe fb before creating device. Thanks to Otavio Salvador 
+    modprobe fb before creating device. Thanks to Otavio Salvador
     <otavio@debian.org> for patch.
 
  -- maximilian attems <maks@sternwelten.at>  Tue, 14 Nov 2006 08:06:40 +0100
@@ -435,7 +859,7 @@ initramfs-tools (0.85) unstable; urgency=high
     having a /boot string. (closes: 393906) Thanks for the patch
     Olli Helenius <olli@starnet.fi>
 
-  * init-top/framebuffer: Fix duplicate fbno0 device creation. Merge the 
+  * init-top/framebuffer: Fix duplicate fbno0 device creation. Merge the
     0.69ubuntu10 solution. Thanks Benjamin Leipold <rabbit171@web.de>
     for the report. (closes: 393890)
 
@@ -928,6 +1352,41 @@ initramfs-tools (0.69ubuntu22) feisty; urgency=low
 
  -- Ben Collins <bcollins@ubuntu.com>  Thu, 23 Nov 2006 02:10:29 -0500
 
+initramfs-tools (0.69ubuntu20) edgy; urgency=low
+
+  * Add the LSI Logic MegaRAID SAS Driver (megaraid_sas) to the SCSI
+    module list, common on newer Dell PowerEdge servers, among others.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Wed, 25 Oct 2006 18:16:15 +1000
+
+initramfs-tools (0.69ubuntu19) edgy; urgency=low
+
+  * Check for "modules.dep" before running depmod, not "modules.depmod"
+    which won't ever exist.  This caused depmod to be run after live
+    filesystem generation without the restricted modules available, it
+    could also randomly cause the same to happen on upgrades depending
+    on the order packages are configured.  Ubuntu: #60938.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 24 Oct 2006 18:51:09 +0100
+
+initramfs-tools (0.69ubuntu18) edgy; urgency=low
+
+  * Anchor regex in sed command to revert conffile edits, to avoid
+    double-commenting RESUME= and causing a conffile prompt on upgrades
+    (Closes: LP#66599)
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Wed, 18 Oct 2006 04:54:45 -0700
+
+initramfs-tools (0.69ubuntu17) edgy; urgency=low
+
+  [ Tollef Fog Heen ]
+  * Load vga16fb on amd64.
+
+  [ Adam Conrad ]
+  * ... but only when booting with a splash.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 17 Oct 2006 12:29:35 +1000
+
 initramfs-tools (0.69ubuntu16) edgy; urgency=low
 
   * Bring in preinst fixes from Debian, including s/configure/install/ in
@@ -1375,7 +1834,7 @@ initramfs-tools (0.54) unstable; urgency=low
   * hook-functions: Add dasd class to auto_add_modules and dd zfcp module.
     Thanks to s390 support Bastian Blank <waldi@debian.org>. (closes: #355595)
 
-  * hook-functions: Add it821x. (closes #352460)
+  * hook-functions: Add it821x. (closes: #352460)
 
  -- maximilian attems <maks@sternwelten.at>  Wed,  8 Mar 2006 17:34:25 +0100
 

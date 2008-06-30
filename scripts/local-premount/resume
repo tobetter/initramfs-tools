@@ -15,8 +15,8 @@ prereqs)
 	;;
 esac
 
-if [ "x${resume}" = "x" ]; then
-	exit
+if [ -z "${resume}" ]; then
+	exit 0
 fi
 
 case $resume in
@@ -58,7 +58,9 @@ if [ ! -e "${resume}" ] || ! /lib/udev/vol_id "${resume}" >/dev/null 2>&1; then
 	fi
 fi
 
-if [ -e /sys/power/resume ]; then
-	# hardcode path, uswsusp ships an resume binary too
+# hardcode path, uswsusp ships an resume binary too
+if [ -n "${resume_offset}" ]; then
+	/bin/resume ${resume} ${resume_offset}
+else
 	/bin/resume ${resume}
 fi
