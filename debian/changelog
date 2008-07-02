@@ -1,3 +1,14 @@
+initramfs-tools (0.85eubuntu39.2) hardy-proposed; urgency=low
+
+  * Whilst looping for the root filesystem, don't just rely on the existance
+    of the block device and whether vol_id succeeds on it, but also make
+    sure that udev is not currently active by calling "settle" on it.  This
+    solves a race where mdadm or devmapper still has a lock on the device,
+    but the contents are ready which will cause the mount call later to fail.
+    LP: #244926.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed, 02 Jul 2008 16:44:53 +0100
+
 initramfs-tools (0.85eubuntu39.1) hardy-proposed; urgency=low
 
   * Add vfat support to the initramfs (LP: #236021).
