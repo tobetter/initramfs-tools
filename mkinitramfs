@@ -176,6 +176,7 @@ export DPKG_ARCH
 export verbose
 export KEYMAP
 export MODULES
+export COMPCACHE_SIZE
 
 # Private, used by 'catenate_cpiogz'.
 export __TMPCPIOGZ
