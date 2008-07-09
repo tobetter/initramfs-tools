@@ -38,10 +38,28 @@ esac
 
 cat >"$DESTDIR"/scripts/init-top/compcache <<EOF
 #!/bin/sh
-set -e
-if [ "\$1" = prereqs ]; then
+
+PREREQ="${COMPCACHE_PREREQ}"
+prereqs()
+{
+     echo "\$PREREQ"
+}
+
+case \$1 in
+prereqs)
+     prereqs
+     exit 0
+     ;;
+esac
+
+if [ -e /tmp/compcache.opts ]; then
+    . /tmp/compcache.opts
+fi
+
+if [ -n "\$SKIP_COMPCACHE" ]; then
   exit 0
 fi
+
 modprobe -Q --ignore-install compcache compcache_size_kbytes="$kbytes"
 EOF
 chmod 0755 "$DESTDIR"/scripts/init-top/compcache
