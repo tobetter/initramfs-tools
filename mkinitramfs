@@ -267,6 +267,7 @@ else
 	rm -f ${DESTDIR}/bin/busybox
 	copy_exec ${BUSYBOXDIR}/busybox /bin/busybox
 	ln -s ${BUSYBOXDIR}/busybox ${DESTDIR}/bin/sh
+	rm -f ${DESTDIR}/bin/chroot # klibc's version is just wrong
 fi
 
 # Modutils

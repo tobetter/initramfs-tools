@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu5) intrepid; urgency=low
+
+  * Remove klibc chroot when using busybox, as the former is just wrong
+    (chroot(); execve() rather than chroot(); chdir(); execvp()).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 11 Jul 2008 12:21:21 +0100
+
 initramfs-tools (0.92bubuntu4) intrepid; urgency=low
 
   * Add COMPCACHE_PREREQ varable (needs to be exported before running 
