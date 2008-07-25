@@ -37,10 +37,40 @@ log_end_msg()
 	_log_msg "Done."
 }
 
+# Add failure hook
+add_mountroot_fail_hook()
+{
+	mkdir -p /tmp/mountroot-fail-hooks.d
+	ln -s "$0" /tmp/mountroot-fail-hooks.d/"$1"
+}
+
+# Run failure hooks.
+# When a failure hook exits "1", it has not done anything to correct the
+# system.  Exiting "0" means that something has been attempted to resolve
+# the lack of a root filesystem.
+# Hooks are run in lexigraphical order, and are responsible for removing
+# themselves if they should not re-run in a later cycle.  When one exits
+# "0", the stack is stopped, so the caller can return to the main rootfs
+# wait loop.
+try_failure_hooks()
+{
+	local hook
+
+	# Disable usplash so text from hooks can be seen
+	if [ -x /sbin/usplash_write ]; then
+		/sbin/usplash_write "QUIT"
+	fi
+
+	for hook in /tmp/mountroot-fail-hooks.d/*; do
+		if [ -x ${hook} ] && ${hook} mountfail; then
+			return 0
+		fi
+	done
+	return 1
+}
+
 panic()
 {
-	local mountroot_fail_hooks mr_fh
-
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
@@ -48,18 +78,6 @@ panic()
 	if [ -n "${panic}" ]; then
 		sleep ${panic}
 		reboot
-	fi
-
-	# Call mountroot failure hooks if requested.
-	if [ "${1}" = "-r" ]; then
-		shift 1
-
-		if [ -r "/tmp/mountroot-fail.hooks" ]; then
-			mountroot_fail_hooks=$(cat /tmp/mountroot-fail.hooks)
-			for mr_fh in ${mountroot_fail_hooks}; do
-				${mr_fh} mountfail
-			done
-		fi
 	fi
 
 	modprobe i8042
@@ -295,11 +313,6 @@ parse_numeric() {
 
 	mknod -m 600 /dev/root b ${major} ${minor}
 	ROOT=/dev/root
-}
-
-add_mountroot_fail_hook()
-{
-	echo "$0" >> /tmp/mountroot-fail.hooks
 }
 
 configure_networking()
