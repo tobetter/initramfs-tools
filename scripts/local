@@ -11,6 +11,11 @@ get_fstype ()
 	# vol_id has a more complete list of file systems,
 	# but fstype is more robust
 	eval $(fstype "${FS}" 2> /dev/null)
+
+	if [ -z "${FSTYPE}" ]; then
+		FSTYPE="unknown"
+	fi
+
 	if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
 		FSTYPE=$(/lib/udev/vol_id -t "${FS}" 2> /dev/null)
 	fi
@@ -24,6 +29,12 @@ get_fstype ()
 	return ${RET}
 }
 
+root_missing()
+{
+	ROOT="${1}"
+	[ ! -e "${ROOT}" ] || ! $(get_fstype "${ROOT}" >/dev/null) || ! /sbin/udevadm settle
+}
+
 # Parameter: Where to mount the filesystem
 mountroot ()
 {
@@ -33,7 +44,7 @@ mountroot ()
 
 	# If the root device hasn't shown up yet, give it a little while
 	# to deal with removable devices
-	if [ ! -e "${ROOT}" ] || ! $(get_fstype "${ROOT}" >/dev/null) || ! /sbin/udevadm settle; then
+	while root_missing "${ROOT}"; do
 		log_begin_msg "Waiting for root file system..."
 
 		# Default delay is 30s
@@ -47,9 +58,7 @@ mountroot ()
 		fi
 
 		slumber=$(( ${slumber} * 10 ))
-		while [ ! -e "${ROOT}" ] \
-		|| ! $(get_fstype "${ROOT}" >/dev/null) \
-		|| ! /sbin/udevadm settle; do
+		while root_missing "${ROOT}"; do
 			/bin/sleep 0.1
 			slumber=$(( ${slumber} - 1 ))
 			[ ${slumber} -gt 0 ] || break
@@ -63,10 +72,17 @@ mountroot ()
 		if [ -x /sbin/usplash_write ]; then
 			/sbin/usplash_write "TIMEOUT 15" || true
 		fi
-	fi
+
+		# Run failure hooks, hoping one of them can fix up the system
+		# and we can restart the wait loop.  If they all fail, abort
+		# and move on to the panic handler and shell.
+		if root_missing "${ROOT}" && ! try_failure_hooks; then
+			break
+		fi
+	done
 
 	# We've given up, but we'll let the user fix matters if they can
-	while [ ! -e "${ROOT}" ] || ! /lib/udev/vol_id "${ROOT}" >/dev/null 2>&1 || ! /sbin/udevadm settle; do
+	while root_missing "${ROOT}"; do
 		# give hint about renamed root
 		case "${ROOT}" in 
 		/dev/hd*)
@@ -91,7 +107,7 @@ mountroot ()
 		echo "   - Check rootdelay= (did the system wait long enough?)"
 		echo "   - Check root= (did the system wait for the right device?)"
 		echo " - Missing modules (cat /proc/modules; ls /dev)"
-		panic -r "ALERT!  ${ROOT} does not exist.  Dropping to a shell!"
+		panic "ALERT!  ${ROOT} does not exist.  Dropping to a shell!"
 	done
 
 	# Get the root filesystem type if not set

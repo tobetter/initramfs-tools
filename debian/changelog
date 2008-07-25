@@ -1,3 +1,22 @@
+initramfs-tools (0.92bubuntu7) intrepid; urgency=low
+
+  * scripts/functions:
+    - add_mountroot_fail_hook(): set up symlinks to hooks in tmp directory
+    - try_failure_hooks(): new function that executes each fail hook in
+      lexographic order, exiting successfully if a hook succeeds
+    - panic(): remove the fail hook calling logic, now provided by
+      try_failure_hooks()
+  * scripts/local:
+    - get_fstype(): FSTYPE must be initialized to "unknown" in case the fstype
+      call does not set it
+    - root_missing(): new function to provide the oft-called set of checks on
+      the ROOT device
+    - mountroot(): use root_missing(), and try the failure hooks before giving
+      up
+  * Fixes required for (LP: #120375), lots of help from Kees Cook, thanks!
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 25 Jul 2008 17:34:21 -0500
+
 initramfs-tools (0.92bubuntu6) intrepid; urgency=low
 
   * Replace /bin/mount by a symlink to busybox if busybox is available;
