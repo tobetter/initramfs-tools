@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu8) intrepid; urgency=low
+
+  * scripts/functions: Change to tty1 in the panic function to make sure the
+    user can read any error messages displayed. (LP: #243226)
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Tue, 29 Jul 2008 16:29:16 +1000
+
 initramfs-tools (0.92bubuntu7) intrepid; urgency=low
 
   * scripts/functions:
