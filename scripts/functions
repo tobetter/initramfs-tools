@@ -74,6 +74,8 @@ panic()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
+	chvt 1
+
 	# Disallow console access
 	if [ -n "${panic}" ]; then
 		sleep ${panic}
