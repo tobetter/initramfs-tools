@@ -1,3 +1,12 @@
+initramfs-tools (0.92bubuntu9) intrepid; urgency=low
+
+  * Default update-initramfs.conf to not keep backups. With latest
+    last-good-boot, we don't need to any more.
+    TODO: LILO probably wants .bak's since it doesn't do last-good-boot stuff.
+    Should we worry about this?
+
+ -- Ben Collins <ben.collins@canonical.com>  Sun, 03 Aug 2008 17:34:22 -0400
+
 initramfs-tools (0.92bubuntu8) intrepid; urgency=low
 
   * scripts/functions: Change to tty1 in the panic function to make sure the
