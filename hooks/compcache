@@ -39,7 +39,7 @@ esac
 cat >"$DESTDIR"/scripts/init-top/compcache <<EOF
 #!/bin/sh
 
-PREREQ="${COMPCACHE_PREREQ}"
+PREREQ=""
 prereqs()
 {
      echo "\$PREREQ"
@@ -52,12 +52,14 @@ prereqs)
      ;;
 esac
 
-if [ -e /tmp/compcache.opts ]; then
-    . /tmp/compcache.opts
-fi
+# find total amount of available ram
+TOTAL_RAM=\$( grep MemTotal /proc/meminfo |tr -d ': [A-Z][a-z]')
 
-if [ -n "\$SKIP_COMPCACHE" ]; then
-  exit 0
+# Do not use compcache on the liveCD if we have more than 512M
+if [ "\${BOOT}" = "casper" ]; then
+    if [ "\${TOTAL_RAM}" -gt 524288 ]; then
+        exit 0
+    fi
 fi
 
 modprobe -Q --ignore-install compcache compcache_size_kbytes="$kbytes"

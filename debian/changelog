@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu10) intrepid; urgency=low
+
+  * drop silly COMPCACHE_PREREQ and SKIP_COMPCACHE hacks, instead we
+    export BOOT from init and deacivate compcache on the fly if booting
+    in casper if we have more than 512M actual ram available.
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Thu, 14 Aug 2008 00:10:13 +0200
+
 initramfs-tools (0.92bubuntu9) intrepid; urgency=low
 
   * Default update-initramfs.conf to not keep backups. With latest

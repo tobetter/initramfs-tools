@@ -167,6 +167,10 @@ fi
 depmod -a
 maybe_break top
 
+# export BOOT variable value for compcache,
+# so we know if we run from casper
+export BOOT
+
 # Don't do log messages here to avoid confusing usplash
 run_scripts /scripts/init-top
 
