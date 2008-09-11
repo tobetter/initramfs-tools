@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu11) intrepid; urgency=low
+
+  * scripts/local-premount/resume: Display a message indicating that a resume
+    has begun.  This is non-localized text, but is better than nothing until
+    we can display a graphical indicator.  (LP: #41137)
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Thu, 11 Sep 2008 09:26:31 +0100
+
 initramfs-tools (0.92bubuntu10) intrepid; urgency=low
 
   * drop silly COMPCACHE_PREREQ and SKIP_COMPCACHE hacks, instead we
