@@ -60,6 +60,7 @@ try_failure_hooks()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
+	chvt 1
 
 	for hook in /tmp/mountroot-fail-hooks.d/*; do
 		if [ -x ${hook} ] && ${hook} mountfail; then
