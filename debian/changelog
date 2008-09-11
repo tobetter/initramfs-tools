@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu12) intrepid; urgency=low
+
+  * scripts/functions: must chvt(1) during failure hooks, as console input
+    might be required (eg, boot degraded raid) (LP: #268873).
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 11 Sep 2008 16:49:17 -0400
+
 initramfs-tools (0.92bubuntu11) intrepid; urgency=low
 
   * scripts/local-premount/resume: Display a message indicating that a resume
