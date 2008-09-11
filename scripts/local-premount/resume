@@ -58,9 +58,20 @@ if [ ! -e "${resume}" ] || ! /lib/udev/vol_id "${resume}" >/dev/null 2>&1; then
 	fi
 fi
 
+if [ -x /sbin/usplash_write ]; then
+	/sbin/usplash_write "TEXT-URGENT Waking up.  Please wait..." || true
+fi
+
 # hardcode path, uswsusp ships an resume binary too
 if [ -n "${resume_offset}" ]; then
 	/bin/resume ${resume} ${resume_offset}
 else
 	/bin/resume ${resume}
+fi
+
+# Not reached if resume is successful
+
+if [ -x /sbin/usplash_write ]; then
+	/sbin/usplash_write "FAILURE failed!" || true
+    /sbin/usplash_write "TEXT-URGENT Attempting normal startup." || true
 fi
