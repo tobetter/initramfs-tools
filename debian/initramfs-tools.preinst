@@ -2,6 +2,17 @@
 
 set -e
 
+chrooted() {
+	# borrowed from udev's postinst
+	if [ "$(stat -c %d/%i /)" = "$(stat -Lc %d/%i /proc/1/root 2>/dev/null)" ]; then
+		# the devicenumber/inode pair of / is the same as that of
+		# /sbin/init's root, so we're *not* in a chroot and hence
+		# return false.
+		return 1
+	fi
+	return 0
+}
+
 case "$1" in
 	install)
 		mkdir -p /etc/initramfs-tools/conf.d
@@ -9,7 +20,11 @@ case "$1" in
 		# First time install.  Can we autodetect the RESUME partition?
 		if [ -r /proc/swaps ]; then
 			RESUME=$(tail -n $(($(wc -l /proc/swaps | awk ' { print $1 } ') - 1)) /proc/swaps | sort -rk3 | head -n 1 | awk ' { print $1 } ')
-			UUID=$(/sbin/vol_id -u "$RESUME" || true)
+			if [ -x /sbin/vol_id ]; then
+				UUID=$(/sbin/vol_id -u "$RESUME" || true)
+			elif [ -x /lib/udev/vol_id ]; then
+				UUID=$(/lib/udev/vol_id -u "$RESUME" || true)
+			fi
 			if [ -n "$UUID" ]; then
 				RESUME="UUID=$UUID"
 			fi
@@ -19,7 +34,8 @@ case "$1" in
 		if [ -e /etc/mkinitrd/mkinitrd.conf ]; then
 			 . /etc/mkinitrd/mkinitrd.conf
 		fi
-		if [ -e ${RESUME} ]; then
+		# write conf.d/resume if not in a chroot
+		if [ -n "${RESUME}" ] && ! chrooted; then
 			echo "RESUME=${RESUME}" > /etc/initramfs-tools/conf.d/resume
 		fi
 
@@ -32,7 +48,7 @@ case "$1" in
 			  -e '/# This file should/,/one per line\./d' \
 			  -e 's/Comments begin with.*/Syntax:  module_name [args ...]/' \
 			  -e 's/^#  ext2$/# raid1/' \
-			  -e 's/^#  wd io=0x300$/# sd_mod/'
+			  -e 's/^#  wd io=0x300$/# sd_mod/' \
 			  -e '/^ide-generic/d' \
 			  -e '/^ide-disk/d' \
 			  -e '/^ext2/d' \
@@ -43,29 +59,6 @@ case "$1" in
 		if [ -e /etc/mkinitrd/DSDT ]; then
 			cp /etc/mkinitrd/DSDT /etc/initramfs-tools/DSDT.aml
 		fi
-	;;
-	upgrade)
-	if [ -n "$2" ] && dpkg --compare-versions "$2" lt "0.61"; then
-		if [ -d /etc/initramfs-tools ]; then
-			echo
-			echo "Warning: /etc/initramfs-tools already exists."
-			echo "         Please remove it for upgrade."
-			echo
-			exit 1
-		fi
-		if [ -d /etc/mkinitramfs ]; then
-			# Reverting automatic edits to conffiles is perfectly acceptable. :P
-			if [ -f /etc/mkinitramfs/initramfs.conf ]; then
-				. /etc/mkinitramfs/initramfs.conf
-			fi
-			if [ -n ${RESUME} ]; then
-				mkdir -p /etc/mkinitramfs/conf.d
-				echo "RESUME=${RESUME}" > /etc/mkinitramfs/conf.d/resume
-				sed -i -e "s/^RESUME=.*/#RESUME=/" /etc/mkinitramfs/initramfs.conf
-			fi
-			mv /etc/mkinitramfs /etc/initramfs-tools
-		fi
-	fi
 	;;
 esac
 

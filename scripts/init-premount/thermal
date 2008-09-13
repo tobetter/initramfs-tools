@@ -18,11 +18,20 @@ esac
 case "$DPKG_ARCH" in
 # load the right modules
 powerpc|ppc64)
-	modprobe -Qb i2c-keywest
-	modprobe -Qb therm_pm72
+	modprobe i2c-powermac
+	modprobe therm_pm72
+	modprobe windfarm_cpufreq_clamp
+	modprobe windfarm_lm75_sensor
+	modprobe windfarm_max6690_sensor
+	modprobe windfarm_pm112
+	modprobe windfarm_pm81
+	modprobe windfarm_pm91
+	modprobe windfarm_smu_controls
+	modprobe windfarm_smu_sat
+	modprobe windfarm_smu_sensors
 	;;
 i386|amd64|ia64)
-	modprobe -Qb fan
-	modprobe -Qb thermal
+	modprobe fan
+	modprobe thermal
 	;;
 esac

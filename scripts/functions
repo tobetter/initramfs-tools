@@ -2,23 +2,23 @@
 
 _log_msg()
 {
-    if [ "$quiet" = "y" ]; then return; fi
-    echo "$@"
+	if [ "$quiet" = "y" ]; then return; fi
+	printf "$@"
 }
 
 log_success_msg()
 {
-    _log_msg "Success: $@"
+	_log_msg "Success: $@\n"
 }
 
 log_failure_msg()
 {
-    _log_msg "Failure: $@"
+	_log_msg "Failure: $@\n"
 }
 
 log_warning_msg()
 {
-    _log_msg "Warning: $@"
+	_log_msg "Warning: $@\n"
 }
 
 log_begin_msg()
@@ -26,7 +26,7 @@ log_begin_msg()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "TEXT $@"
 	fi
-	_log_msg "Begin: $@ ..."
+	_log_msg "Begin: $@ ... "
 }
 
 log_end_msg()
@@ -34,24 +34,7 @@ log_end_msg()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "SUCCESS ok"
 	fi
-	_log_msg "Done."
-	update_progress
-}
-
-update_progress()
-{
-	[ -d /dev/.initramfs ] || return
-
-	if [ -z "$PROGRESS_STATE" ]; then
-		export PROGRESS_STATE=0
-	fi
-
-	PROGRESS_STATE=$(($PROGRESS_STATE + 1))
-	echo "PROGRESS_STATE=${PROGRESS_STATE}" > /dev/.initramfs/progress_state
-
-	if [ -x /sbin/usplash_write ]; then
-		/sbin/usplash_write "PROGRESS $PROGRESS_STATE"
-	fi
+	_log_msg "done.\n"
 }
 
 panic()
@@ -59,15 +42,20 @@ panic()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
-	modprobe -q i8042
-	modprobe -q atkbd
+	# Disallow console access
+	if [ -n "${panic}" ]; then
+		sleep ${panic}
+		reboot
+	fi
+	modprobe i8042
+	modprobe atkbd
 	echo $@
-	PS1='(initramfs) ' /bin/sh </dev/console >/dev/console 2>&1
+	PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
 
 maybe_break()
 {
-	if [ x$1 = x${break} ]; then
+	if [ "${break}" = "$1" ]; then
 		panic "Spawning shell within the initramfs"
 	fi
 }
@@ -81,10 +69,33 @@ set_initlist()
 {
 	unset initlist
 	for si_x in ${initdir}/*; do
+		# skip empty dirs without warning
+		[ "${si_x}" = "${initdir}/*" ] && return
+
+		# only allow variable name chars
+		case ${si_x#${initdir}/} in
+		*[![:alnum:]_]*)
+			[ "${verbose}" = "y" ] \
+			&& echo "$si_x ignored: not alphanumeric or '_' file"
+			continue
+			;;
+		esac
+
+		# skip non executable scripts
 		if [ ! -x ${si_x} ]; then
+			[ "${verbose}" = "y" ] \
+			&& echo "$si_x ignored: not executable"
 			continue
 		fi
-		initlist="${initlist} $(basename ${si_x})"
+
+		# skip directories
+		if [ -d ${si_x} ]; then
+			[ "${verbose}" = "y" ] \
+			&& echo "$si_x ignored: a directory"
+			continue
+		fi
+
+		initlist="${initlist} ${si_x#${initdir}/}"
 	done
 }
 
@@ -93,7 +104,18 @@ reduce_satisfied()
 	deplist="$(render array_${1})"
 	unset tmpdeplist
 	for rs_y in ${deplist}; do
-		if [ ! -f ${initdir}/${rs_y} ]; then
+		# only allow variable name chars
+		case ${rs_y} in
+		*[![:alnum:]_]*)
+			continue
+			;;
+		esac
+		# skip non executable scripts
+		if [ ! -x ${initdir}/${rs_y} ]; then
+			continue
+		fi
+		# skip directories
+		if [ -d ${initdir}/${rs_y} ]; then
 			continue
 		fi
 		tmpdeplist="${tmpdeplist} ${rs_y}"
@@ -117,7 +139,7 @@ get_prereqs()
 
 count_unsatisfied()
 {
-	set - ${@}
+	set -- ${@}
 	return ${#}
 }
 
@@ -126,7 +148,7 @@ pop_list_item()
 {
 	item=${1}
 	shift
-	set - ${@}
+	set -- ${@}
 	unset tmppop
 	# Iterate
 	for pop in ${@}; do
@@ -142,8 +164,7 @@ pop_list_item()
 reduce_prereqs()
 {
 	unset runlist
-	set_initlist
-	set - ${initlist}
+	set -- ${initlist}
 	i=$#
 	# Loop until there's no more in the queue to loop through
 	while [ ${i} -ne 0 ]; do
@@ -160,8 +181,7 @@ reduce_prereqs()
 			fi
 		done
 		if [ ${i} -eq ${oldi} ]; then
-			echo "PANIC: Circular dependancy.  Exiting." >&2
-			exit 1
+			panic "PANIC: Circular dependancy.  Exiting."
 		fi
 	done
 }
@@ -169,6 +189,10 @@ reduce_prereqs()
 call_scripts()
 {
 	for cs_x in ${runlist}; do
+		# mkinitramfs verbose output
+		if [ "${verbose}" = "y" ]; then
+			echo "Calling hook ${cs_x}"
+		fi
 		${initdir}/${cs_x}
 		# allow boot scripts to modify exported boot paramaters
 		if [ -e /conf/param.conf ]; then
@@ -180,40 +204,10 @@ call_scripts()
 run_scripts()
 {
 	initdir=${1}
+	[ ! -d ${initdir} ] && return
 	get_prereqs
 	reduce_prereqs
 	call_scripts
-}
-
-check_minkver()
-{
-	curversion=${1}
-	initdir=${2}
-	set_initlist
-	if [ -z ${initdir} ]; then
-		DPKG_ARCH=`dpkg --print-installation-architecture`
-		case ${DPKG_ARCH} in
-			ia64|hppa)
-				minversion="2.6.15"
-			;;
-			*)
-				minversion="2.6.12"
-			;;
-		esac
-		if dpkg --compare-versions "${curversion}" lt "${minversion}"; then
-			echo "W: kernerl ${curversion} too old for initramfs on ${DPKG_ARCH}" >&2
-			echo "W: not generating requested initramfs for kernel ${curversion}" >&2
-			exit 2
-		fi
-	fi
-	[ -z ${initdir} ] || for cm_x in ${initlist}; do
-		tmp=$(eval echo $(grep ^MINKVER ${initdir}/${cm_x} | cut -d'=' -f2))
-		if dpkg --compare-versions "${curversion}" lt "${tmp}"; then
-			echo "W: ${cm_x} hook script requires at least kernel version ${tmp}" >&2
-			echo "W: not generating requested initramfs for kernel ${curversion}" >&2
-			exit 2
-		fi
-	done
 }
 
 # Load custom modules first
@@ -222,7 +216,7 @@ load_modules()
 	if [ -e /conf/modules ]; then
 		cat /conf/modules | while read m; do
 			# Skip empty lines
-			if [ -z "$m" ];  then 
+			if [ -z "$m" ];  then
 				continue
 			fi
 			# Skip comments - d?ash removes whitespace prefix
@@ -230,7 +224,7 @@ load_modules()
 			if [ "$com" = "#" ]; then
 				continue
 			fi
-			modprobe -q $m
+			modprobe $m
 		done
 	fi
 }
@@ -248,16 +242,67 @@ parse_numeric() {
 		minor=${1#*:}
 		major=${1%:*}
 		;;
-	[0-9][0-9][0-9])
-		minor=$((0x${1#?}))
-		major=$((0x${1%??}))
+	[A-Fa-f0-9]*)
+		value=$(( 0x${1} ))
+		minor=$(( ${value} % 256 ))
+		major=$(( ${value} / 256 ))
 		;;
 	*)
-		minor=$((0x${1#??}))
-		major=$((0x${1%??}))
+		return
 		;;
 	esac
 
-	mknod /dev/root b ${major} ${minor}
+	mknod -m 600 /dev/root b ${major} ${minor}
 	ROOT=/dev/root
+}
+
+configure_networking()
+{
+	# networking already configured thus bail out
+	[ -n "${DEVICE}" ] && [ -e /tmp/net-"${DEVICE}".conf ] && return 0
+
+	# support ip options see linux sources Documentation/nfsroot.txt
+	case ${IPOPTS} in
+	none|off)
+		# Do nothing
+		;;
+	""|on|any)
+		# Bring up device
+		ipconfig ${DEVICE}
+		;;
+	dhcp|bootp|rarp|both)
+		ipconfig -c ${IPOPTS} -d ${DEVICE}
+		;;
+	*)
+		ipconfig -d $IPOPTS
+
+		# grab device entry from ip option
+		NEW_DEVICE=${IPOPTS#*:*:*:*:*:*}
+		if [ "${NEW_DEVICE}" != "${IPOPTS}" ]; then
+			NEW_DEVICE=${NEW_DEVICE%:*}
+		else
+			# wrong parse, possibly only a partial string
+			NEW_DEVICE=
+		fi
+		if [ -n "${NEW_DEVICE}" ]; then
+			DEVICE="${NEW_DEVICE}"
+		fi
+		;;
+	esac
+
+	# source ipconfig output
+	if [ -n "${DEVICE}" ]; then
+		# source specific bootdevice
+		. /tmp/net-${DEVICE}.conf
+	else
+		# source any interface as not exaclty specified
+		. /tmp/net-*.conf
+	fi
+}
+
+# Wait for queued kernel/udev events
+wait_for_udev()
+{
+	[ -x "$(command -v udevadm)" ] && return 0
+	udevadm settle ${1:+--timeout=$1}
 }
