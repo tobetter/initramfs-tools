@@ -58,7 +58,15 @@ if [ ! -e "${resume}" ] || ! /lib/udev/vol_id "${resume}" >/dev/null 2>&1; then
 	fi
 fi
 
-if [ -x /sbin/usplash_write ]; then
+magic=SWAPSPACE2S1SUSPEND
+str=$(dd if=$resume bs=1 skip=4076 count=19)
+magic_found=
+
+if [ "$str" = "$magic" ]; then
+	magic_found=yes
+fi
+
+if [ -n "$magic_found" -a -x /sbin/usplash_write ]; then
 	/sbin/usplash_write "TEXT-URGENT Waking up.  Please wait..." || true
 fi
 
@@ -71,7 +79,7 @@ fi
 
 # Not reached if resume is successful
 
-if [ -x /sbin/usplash_write ]; then
+if [ -n "$magic_found" -a -x /sbin/usplash_write ]; then
 	/sbin/usplash_write "FAILURE failed!" || true
     /sbin/usplash_write "TEXT-URGENT Attempting normal startup." || true
 fi
