@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu13) intrepid; urgency=low
+
+  * scripts/local-premount/resume: Fix incorrect resume message by checking
+    for swsusp signature before assuming there's a resume about to happen
+
+ -- Matt Zimmerman <mdz@ubuntu.com>  Tue, 16 Sep 2008 11:49:55 +0100
+
 initramfs-tools (0.92bubuntu12) intrepid; urgency=low
 
   * scripts/functions: must chvt(1) during failure hooks, as console input
