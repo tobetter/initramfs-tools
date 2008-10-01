@@ -1,3 +1,12 @@
+initramfs-tools (0.92bubuntu15) intrepid; urgency=low
+
+  [ Dan Munckton ]
+  * Revert "framebuffer: Let udev create fb devices." udev isn't started at
+    this point and therefore can't create framebuffer devices. This causes
+    usplash not to run on PS3 (LP: #274860).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 01 Oct 2008 16:02:37 +0100
+
 initramfs-tools (0.92bubuntu14) intrepid; urgency=low
 
   * scripts/functions: Call ipconfig with a one-minute timeout rather than
