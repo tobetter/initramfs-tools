@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu14) intrepid; urgency=low
+
+  * scripts/functions: Call ipconfig with a one-minute timeout rather than
+    waiting forever (LP: #182940).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 01 Oct 2008 14:51:59 +0100
+
 initramfs-tools (0.92bubuntu13) intrepid; urgency=low
 
   * scripts/local-premount/resume: Fix incorrect resume message by checking
