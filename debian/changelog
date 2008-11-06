@@ -1,3 +1,15 @@
+initramfs-tools (0.85eubuntu39.3) hardy-proposed; urgency=low
+
+  * Functionality backported from Intrepid to Hardy to support booting
+    degraded RAID, LP: #290885.
+  * scripts/functions: Adjust the mountroot failure hooks framework to
+    that used in Intrepid, renaming the function so as not to break other
+    callers in Hardy
+  * scripts/local: Add get_fstype() and root_missing() helper functions
+    and fix the root_missing loop
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 06 Nov 2008 22:11:27 +0100
+
 initramfs-tools (0.85eubuntu39.2) hardy-proposed; urgency=low
 
   * Whilst looping for the root filesystem, don't just rely on the existance

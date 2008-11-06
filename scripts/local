@@ -1,5 +1,40 @@
 # Local filesystem mounting			-*- shell-script -*-
 
+# Parameter: device node to check
+# Echos fstype to stdout
+# Return value: indicates if an fs could be recognized
+get_fstype ()
+{
+	local FS FSTYPE FSSIZE RET
+	FS="${1}"
+
+	# vol_id has a more complete list of file systems,
+	# but fstype is more robust
+	eval $(fstype "${FS}" 2> /dev/null)
+
+	if [ -z "${FSTYPE}" ]; then
+		FSTYPE="unknown"
+	fi
+
+	if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
+		FSTYPE=$(/lib/udev/vol_id -t "${FS}" 2> /dev/null)
+	fi
+	RET=$?
+
+	if [ -z "${FSTYPE}" ]; then
+		FSTYPE="unknown"
+	fi
+
+	echo "${FSTYPE}"
+	return ${RET}
+}
+
+root_missing()
+{
+	ROOT="${1}"
+	[ ! -e "${ROOT}" ] || ! $(get_fstype "${ROOT}" >/dev/null) || ! /sbin/udevadm settle
+}
+
 # Parameter: Where to mount the filesystem
 mountroot ()
 {
@@ -9,7 +44,7 @@ mountroot ()
 
 	# If the root device hasn't shown up yet, give it a little while
 	# to deal with removable devices
-	if [ ! -e "${ROOT}" ] || ! /lib/udev/vol_id "${ROOT}" >/dev/null 2>&1 || ! /sbin/udevadm settle; then
+	while root_missing "${ROOT}"; do
 		log_begin_msg "Waiting for root file system..."
 
 		# Default delay is 180s
@@ -23,7 +58,7 @@ mountroot ()
 		fi
 
 		slumber=$(( ${slumber} * 10 ))
-		while [ ! -e "${ROOT}" ] || ! /lib/udev/vol_id "${ROOT}" >/dev/null 2>&1 || ! /sbin/udevadm settle; do
+		while root_missing "${ROOT}"; do
 			/bin/sleep 0.1
 			slumber=$(( ${slumber} - 1 ))
 			[ ${slumber} -gt 0 ] || break
@@ -37,10 +72,16 @@ mountroot ()
 		if [ -x /sbin/usplash_write ]; then
 			/sbin/usplash_write "TIMEOUT 15" || true
 		fi
-	fi
+		# Run failure hooks, hoping one of them can fix up the system
+		# and we can restart the wait loop.  If they all fail, abort
+		# and move on to the panic handler and shell.
+		if root_missing "${ROOT}" && ! try_failure_hooks; then
+			break
+		fi
+	done
 
 	# We've given up, but we'll let the user fix matters if they can
-	while [ ! -e "${ROOT}" ] || ! /lib/udev/vol_id "${ROOT}" >/dev/null 2>&1 || ! /sbin/udevadm settle; do
+	while root_missing "${ROOT}"; do
 		echo "	Check root= bootarg cat /proc/cmdline"
 		echo "	or missing modules, devices: cat /proc/modules ls /dev"
 		panic -r "ALERT!  ${ROOT} does not exist.  Dropping to a shell!"
@@ -48,13 +89,9 @@ mountroot ()
 
 	# Get the root filesystem type if not set
 	if [ -z "${ROOTFSTYPE}" ]; then
-		eval $(fstype < ${ROOT})
+		FSTYPE=$(get_fstype "${ROOT}")
 	else
 		FSTYPE=${ROOTFSTYPE}
-	fi
-	if [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
-		FSTYPE=$(/lib/udev/vol_id -t ${ROOT})
-		[ -z "$FSTYPE" ] && FSTYPE="unknown"
 	fi
 
 	[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/local-premount"
