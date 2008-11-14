@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu16) intrepid-proposed; urgency=low
+
+  * Added atl1e to the list of NICs built into the initramfs.
+    -LP: #292411
+
+ -- Tim Gardner <tim.gardner@canonical.com>  Fri, 14 Nov 2008 11:40:29 -0700
+
 initramfs-tools (0.92bubuntu15) intrepid; urgency=low
 
   [ Dan Munckton ]
