@@ -1,3 +1,15 @@
+initramfs-tools (0.92bubuntu17) jaunty; urgency=low
+
+  [ Mikael Gerdin ]
+  * Create /dev/mem and /dev/zero if video=uvesafb (LP: #285970).
+
+  [ Colin Watson ]
+  * Make debug option write debug output to /dev/.initramfs/initramfs.debug
+    rather than /tmp/initramfs.debug, so that it can be retrieved after
+    boot.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 26 Nov 2008 17:22:18 +0000
+
 initramfs-tools (0.92bubuntu16) intrepid-proposed; urgency=low
 
   * Added atl1e to the list of NICs built into the initramfs.

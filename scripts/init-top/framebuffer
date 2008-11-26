@@ -77,6 +77,10 @@ case ${FB} in
 matroxfb)
 	FB=matroxfb_base
 	;;
+uvesafb)
+	mknod -m 640 /dev/mem c 1 1
+	mknod -m 666 /dev/zero c 1 5
+	;;
 *)
 	;;
 esac
