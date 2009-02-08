@@ -67,7 +67,13 @@ if [ "$str" = "$magic" ]; then
 fi
 
 if [ -n "$magic_found" -a -x /sbin/usplash_write ]; then
-	/sbin/usplash_write "TEXT-URGENT Waking up.  Please wait..." || true
+	# Force usplash to finish drawing before attempting resume.
+	# The screen can sometimes become corrupted if usplash is
+	# interrupted by the resume.
+	/sbin/usplash_write "PROGRESS 0" \
+		"TEXT-URGENT Waking up.  Please wait..." \
+		"INPUTCHAR" || true
+	read ignored < /dev/.initramfs/usplash_outfifo
 fi
 
 # hardcode path, uswsusp ships an resume binary too
@@ -80,6 +86,6 @@ fi
 # Not reached if resume is successful
 
 if [ -n "$magic_found" -a -x /sbin/usplash_write ]; then
-	/sbin/usplash_write "FAILURE failed!" || true
-    /sbin/usplash_write "TEXT-URGENT Attempting normal startup." || true
+	/sbin/usplash_write "FAILURE failed!" \
+		"TEXT-URGENT Attempting normal startup." || true
 fi
