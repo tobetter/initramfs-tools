@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu21) jaunty; urgency=low
+
+  * mkinitramfs: catch errors in find/cpio/gzip pipe (debian bug 514938):
+    - git 63cc7b9216d69f413cd5414c96cf2c9a403e03ae
+    - git 93654c9230d3817fa57069012a0b06ccb1df09e4
+
+ -- Kees Cook <kees@ubuntu.com>  Sun, 15 Feb 2009 09:48:50 -0800
+
 initramfs-tools (0.92bubuntu20) jaunty; urgency=low
 
   * scripts/local-premount/resume: wait for usplash drawing routines
