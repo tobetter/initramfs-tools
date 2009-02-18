@@ -259,7 +259,7 @@ dep_add_modules()
 			block=$(awk "/^${block}/{print substr(\$5, 1, 4); exit}" \
 				/proc/mdstat)
 		fi
-		block=${block%[0-9]*}
+		block=${block%%[0-9]*}
 	# md root new naming scheme /dev/md/X
 	elif [ "${root#/dev/md/}" != "${root}" ]; then
 		root=${root#/dev/md/}
@@ -283,10 +283,19 @@ dep_add_modules()
 		root=${root#/dev/}
 		block=$(losetup -a \
 			| awk "/${root}/{print substr(\$3, 7, 3); exit}")
+	# Xen virtual device /dev/xvdX
+	elif [ "${root#/dev/xvd}" != "${root}" ]; then
+		block=${root#/dev/}
+		# Xen has a mode where only the individual partitions are
+		# registered with the kernel as well as the usual full disk
+		# with partition table scheme.
+		if [ ! -e /sys/block/${block} ] ; then
+			block=${block%%[0-9]*}
+		fi
 	# classical root device
 	else
 		block=${root#/dev/}
-		block=${block%[0-9]*}
+		block=${block%%[0-9]*}
 	fi
 
 	# Error out if /sys lack block dev
@@ -336,7 +345,11 @@ auto_add_modules()
 {
 	case "$1" in
 	base)
-		for x in ehci-hcd ohci-hcd uhci-hcd usbhid usb-storage ext2 \
+		for x in ehci-hcd ohci-hcd uhci-hcd usbhid hid_a4tech \
+		hid_apple hid_belkin hid_bright hid_cherry hid_chicony \
+		hid_cypress hid_dell hid_ezkey hid_gyration hid_logitech \
+		hid_microsoft hid_monterey hid_petalynx hid_pl 	hid_samsung \
+		hid_sony hid_sunplus hid_tmff hid_zpff usb-storage ext2 \
 		ext3 ext4 ext4dev isofs jfs nfs reiserfs udf xfs af_packet \
 		atkbd i8042 virtio_pci; do
 			manual_add_modules "${x}"
@@ -375,7 +388,6 @@ auto_add_modules()
 	block)
 		copy_modules_dir kernel/drivers/block
 	;;
-	# FIXME: can be removed after Lenny release
 	ieee1394)
 		for x in ohci1394 sbp2; do
 			manual_add_modules "${x}"
