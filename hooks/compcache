@@ -62,7 +62,7 @@ if [ "\${BOOT}" = "casper" ]; then
     fi
 fi
 
-modprobe -Q --ignore-install compcache compcache_size_kbytes="$kbytes"
+modprobe -q --ignore-install compcache compcache_size_kbytes="$kbytes"
 EOF
 chmod 0755 "$DESTDIR"/scripts/init-top/compcache
 
