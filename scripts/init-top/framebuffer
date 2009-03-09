@@ -87,8 +87,8 @@ esac
 
 if [ -n "${FB}" ]; then
 	unset MODPROBE_OPTIONS
-	modprobe -Q fbcon
-	modprobe -Q ${FB} ${OPTS}
+	modprobe -q fbcon
+	modprobe -q ${FB} ${OPTS}
 fi
 
 if [ -e /proc/fb ]; then
