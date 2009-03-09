@@ -24,7 +24,7 @@ export DPKG_ARCH=
 . /conf/arch.conf
 
 # Set modprobe env
-export MODPROBE_OPTIONS="-Qb"
+export MODPROBE_OPTIONS="-qb"
 
 # Export relevant variables
 export ROOT=
