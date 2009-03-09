@@ -1,3 +1,9 @@
+initramfs-tools (0.92bubuntu23) jaunty; urgency=low
+
+  * Forgot the top-level MODPROBE_OPTIONS set.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Mon, 09 Mar 2009 22:06:46 +0000
+
 initramfs-tools (0.92bubuntu22) jaunty; urgency=low
 
   * Replace calls to modprobe -Q with -q.  LP: #340128.
