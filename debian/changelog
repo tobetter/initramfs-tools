@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu24) jaunty; urgency=low
+
+  * update-initramfs:
+    - when doing set_linked_version, check if the links point
+      to a existing initrd.img
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Wed, 11 Mar 2009 10:25:42 +0100
+
 initramfs-tools (0.92bubuntu23) jaunty; urgency=low
 
   * Forgot the top-level MODPROBE_OPTIONS set.
