@@ -1,3 +1,9 @@
+initramfs-tools (0.92bubuntu25) jaunty; urgency=low
+
+  * mkinitramfs: include the modules.order file.  LP: #296710.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 13 Mar 2009 16:11:49 +0000
+
 initramfs-tools (0.92bubuntu24) jaunty; urgency=low
 
   * update-initramfs:
