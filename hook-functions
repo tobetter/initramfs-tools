@@ -292,6 +292,10 @@ dep_add_modules()
 		if [ ! -e /sys/block/${block} ] ; then
 			block=${block%%[0-9]*}
 		fi
+	# mmc root /dev/mmcblkXpX
+	elif [ "${root#/dev/mmcblk}" != "${root}" ]; then
+		block=${root#/dev/}
+		block=${block%%p[0-9]*}
 	# classical root device
 	else
 		block=${root#/dev/}
@@ -300,7 +304,7 @@ dep_add_modules()
 
 	# Error out if /sys lack block dev
 	if [ -z "${block}" ] || [ ! -e /sys/block/${block} ]; then
-		echo "mkinitramfs: missing ${block} root ${root} /sys entry"
+		echo "mkinitramfs: for root ${root} missing ${block} /sys/block/ entry"
 		echo "mkinitramfs: workaround is MODULES=most" 
 		echo "mkinitramfs: Error please report the bug" 
 		exit 1
@@ -313,6 +317,8 @@ dep_add_modules()
 	# catch old-style IDE
 	if [ -e /sys/bus/ide/devices/ ]; then
 		sys_walk_modalias ${root_dev_path}
+		manual_add_modules ide-gd_mod
+		# FIXME: remove post Squeeze
 		manual_add_modules ide-disk
 		manual_add_modules ide-cd
 	fi
@@ -434,7 +440,7 @@ Options:
   -d confdir  Specify an alternative configuration directory.
   -k          Keep temporary directory used to make the image.
   -o outfile  Write to outfile.
-  -r root     Override ROOT setting in mkinitrd.conf.
+  -r root     Override ROOT setting in initramfs.conf.
 
 See mkinitramfs(8) for further details.
 EOF
