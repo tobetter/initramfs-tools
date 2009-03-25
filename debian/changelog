@@ -1,3 +1,9 @@
+initramfs-tools (0.92bubuntu26) jaunty; urgency=low
+
+  * hooks/thermal: Do not load thermal control for macintosh if the device is a PS3. (LP: #346899)
+
+ -- Arnaud Jeansen <arnaud.jeansen@gmail.com>  Thu, 26 Mar 2009 00:41:46 +0100
+
 initramfs-tools (0.92bubuntu25) jaunty; urgency=low
 
   * mkinitramfs: include the modules.order file.  LP: #296710.
