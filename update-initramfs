@@ -187,8 +187,10 @@ run_lilo()
 # check if lilo is on mbr
 mbr_check()
 {
-	# try to discover grub and be happy
-	# FIXME: check grub2 /boot/grub/grub.cfg
+	# try to discover grub|grub2 and be happy
+	[ -r /boot/grub/grub.cfg ] \
+		&& groot=$(awk '/^set root=/{print substr($2, 7, 3); exit}' \
+			/boot/grub/grub.cfg)
 	[ -r /boot/grub/menu.lst ] \
 		&& groot=$(awk '/^root/{print substr($2, 2, 3); exit}' \
 			/boot/grub/menu.lst)
@@ -233,23 +235,22 @@ mbr_check()
 run_bootloader()
 {
 	# if both lilo and grub around, figure out if lilo needs to be run
-	if [ -x "$(command -v update-grub)" ] || [ -e /boot/grub/menu.lst ] \
-	|| [ -e /boot/grub/grub.cfg ]; then
-		if [ -e /etc/lilo.conf ] && [ -x /sbin/lilo ]; then
-			[ -r "${KPKGCONF}" ] && \
-			do_b=$(awk  '/^do_bootloader/{print $3}' "${KPKGCONF}")
-			if [ "${do_b}" = "yes" ] || [ "${do_b}" = "Yes" ] \
-				|| [ "${do_b}" = "YES" ]; then
-				run_lilo
-				return 0
-			elif [ "${do_b}" = "no" ] || [ "${do_b}" = "No" ] \
-				|| [ "${do_b}" = "NO" ]; then
-				return 0
-			else
-				mbr_check
-				return 0
-			fi
+	if ( [ -x "$(command -v update-grub)" ] || [ -e /boot/grub/menu.lst ] \
+	     || [ -e /boot/grub/grub.cfg ] ) \
+	&& ( [ -e /etc/lilo.conf ] && [ -x /sbin/lilo ] ); then
+		[ -r "${KPKGCONF}" ] && \
+		do_b=$(awk  '/^do_bootloader/{print $3}' "${KPKGCONF}")
+		if [ "${do_b}" = "yes" ] || [ "${do_b}" = "Yes" ] \
+		|| [ "${do_b}" = "YES" ]; then
+			run_lilo
+			return 0
+		elif [ "${do_b}" = "no" ] || [ "${do_b}" = "No" ] \
+		|| [ "${do_b}" = "NO" ]; then
+			return 0
 		fi
+
+		# do_bootloader unconfigured
+		mbr_check
 		return 0
 	fi
 	if [ -r /etc/lilo.conf ] && [ -x /sbin/lilo ]; then
@@ -389,11 +390,11 @@ update()
 	fi
 
 	if [ -z "${version}" ]; then
-		set_linked_version
+		set_highest_version
 	fi
 
 	if [ -z "${version}" ]; then
-		set_highest_version
+		set_linked_version
 	fi
 
 	if [ -z "${version}" ]; then
@@ -502,6 +503,13 @@ while getopts "k:cudyvtb:h?" flag; do
 		;;
 	esac
 done
+
+shift $((${OPTIND} - 1))
+
+if [ $# -ne 0 ]; then
+	echo "Invalid argument for option -k."	
+	usage
+fi
 
 # Validate arguments
 if [ -z "${mode}" ]; then
