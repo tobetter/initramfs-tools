@@ -1,3 +1,12 @@
+initramfs-tools (0.92bubuntu27) jaunty; urgency=low
+
+  * Backport from Debian (LP: #347685):
+    - init: Fix boot with LABEL containing one or several '/'. Thanks to
+      Andres Salomon <dilinger@debian.org> for testing. (closes: #489008)
+    - scripts/local-premount/resume: Fix resume with LABEL containing '/'.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 03 Apr 2009 02:04:34 +0100
+
 initramfs-tools (0.92bubuntu26) jaunty; urgency=low
 
   * hooks/thermal: Do not load thermal control for macintosh if the device is a PS3. (LP: #346899)
