@@ -262,6 +262,9 @@ run_bootloader()
 	if [ -r /etc/zipl.conf ]; then
 		zipl
 	fi
+	if flash-kernel --supported >/dev/null 2>&1; then
+		flash-kernel
+	fi
 }
 
 compare_sha1()

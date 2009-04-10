@@ -1,3 +1,12 @@
+initramfs-tools (0.92bubuntu28) jaunty; urgency=low
+
+  * update-initramfs: copy the logic added in Debian to run flash-kernel after
+    the initrd has been generated (if the system is supported by
+    flash-kernel); flash-kernel is run twice, but at least the system really
+    runs the latest initrd; LP: #358762.
+
+ -- Loic Minier <lool@dooz.org>  Sat, 11 Apr 2009 00:07:04 +0200
+
 initramfs-tools (0.92bubuntu27) jaunty; urgency=low
 
   * Backport from Debian (LP: #347685):
