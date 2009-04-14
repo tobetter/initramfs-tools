@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu29) jaunty; urgency=low
+
+  * copy_exec: also avoid picking sse2, neon, and vfp hwcaps versions of libs.
+  * Move debhelper and cdbs from -Indep to Build-Depends for clean:.
+
+ -- Loic Minier <lool@dooz.org>  Tue, 14 Apr 2009 11:11:52 +0200
+
 initramfs-tools (0.92bubuntu28) jaunty; urgency=low
 
   * update-initramfs: copy the logic added in Debian to run flash-kernel after
