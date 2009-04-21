@@ -152,8 +152,9 @@ copy_exec() {
 	    s/[[:blank:]]*\([^[:blank:]]*\) (.*)/\1/' 2>/dev/null); do
 
 		# Try to use non-optimised libraries where possible.
-		# We assume that all HWCAP libraries will be in tls.
-		nonoptlib=$(echo "${x}" | sed -e 's#/lib/\(tls\|i686\).*/\(lib.*\)#/lib/\2#')
+		# We assume that all HWCAP libraries will be in tls,
+		# sse2, vfp or neon.
+		nonoptlib=$(echo "${x}" | sed -e 's#/lib/\(tls\|i686\|sse2\|neon\|vfp\).*/\(lib.*\)#/lib/\2#')
 
 		if [ -e "${nonoptlib}" ]; then
 			x="${nonoptlib}"
@@ -227,6 +228,12 @@ sys_walk_modalias()
 dep_add_modules()
 {
 	local block minor root FSTYPE root_dev_path x
+
+	# require mounted sysfs
+	if [ ! -d /sys/kernel/ ]; then
+		echo "mkinitramfs: MODULES dep requires mounted sysfs on /sys"
+		exit 1
+	fi
 
 	# findout root block device + fstype
 	eval "$(mount | awk '/\/dev\// {if ($3 == "/") {print "root=" $1 "\nFSTYPE=" $5; exit}}')"
@@ -381,7 +388,7 @@ auto_add_modules()
 		hp100 igb ipg ixgb ixgbe mace mlx4_core mv643xx_eth myri10ge \
 		natsemi ne2k-pci netconsole netxen_nic niu ns83820 \
 		pcnet32 qla3xxx \
-		r8169 s2io sfc sis900 skge sky2 slhc smc911x starfire \
+		r8169 s2io sfc sis900 skge sky2 slhc smc91x starfire \
 		sundance sungem sungem_phy sunhme sunvnet tehuti tg3 tlan \
 		tulip typhoon via-rhine via-velocity winbond-840 \
 		xircom_cb xircom_tulip_cb yellowfin; do
@@ -389,6 +396,9 @@ auto_add_modules()
 		done
 	;;
 	fb)
+		for x in i915; do
+			manual_add_modules "${x}"
+		done
 		copy_modules_dir kernel/drivers/video
 		copy_modules_dir kernel/drivers/char/agp
 	;;
@@ -473,7 +483,6 @@ check_minkver()
 	curversion="${1}"
 	initdir="${2}"
 	if [ -z "${initdir}" ]; then
-		DPKG_ARCH=$(dpkg --print-installation-architecture)
 		case ${DPKG_ARCH} in
 			ia64|hppa)
 				minversion="2.6.15"
