@@ -1,3 +1,9 @@
+initramfs-tools (0.92bubuntu30) karmic; urgency=low
+
+  * Replace all instances of vol_id with blkid, and depend on util-linux
+
+ -- Scott James Remnant <scott@ubuntu.com>  Thu, 07 May 2009 12:52:20 +0100
+
 initramfs-tools (0.92bubuntu29) jaunty; urgency=low
 
   * copy_exec: also avoid picking sse2, neon, and vfp hwcaps versions of libs.
