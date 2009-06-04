@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu31) karmic; urgency=low
+
+  * Set the permissions on the initramfs root to 755, as otherwise
+    unionfs-fuse (which may be used via casper) can't service requests made
+    by non-root users.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Thu, 04 Jun 2009 02:58:57 +0100
+
 initramfs-tools (0.92bubuntu30) karmic; urgency=low
 
   * Replace all instances of vol_id with blkid, and depend on util-linux
