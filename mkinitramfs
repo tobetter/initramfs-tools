@@ -227,6 +227,7 @@ esac
 # klibc
 ln -s /usr/lib/klibc/bin/* ${DESTDIR}/bin
 ln -s /lib/klibc-*.so ${DESTDIR}/lib
+rm -f ${DESTDIR}/bin/kinit* ${DESTDIR}/bin/gzip
 
 copy_exec /usr/share/initramfs-tools/init /init
 
@@ -246,6 +247,7 @@ for b in $(cd "${CONFDIR}/scripts" && find . \
 done
 
 echo "DPKG_ARCH=${DPKG_ARCH}" > ${DESTDIR}/conf/arch.conf
+echo "PAGE_SIZE=$(getconf PAGESIZE)" > ${DESTDIR}/conf/page_size.conf
 copy_exec "${CONFDIR}/initramfs.conf" /conf
 for i in ${EXTRA_CONF}; do
 	if [ -e "${CONFDIR}/conf.d/${i}" ]; then
@@ -270,6 +272,13 @@ if [ "${BUSYBOX}" = "n" ] || [ ! -e ${BUSYBOXDIR}/busybox ]; then
 		echo "Warning: Busybox is required for successful boot!"
 	fi
 else
+	# Busybox is configured to prefer its own applets, so remove
+	# duplication from klibc.
+	for cmd in `${BUSYBOXDIR}/busybox | sed -n '/functions:$/,$p' \
+		| tail -n +2 \
+		| sed -e 's/[[:space:]]*//g; s/,$//; s/,/\n/g; /busybox/d'`; do
+		rm -f ${DESTDIR}/bin/${cmd}
+	done
 	rm -f ${DESTDIR}/bin/sh
 	rm -f ${DESTDIR}/bin/busybox
 	copy_exec ${BUSYBOXDIR}/busybox /bin/busybox
@@ -280,6 +289,12 @@ else
 	# needs /bin/mount to exist, so add a symlink
 	rm -f ${DESTDIR}/bin/mount
 	ln -s busybox ${DESTDIR}/bin/mount
+	# ... but some scripts expect /bin/sleep to exist. Boo.
+	ln -s busybox ${DESTDIR}/bin/sleep
+	# Useless
+	for cmd in minips nuke sh.shared; do
+		rm -f ${DESTDIR}/bin/${cmd}
+	done
 fi
 
 # Modutils
