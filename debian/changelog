@@ -1,3 +1,26 @@
+initramfs-tools (0.92bubuntu32) karmic; urgency=low
+
+  * Copy in KMS drivers (currently just i915 and the AGP drivers) if we can,
+    so that we can load them before starting usplash. NOTE that this whole
+    edifice is not intended to be used by default on most systems for
+    Karmic, and that the general intent is to make the initramfs smaller
+    rather than larger; however, we're still going to need usplash in the
+    initramfs for some use cases (e.g. dm-crypt), so we might as well get
+    this working now.
+  * Fix formatting error in initramfs-tools(8).
+  * 'set -e' in initramfs-tools.postrm.
+  * Fix handling of resume_offset: if it's set then we need to check in a
+    different location for the swap signature.
+  * Remove kinit and gzip from the initramfs. The first record I can find of
+    this Ubuntu change is in a merge from Debian, and I can't see any
+    justification for it since neither binary is actually used by any
+    initramfs scripts.
+  * Remove klibc utilities if busybox is in use (patch based on Debian
+    #338405; LP: #327106). Leave a symlink for /bin/sleep since some scripts
+    expect that to exist.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 23 Jun 2009 14:19:02 +0100
+
 initramfs-tools (0.92bubuntu31) karmic; urgency=low
 
   * Set the permissions on the initramfs root to 755, as otherwise

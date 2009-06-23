@@ -36,6 +36,18 @@ for x in ${MODULESDIR}/initrd/*; do
 	force_load ${x}
 done
 
+# Kernel modesetting
+# I haven't figured out a way to cut this down in the MODULES=dep case, but
+# at least it's not too atrociously big (60KB gzipped at the time of
+# writing).
+copy_modules_dir kernel/drivers/char/agp
+for kms_module in i915; do
+	if have_module "${kms_module}"; then
+		manual_add_modules "${kms_module}"
+		fbcon=y
+	fi
+done
+
 # And add vga16fb for usplash to use as well
 manual_add_modules vga16fb
 

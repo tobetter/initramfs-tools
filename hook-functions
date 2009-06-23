@@ -38,6 +38,13 @@ add_modules_from_file()
 	done
 }
 
+# Is this module available?
+have_module()
+{
+	modprobe --set-version="${version}" --ignore-install \
+		--show-depends "${1}" >/dev/null 2>&1
+}
+
 # Add dependent modules + eventual firmware
 manual_add_modules()
 {
