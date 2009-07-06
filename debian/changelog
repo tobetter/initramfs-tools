@@ -1,3 +1,9 @@
+initramfs-tools (0.92bubuntu33) karmic; urgency=low
+
+  * Cope with new compcache module naming.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 06 Jul 2009 14:12:07 +0100
+
 initramfs-tools (0.92bubuntu32) karmic; urgency=low
 
   * Copy in KMS drivers (currently just i915 and the AGP drivers) if we can,
