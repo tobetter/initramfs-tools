@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu38) karmic; urgency=low
+
+  * change --print-installation-architecture to --print-architecture in
+    mkinitramfs and hook-functions to quieten down dpkg warning during
+    update-initramfs
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Tue, 07 Jul 2009 21:33:50 +0200
+
 initramfs-tools (0.92bubuntu37) karmic; urgency=low
 
   * update-initramfs: Fix run_bootloader() to check for grub2
