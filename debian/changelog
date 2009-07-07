@@ -1,3 +1,13 @@
+initramfs-tools (0.92bubuntu35) karmic; urgency=low
+
+  * update-initramfs: check whether kernel-img.conf exists and postinst_hook
+    is set before calling flash-kernel. (patch from Loic Minier to work
+    around shortcomings described in launchpad bug 365053 (not the desired
+    solution yet which needs to happen in debian but we need it for
+    livecd-rootfs to work on armel))
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Tue, 07 Jul 2009 16:49:10 +0200
+
 initramfs-tools (0.92bubuntu34) karmic; urgency=low
 
   * Remove bnx2 from the initramfs; it needs firmware, and at this stage we
