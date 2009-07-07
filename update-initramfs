@@ -262,8 +262,10 @@ run_bootloader()
 	if [ -r /etc/zipl.conf ]; then
 		zipl
 	fi
-	if flash-kernel --supported >/dev/null 2>&1; then
-		flash-kernel
+	if [ -r /etc/kernel-img.conf ] && grep -q '^postinst_hook[[:space:]]*=[[:space:]]*[^[:space]]'; then
+		if flash-kernel --supported >/dev/null 2>&1; then
+			flash-kernel
+		fi
 	fi
 }
 
