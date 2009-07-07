@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu34) karmic; urgency=low
+
+  * Remove bnx2 from the initramfs; it needs firmware, and at this stage we
+    only support network modules that don't need firmware loading (LP:
+    #394783).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 07 Jul 2009 11:45:58 +0100
+
 initramfs-tools (0.92bubuntu33) karmic; urgency=low
 
   * Cope with new compcache module naming.

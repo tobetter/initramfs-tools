@@ -330,7 +330,7 @@ auto_add_modules()
 	;;
 	net)
 		for x in 3c59x 8139cp 8139too 8390 atl1 atl1e b44 bmac \
-		bnx2 cxgb3 defxx dl2k e100 e1000 e1000e ehea epic100 \
+		cxgb3 defxx dl2k e100 e1000 e1000e ehea epic100 \
 		ep93xx_eth eql fealnx famachi forcedeth gelic_net \
 		hp100 igb ipg mace mv643xx_eth myri10ge \
 		natsemi ne2k-pci netconsole niu ns83820 pcnet32 qla3xxx \
