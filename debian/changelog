@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu36) karmic; urgency=low
+
+  * add missing colon in the regex and a filename for the grep from the next
+    upload ... d'oh
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Tue, 07 Jul 2009 19:28:16 +0200
+
 initramfs-tools (0.92bubuntu35) karmic; urgency=low
 
   * update-initramfs: check whether kernel-img.conf exists and postinst_hook
