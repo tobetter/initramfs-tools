@@ -31,6 +31,7 @@ export ROOT=
 export ROOTDELAY=
 export ROOTFLAGS=
 export ROOTFSTYPE=
+export IPOPTS=
 export break=
 export init=/sbin/init
 export quiet=n
