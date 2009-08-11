@@ -337,7 +337,7 @@ auto_add_modules()
 		r8169 s2io sis900 skge sky2 slhc smc911x starfire \
 		sundance sungem sungem_phy sunhme sunvnet tg3 tlan de2104x \
 		de4x5 dmfe tulip winbond-840 xircom_cb xircom_tulip_cb \
-		typhon via-rhine via-velocity yellowfin; do
+		typhon via-rhine via-velocity virtio_net yellowfin; do
 			manual_add_modules "${x}"
 		done
 	;;

@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu39) karmic; urgency=low
+
+  * auto_add_modules net: Load virtio_net, to make testing in kvm easier.
+  * init: Export IPOPTS (LP: #364626).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 11 Aug 2009 12:37:56 +0100
+
 initramfs-tools (0.92bubuntu38) karmic; urgency=low
 
   * change --print-installation-architecture to --print-architecture in
