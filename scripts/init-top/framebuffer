@@ -81,6 +81,15 @@ uvesafb)
 	mknod -m 640 /dev/mem c 1 1
 	mknod -m 666 /dev/zero c 1 5
 	;;
+mxcfb)
+	# temporary workaround for (LP: #420555) until mxcfb is fixed
+	if ! $(grep -qv ^# /etc/usplash.conf) && \
+		[ -e /sys/class/graphics/fb0/virtual_size ];then
+		res=$(cat /sys/class/graphics/fb0/virtual_size)
+		echo "xres=${res%,*}" >>/etc/usplash.conf
+		echo "yres=${res#*,}" >>/etc/usplash.conf
+	fi
+	;;
 *)
 	# Try kernel modesetting drivers; they'll fail if they can't bind.
 	# Right now, we only try intel_agp, but we really ought to try the

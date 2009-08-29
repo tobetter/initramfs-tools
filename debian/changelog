@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu40) karmic; urgency=low
+
+  * add a hack to scripts/init-top/framebuffer for handling the yet broken
+    mxcfb as described in LP bug #420555, so usplash can be used on the
+    imx51 architecture based devices
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Sat, 29 Aug 2009 11:37:27 +0200
+
 initramfs-tools (0.92bubuntu39) karmic; urgency=low
 
   * auto_add_modules net: Load virtio_net, to make testing in kvm easier.
