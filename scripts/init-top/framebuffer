@@ -83,7 +83,7 @@ uvesafb)
 	;;
 mxcfb)
 	# temporary workaround for (LP: #420555) until mxcfb is fixed
-	if ! $(grep -qv ^# /etc/usplash.conf) && \
+	if ! grep -qs '^[^#]' /etc/usplash.conf && \
 		[ -e /sys/class/graphics/fb0/virtual_size ];then
 		res=$(cat /sys/class/graphics/fb0/virtual_size)
 		echo "xres=${res%,*}" >>/etc/usplash.conf
