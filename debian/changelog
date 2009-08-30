@@ -1,3 +1,9 @@
+initramfs-tools (0.92bubuntu41) karmic; urgency=low
+
+  *  fix quoting for mxcfb in scripts/init-top/framebuffer
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Sun, 30 Aug 2009 10:28:06 +0200
+
 initramfs-tools (0.92bubuntu40) karmic; urgency=low
 
   * add a hack to scripts/init-top/framebuffer for handling the yet broken
