@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu42) karmic; urgency=low
+
+  * Don't display "Loading, please wait..." message when 'quiet' is in
+    /proc/cmdline.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Thu, 03 Sep 2009 23:31:28 +0100
+
 initramfs-tools (0.92bubuntu41) karmic; urgency=low
 
   *  fix quoting for mxcfb in scripts/init-top/framebuffer

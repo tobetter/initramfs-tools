@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Loading, please wait..."
+grep -q '\<quiet\>' /proc/cmdline || echo "Loading, please wait..."
 
 [ -d /dev ] || mkdir -m 0755 /dev
 [ -d /root ] || mkdir -m 0700 /root
