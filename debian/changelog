@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu43) karmic; urgency=low
+
+  * Move "Loading, please wait..." message to after /proc is mounted, so
+    that we can inspect /proc/cmdline.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 04 Sep 2009 14:23:05 +0100
+
 initramfs-tools (0.92bubuntu42) karmic; urgency=low
 
   * Don't display "Loading, please wait..." message when 'quiet' is in
