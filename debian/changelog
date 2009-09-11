@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu44) karmic; urgency=low
+
+  * Revert mxcfb changes of 0.92bubuntu40 and 0.92bubuntu41 as a more complete
+    workaround was put in usplash.
+
+ -- Loïc Minier <loic.minier@ubuntu.com>  Fri, 11 Sep 2009 21:46:45 +0200
+
 initramfs-tools (0.92bubuntu43) karmic; urgency=low
 
   * Move "Loading, please wait..." message to after /proc is mounted, so
