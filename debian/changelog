@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu45) karmic; urgency=low
+
+  * Depend on busybox-initramfs (>= 1:1.13.3-1ubuntu5) to ensure that we
+    have gzip (LP: #428282).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 14 Sep 2009 10:23:40 +0100
+
 initramfs-tools (0.92bubuntu44) karmic; urgency=low
 
   * Revert mxcfb changes of 0.92bubuntu40 and 0.92bubuntu41 as a more complete
