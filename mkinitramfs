@@ -234,6 +234,9 @@ copy_exec /usr/share/initramfs-tools/init /init
 # add existant boot scripts
 for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
 	-regextype posix-extended -regex '.*/[[:alnum:]_]+$' -type f); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "/usr/share/initramfs-tools/scripts/${b}")
+	[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "/usr/share/initramfs-tools/scripts/${b}" \
@@ -241,6 +244,9 @@ for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
 done
 for b in $(cd "${CONFDIR}/scripts" && find . \
 	-regextype posix-extended -regex '.*/[[:alnum:]_]+$' -type f); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${CONFDIR}/scripts/${b}")
+	[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "${CONFDIR}/scripts/${b}" "${DESTDIR}/scripts/$(dirname "${b}")/"
