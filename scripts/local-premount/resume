@@ -98,7 +98,7 @@ if [ -n "${resume_offset}" ]; then
 else
 	offset=4076
 fi
-str=$(dd if=$resume bs=1 skip=$offset count=19)
+str=$(dd if=$resume bs=1 skip=$offset count=19 2>/dev/null)
 magic_found=
 
 if [ "$str" = "$magic" ]; then
@@ -117,9 +117,9 @@ fi
 
 # hardcode path, uswsusp ships an resume binary too
 if [ -n "${resume_offset}" ]; then
-	/bin/resume ${resume} ${resume_offset}
+	/bin/resume ${resume} ${resume_offset} >/dev/null 2>&1
 else
-	/bin/resume ${resume}
+	/bin/resume ${resume} >/dev/null 2>&1
 fi
 
 # Not reached if resume is successful

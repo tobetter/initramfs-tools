@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu47) karmic; urgency=low
+
+  * Silence output when trying to resume, since the only output is bitching
+    that we can't resume because we didn't hibernate in the first place.
+    LP: #432585.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Mon, 21 Sep 2009 16:07:10 -0700
+
 initramfs-tools (0.92bubuntu46) karmic; urgency=low
 
   FFE LP: #427356.
