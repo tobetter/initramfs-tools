@@ -254,9 +254,6 @@ reduce_prereqs()
 call_scripts()
 {
 	for cs_x in ${runlist}; do
-		option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${initdir}/${cs_x}")
-		[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
-
 		# mkinitramfs verbose output
 		if [ "${verbose}" = "y" ]; then
 			echo "Calling hook ${cs_x}"
