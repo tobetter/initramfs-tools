@@ -1,3 +1,12 @@
+initramfs-tools (0.92bubuntu48) karmic; urgency=low
+
+   * Don't do OPTION=VAR checking at runtime, only do it when assembling the
+     initramfs; this spares us having to add extra config files to the
+     initramfs to enable functionality that's already been selected.
+     LP: #433773.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 22 Sep 2009 00:17:13 -0700
+
 initramfs-tools (0.92bubuntu47) karmic; urgency=low
 
   * Silence output when trying to resume, since the only output is bitching
