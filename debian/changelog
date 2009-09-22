@@ -1,3 +1,13 @@
+initramfs-tools (0.92bubuntu49) karmic; urgency=low
+
+  * Re-add the OPTION=VAR checking to scripts/functions, since we actually do
+    need this when calling the hooks at initramfs generation; but add a second
+    argument to call_scripts, "optional", that we check for before doing these
+    checks since we definitely don't want this to be conditional in the
+    initramfs at runtime.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 22 Sep 2009 09:44:00 -0700
+
 initramfs-tools (0.92bubuntu48) karmic; urgency=low
 
    * Don't do OPTION=VAR checking at runtime, only do it when assembling the
