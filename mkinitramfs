@@ -318,8 +318,8 @@ if [ "$DPKG_ARCH" = arm ] || [ "$DPKG_ARCH" = armeb ]; then
 	cp -a /lib/libgcc_s.so.1 "${DESTDIR}/lib/"
 fi
 
-run_scripts /usr/share/initramfs-tools/hooks
-run_scripts "${CONFDIR}"/hooks
+run_scripts /usr/share/initramfs-tools/hooks optional
+run_scripts "${CONFDIR}"/hooks optional
 
 # Apply DSDT to initramfs
 if [ -e "${CONFDIR}/DSDT.aml" ]; then
