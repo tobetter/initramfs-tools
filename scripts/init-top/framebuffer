@@ -1,7 +1,7 @@
 #!/bin/sh
 
 OPTION=USPLASH
-PREREQ=""
+PREREQ="udev"
 prereqs()
 {
 	echo "$PREREQ"
@@ -78,37 +78,16 @@ case ${FB} in
 matroxfb)
 	FB=matroxfb_base
 	;;
-uvesafb)
-	mknod -m 640 /dev/mem c 1 1
-	mknod -m 666 /dev/zero c 1 5
-	;;
-*)
-	# Try kernel modesetting drivers; they'll fail if they can't bind.
-	# Right now, we only try intel_agp, but we really ought to try the
-	# others as well. Scott points out that if this is done for NVIDIA
-	# then we need to take care to load the non-free one as appropriate,
-	# since once you load the free AGP module you can't unload it in
-	# order to use the non-free X driver ...
-	if modprobe -q intel_agp && modprobe -q i915; then
-		FB=kms
-	fi
-	;;
 esac
 
 if [ -n "${FB}" ]; then
-	unset MODPROBE_OPTIONS
-	modprobe -q fbcon
-	if [ "${FB}" != kms ]; then
-		modprobe -q ${FB} ${OPTS}
-	fi
+	MODPROBE_OPTIONS=-q modprobe ${FB} ${OPTS}
+else
+	# If we have no graphics devices, wait for udev to settle;
+	# if we still don't have a graphics device, load vesafb
+	[ -d /sys/class/graphics ] || udevadm settle
+	[ -d /sys/class/graphics ] || modprobe vesafb
 fi
 
-if [ -e /proc/fb ]; then
-	while read fbno desc; do
-		if [ $(($fbno < 32)) ]; then
-			mknod /dev/fb${fbno} c 29 ${fbno}
-		fi
-	done < /proc/fb
-else
-	mknod /dev/fb0 c 29 0
-fi
+# Wait for the framebuffer devices to be ready
+udevadm settle
