@@ -1,3 +1,30 @@
+initramfs-tools (0.92bubuntu50) karmic; urgency=low
+
+  LP: #392039, #431812.
+  * hooks/framebuffer:
+    - rename from hooks/kernelextras, this is much more descriptive and
+      actually matches the associated script
+    - copy kernel-mode-setting drivers (drivers/gpu) into the initramfs
+    - include the vesafb driver, which we previously relied on being in
+      the special initrd directory
+    - don't force load fbcon
+    - don't force load things from the initrd directory
+  * scripts/init-top/framebuffer:
+    - add udev as a pre-requisite
+    - remove mknods since udev will make those now
+    - remove intel_agp and i915 code
+    - don't unset MODPROBE_OPTIONS, just override for the modprobe call
+      (since we want video= to override the blacklist)
+    - if we didn't pick up a framebuffer from vga= or video=, and don't
+      have one from udev, wait for udev to finish then if we still don't
+      have one, load vesafb
+    - settle after loading drivers to ensure the device is ready
+  * debian/control:
+    - increase dependency on udev to that which loads fbcon
+    - add breaks on older usplash to force upgrade
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed, 23 Sep 2009 14:25:00 -0700
+
 initramfs-tools (0.92bubuntu49) karmic; urgency=low
 
   * Re-add the OPTION=VAR checking to scripts/functions, since we actually do
