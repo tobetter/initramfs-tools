@@ -81,6 +81,7 @@ matroxfb)
 esac
 
 if [ -n "${FB}" ]; then
+	udevadm settle
 	MODPROBE_OPTIONS=-q modprobe ${FB} ${OPTS}
 else
 	# If we have no graphics devices, wait for udev to settle;
