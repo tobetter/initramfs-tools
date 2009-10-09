@@ -355,6 +355,7 @@ auto_add_modules()
 	;;
 	block)
 		copy_modules_dir kernel/drivers/block
+		copy_modules_dir kernel/drivers/usb/storage
 	;;
 	# FIXME: can be removed after Lenny release
 	ieee1394)
