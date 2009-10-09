@@ -1,3 +1,9 @@
+initramfs-tools (0.92bubuntu52) karmic; urgency=low
+
+  * Include all usb/storage drivers, not just usb-storage.ko  LP: #419231
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 09 Oct 2009 15:34:43 +0100
+
 initramfs-tools (0.92bubuntu51) karmic; urgency=low
 
   * scripts/init-top/framebuffer: wait for udev to settle before loading
