@@ -1,3 +1,13 @@
+initramfs-tools (0.92bubuntu53) karmic; urgency=low
+
+  * Explicitly check for fb0 so we don't false-positive on the graphics
+    subsystem having been initialised (should cure some issues with usplash
+    using svgalib instead of KMS, and vanishing part way through).
+  * Don't force load the vesafb driver, we never did this before, so it
+    seems silly to do it now.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed, 14 Oct 2009 04:41:37 +0100
+
 initramfs-tools (0.92bubuntu52) karmic; urgency=low
 
   * Include all usb/storage drivers, not just usb-storage.ko  LP: #419231

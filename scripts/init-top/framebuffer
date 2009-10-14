@@ -81,14 +81,12 @@ matroxfb)
 esac
 
 if [ -n "${FB}" ]; then
+	# Some framebuffer devices need character devices :-/
 	udevadm settle
 	MODPROBE_OPTIONS=-q modprobe ${FB} ${OPTS}
+	# Wait for the framebuffer devices to be ready
+	udevadm settle
 else
-	# If we have no graphics devices, wait for udev to settle;
-	# if we still don't have a graphics device, load vesafb
-	[ -d /sys/class/graphics ] || udevadm settle
-	[ -d /sys/class/graphics ] || modprobe vesafb
+	# If we have no graphics devices yet, wait for udev to settle
+	[ -d /sys/class/graphics/fb0 ] || udevadm settle
 fi
-
-# Wait for the framebuffer devices to be ready
-udevadm settle
