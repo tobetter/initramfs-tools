@@ -1,3 +1,16 @@
+initramfs-tools (0.92bubuntu54) lucid; urgency=low
+
+  * hook-functions: check both /lib/firmware/$(uname -r) and /lib/firmware
+    for the firmware that we wish to copy; in any cases where we want to
+    suppress a firmware-using module from the initramfs, we should do that
+    explicitly and not by accidentally failing to include the firmware.
+    LP: #328550.
+  * hook-functions: cherry pick fix from Debian upstream version to not warn
+    about missing firmware for modules whose names are merely /like/ those of
+    modules listed in /proc/modules.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 19 Nov 2009 00:47:55 -0600
+
 initramfs-tools (0.92bubuntu53) karmic; urgency=low
 
   * Explicitly check for fb0 so we don't false-positive on the graphics
