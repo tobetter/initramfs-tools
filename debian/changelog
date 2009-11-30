@@ -1,3 +1,16 @@
+initramfs-tools (0.92bubuntu55) lucid; urgency=low
+
+  * hooks/framebuffer: Change the inclusion option from USPLASH to
+    FRAMEBUFFER, in hindsight that option name wasn't very forward-thinking
+    of me.
+  * scripts/init-top/framebuffer:
+    - Make conditional on new option name.
+    - As well as waiting for fb0 to show up, we also should wait for fbcon
+      and dri/card0 to show up as well, since we'll almost certainly want
+      a console and direct rendering.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Mon, 30 Nov 2009 23:45:44 +0000
+
 initramfs-tools (0.92bubuntu54) lucid; urgency=low
 
   * hook-functions: check both /lib/firmware/$(uname -r) and /lib/firmware
