@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu56) lucid; urgency=low
+
+  * scripts/init-top/keymap: We don't need to load keymaps unless we're
+    loading the framebuffer module (and thus have a splash screen). 
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 15 Dec 2009 14:57:29 +0000
+
 initramfs-tools (0.92bubuntu55) lucid; urgency=low
 
   * hooks/framebuffer: Change the inclusion option from USPLASH to
