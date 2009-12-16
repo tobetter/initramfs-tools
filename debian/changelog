@@ -1,3 +1,22 @@
+initramfs-tools (0.92bubuntu57) lucid; urgency=low
+
+  * debian/initramfs-tools.dirs:
+    - add scripts/panic directory
+
+  * scripts/functions:
+    - if tsort is available, use it instead of custom sorting code
+    - if a pre-cached order file is available, use that instead
+    - run panic scripts before giving a root shell
+  * mkinitramfs:
+    - generate a pre-cached order file for each scripts directory in the
+      output initramfs
+    - call depmod before packing the initramfs, so it contains the output
+      already
+  * init:
+    - drop depmod call
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed, 16 Dec 2009 17:47:49 +0000
+
 initramfs-tools (0.92bubuntu56) lucid; urgency=low
 
   * scripts/init-top/keymap: We don't need to load keymaps unless we're
