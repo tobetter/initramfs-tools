@@ -1,3 +1,32 @@
+initramfs-tools (0.92bubuntu58) lucid; urgency=low
+
+  * Add new initramfs-tools-bin package containing a binary that uses
+    libudev to wait for udev to create the udev device, or wait for udev
+    to finish processing if we catch it in the act, and returns the
+    filesystem type as already probed by udev.
+    - This avoids calls to udevadm settle, which make us wait for irrelevant
+      modules that we don't need.
+    - This avoids duplicate calls to blkid, which since they probe the block
+      device directly, are expensive
+    - This does not use fstype; which avoids issues with that and blkid
+      returning different answers (since everything else throughout the
+      entire system now uses blkid)
+  * scripts/local: Rewrite to use wait-for-root rather than looping over
+    our own shell attempts to do the same.
+  * mkinitramfs:
+    - include wait-for-root
+    - mkinitramfs: Don't quote modules.*map, so we actually expand it.
+  * hooks/thermal:
+    - don't force load fan or thermal, they're generally built-in and if not
+      will be loaded by udev anyway
+  * scripts/panic/keymap:
+    - auto-generated from the init-top keymap file, with the OPTION= removed,
+      so keymap will always be set on panic
+
+  * Remove accidentally included test initramfs.  :-)
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 18 Dec 2009 03:18:28 +0000
+
 initramfs-tools (0.92bubuntu57) lucid; urgency=low
 
   * debian/initramfs-tools.dirs:

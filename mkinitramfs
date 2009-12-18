@@ -303,6 +303,8 @@ else
 	done
 fi
 
+copy_exec /usr/lib/initramfs-tools/bin/wait-for-root /sbin
+
 # Modutils
 copy_exec /sbin/modprobe /sbin
 copy_exec /sbin/depmod /sbin
@@ -329,7 +331,7 @@ done
 
 # generate module deps
 depmod -a -b "${DESTDIR}" ${version}
-rm "${DESTDIR}/lib/modules/${version}/modules.*map"
+rm "${DESTDIR}"/lib/modules/${version}/modules.*map
 
 # Apply DSDT to initramfs
 if [ -e "${CONFDIR}/DSDT.aml" ]; then
