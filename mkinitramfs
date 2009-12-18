@@ -253,7 +253,6 @@ for b in $(cd "${CONFDIR}/scripts" && find . \
 done
 
 echo "DPKG_ARCH=${DPKG_ARCH}" > ${DESTDIR}/conf/arch.conf
-echo "PAGE_SIZE=$(getconf PAGESIZE)" > ${DESTDIR}/conf/page_size.conf
 copy_exec "${CONFDIR}/initramfs.conf" /conf
 for i in ${EXTRA_CONF}; do
 	if [ -e "${CONFDIR}/conf.d/${i}" ]; then

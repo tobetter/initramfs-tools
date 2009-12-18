@@ -1,3 +1,14 @@
+initramfs-tools (0.92bubuntu59) lucid; urgency=low
+
+  * src/wait-for-root.c: handle the case where we're given UUID= or LABEL=
+    and the device already exists (we need to stat the /dev/disk path).
+  * scripts/local-premount/resume: this means we can use wait-for-root for
+    resume handling too.
+  * mkinitramfs: drop the PAGE_SIZE conf, it's no longer needed since we
+    rely on udev finding out it's a hibernated image through blkid.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 18 Dec 2009 04:34:04 +0000
+
 initramfs-tools (0.92bubuntu58) lucid; urgency=low
 
   * Add new initramfs-tools-bin package containing a binary that uses
