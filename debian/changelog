@@ -1,3 +1,17 @@
+initramfs-tools (0.92bubuntu60) lucid; urgency=low
+
+  * src/wait-for-root.c:
+    - Fix a bug where we checked queue entries for ID_FS_TYPE too; would
+      mean we thought a device directly named (e.g. /dev/md0) wasn't
+      in the queue when it was, and wouldn't wait for it.
+    - Fix another bug where we didn't clear udev_device after iterating
+      the queue.
+    - Rather than mucking around with sequence numbers in the queue, just
+      wait using the monitor if we identify the device as being in the
+      queue.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 18 Dec 2009 14:47:30 +0000
+
 initramfs-tools (0.92bubuntu59) lucid; urgency=low
 
   * src/wait-for-root.c: handle the case where we're given UUID= or LABEL=
