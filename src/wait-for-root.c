@@ -66,13 +66,15 @@ main (int   argc,
 	udev_monitor_filter_add_match_subsystem_devtype (udev_monitor, "block", NULL);
 	udev_monitor_enable_receiving (udev_monitor);
 
-	/* Check whether or not the device already exists */
+	/* Check to see whether the device exists already */
 	if ((stat (path, &devstat) == 0)
 	    && S_ISBLK (devstat.st_mode)) {
 		struct udev_queue *     udev_queue;
 		struct udev_list_entry *queue_entry;
 
-		/* Make sure that the device is not currently queued */
+		/* Check to see whether the device is still being processed
+		 * by udev.
+		 */
 		udev_queue = udev_queue_new (udev);
 
 		for (queue_entry = udev_queue_get_queued_list_entry (udev_queue);
@@ -82,58 +84,51 @@ main (int   argc,
 
 			syspath = udev_list_entry_get_name (queue_entry);
 			udev_device = udev_device_new_from_syspath (udev, syspath);
-
-			/* If the device exists, we wait for it to leave
-			 * the queue.
-			 */
 			if (udev_device
 			    && matching_device (udev_device, devpath)) {
-				struct timespec    time;
-				unsigned long long seqnum;
-
-				sscanf (udev_list_entry_get_value (queue_entry),
-					"%llu", &seqnum);
-
-				time.tv_sec = 0;
-				time.tv_nsec = 100000000;
-
-				while (! udev_queue_get_seqnum_is_finished (udev_queue, seqnum))
-					nanosleep (&time, NULL);
-
-				break;
-			} else
 				udev_device_unref (udev_device);
+				break;
+			}
+
+			udev_device_unref (udev_device);
 		}
 
 		udev_queue_unref (udev_queue);
+		udev_device = NULL;
 
-		/* If the device exists but isn't queued, look it up in the
-		 * udevdb by major/minor number (since udev must have created
-		 * it).
+		/* If the device exists, but isn't being processed by udev,
+		 * we can look up the udevdb record directly by major/minor
+		 * and output the type now.
 		 */
-		if (! udev_device)
+		if (! queue_entry) {
+			const char *type;
+
 			udev_device = udev_device_new_from_devnum (udev, 'b', devstat.st_rdev);
+			if (udev_device) {
+				type = udev_device_get_property_value (udev_device, "ID_FS_TYPE");
+				if (type)
+					printf ("%s\n", type);
 
-	} else {
-		while ((udev_device = udev_monitor_receive_device (udev_monitor)) != NULL) {
-			if (matching_device (udev_device, devpath))
-				break;
-
-			udev_device_unref (udev_device);
+				udev_device_unref (udev_device);
+			}
 		}
 	}
 
-
-	if (udev_device) {
+	/* When the device doesn't exist yet, or is still being processed
+	 * by udev, use the monitor socket to wait it to be done.
+	 */
+	if (! udev_device) {
 		const char *type;
 
-		type = udev_device_get_property_value (udev_device, "ID_FS_TYPE");
-		if (type) {
-			printf ("%s\n", udev_device_get_property_value (udev_device, "ID_FS_TYPE"));
+		while ((udev_device = udev_monitor_receive_device (udev_monitor)) != NULL) {
+			if (matching_device (udev_device, devpath)
+			    && ((type = udev_device_get_property_value (udev_device, "ID_FS_TYPE")) != NULL)) {
+				printf ("%s\n", type);
+				udev_device_unref (udev_device);
+				break;
+			}
+
 			udev_device_unref (udev_device);
-		} else {
-			udev_device_unref (udev_device);
-			udev_device = NULL;
 		}
 	}
 
@@ -149,12 +144,7 @@ static int
 matching_device (struct udev_device *device,
 		 const char *        path)
 {
-	const char *            fs_type;
 	struct udev_list_entry *devlinks_entry;
-
-	fs_type = udev_device_get_property_value (device, "ID_FS_TYPE");
-	if (! fs_type)
-		return 0;
 
 	/* Match by name */
 	if (! strcmp (path, udev_device_get_devnode (device)))
