@@ -5,6 +5,7 @@
 
 #include <time.h>
 #include <stdio.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +22,7 @@ main (int   argc,
       char *argv[])
 {
 	const char *         devpath;
+	char                 path[PATH_MAX];
 	const char *         rootdelay;
 	int                  timeout;
 	struct udev *        udev;
@@ -34,6 +36,15 @@ main (int   argc,
 	}
 
 	devpath = argv[1];
+	if (! strncmp (devpath, "UUID=", 5)) {
+		strcpy (path, "/dev/disk/by-uuid/");
+		strcat (path, devpath + 5);
+	} else if (! strncmp (devpath, "LABEL=", 6)) {
+		strcpy (path, "/dev/disk/by-label/");
+		strcat (path, devpath + 6);
+	} else {
+		strcpy (path, devpath);
+	}
 
 	rootdelay = getenv ("ROOTDELAY");
 	if (rootdelay) {
@@ -56,7 +67,7 @@ main (int   argc,
 	udev_monitor_enable_receiving (udev_monitor);
 
 	/* Check whether or not the device already exists */
-	if ((stat (devpath, &devstat) == 0)
+	if ((stat (path, &devstat) == 0)
 	    && S_ISBLK (devstat.st_mode)) {
 		struct udev_queue *     udev_queue;
 		struct udev_list_entry *queue_entry;
