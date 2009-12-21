@@ -8,7 +8,7 @@ mountroot ()
 	[ "$quiet" != "y" ] && log_end_msg
 
 	while [ -z "${FSTYPE}" ]; do
-		FSTYPE=$(wait-for-root "${ROOT}")
+		FSTYPE=$(wait-for-root "${ROOT}" ${ROOTDELAY:-30})
 
 		# Run failure hooks, hoping one of them can fix up the system
 		# and we can restart the wait loop.  If they all fail, abort

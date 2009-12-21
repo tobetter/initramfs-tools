@@ -1,3 +1,15 @@
+initramfs-tools (0.92bubuntu61) lucid; urgency=low
+
+  * init: Mount devtmpfs on /dev, falling back to a tmpfs if not supported
+    by the kernel.
+
+  * src/wait-for-root.c: accept the timeout on the command-line too rather
+    than using an environment variable.
+  * scripts/local: Pass $ROOTDELAY or 30
+  * scripts/local-premount/resume: pass $RESUMEDELAY or 5
+
+ -- Scott James Remnant <scott@ubuntu.com>  Mon, 21 Dec 2009 23:06:53 +0000
+
 initramfs-tools (0.92bubuntu60) lucid; urgency=low
 
   * src/wait-for-root.c:
