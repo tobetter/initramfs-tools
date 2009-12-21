@@ -23,15 +23,14 @@ main (int   argc,
 {
 	const char *         devpath;
 	char                 path[PATH_MAX];
-	const char *         rootdelay;
 	int                  timeout;
 	struct udev *        udev;
 	struct udev_monitor *udev_monitor;
 	struct stat          devstat;
 	struct udev_device * udev_device = NULL;
 
-	if (argc != 2) {
-		fprintf (stderr, "Usage: %s DEVICE\n", argv[0]);
+	if (argc != 3) {
+		fprintf (stderr, "Usage: %s DEVICE TIMEOUT\n", argv[0]);
 		exit (2);
 	}
 
@@ -46,12 +45,7 @@ main (int   argc,
 		strcpy (path, devpath);
 	}
 
-	rootdelay = getenv ("ROOTDELAY");
-	if (rootdelay) {
-		timeout = atoi (rootdelay) ?: 30;
-	} else {
-		timeout = 30;
-	}
+	timeout = atoi (argv[2]);
 
 	signal (SIGALRM, alarm_handler);
 	alarm (timeout);

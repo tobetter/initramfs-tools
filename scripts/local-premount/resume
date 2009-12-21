@@ -21,7 +21,7 @@ if [ -z "${resume}" ]; then
 	exit 0
 fi
 
-SWAPTYPE=$(wait-for-root "${resume}")
+SWAPTYPE=$(wait-for-root "${resume}" ${RESUMEDELAY:-5})
 
 case "${SWAPTYPE}" in
     s1suspend|s2suspend|ulsuspend|tuxonice)
