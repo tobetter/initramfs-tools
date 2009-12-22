@@ -1,3 +1,16 @@
+initramfs-tools (0.92bubuntu62) lucid; urgency=low
+
+  * src/wait-for-root.c:
+    - device records we obtain from udev may not have a device node name
+      yet, check to avoid strcmp between NULL and our path.  LP: #499422.
+    - device records from the queue may not exist at all, check to avoid
+      calling udev_device_unref on NULL (which should be safe anyway).
+    - eliminate a race condition; by checking the filesystem before the
+      queue, there was a small chance that udev could finish processing
+      between our calls
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 22 Dec 2009 19:30:01 +0000
+
 initramfs-tools (0.92bubuntu61) lucid; urgency=low
 
   * init: Mount devtmpfs on /dev, falling back to a tmpfs if not supported
