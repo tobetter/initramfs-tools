@@ -367,7 +367,20 @@ configure_networking()
 	# networking already configured thus bail out
 	[ -n "${DEVICE}" ] && [ -e /tmp/net-"${DEVICE}".conf ] && return 0
 
-	# support ip options see linux sources Documentation/nfsroot.txt
+	if [ "${HWADDR}" ]; then
+		# select interface by MAC address
+		HWADDR="$(echo "${HWADDR}" | tr A-Z- a-z:)"
+		local iface
+		for iface in /sys/class/net/*; do
+			[ -f "$iface/address" ] || continue
+			if [ "$(cat "$iface/address")" = "${HWADDR}" ]; then
+				DEVICE="$iface"
+			fi
+		done
+	fi
+
+	# support ip options see linux sources
+	# Documentation/filesystems/nfsroot.txt
 	case ${IPOPTS} in
 	none|off)
 		# Do nothing

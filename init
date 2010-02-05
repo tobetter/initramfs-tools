@@ -34,6 +34,7 @@ export ROOTDELAY=
 export ROOTFLAGS=
 export ROOTFSTYPE=
 export IPOPTS=
+export HWADDR=
 export break=
 export init=/sbin/init
 export quiet=n
@@ -135,6 +136,9 @@ for x in $(cat /proc/cmdline); do
 		;;
 	ip=*)
 		IPOPTS="${x#ip=}"
+		;;
+	hwaddr=*)
+		HWADDR="${x#hwaddr=}"
 		;;
 	boot=*)
 		BOOT=${x#boot=}
