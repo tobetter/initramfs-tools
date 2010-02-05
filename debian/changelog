@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu63) lucid; urgency=low
+
+  * init, scripts/functions: Add support for specifying a network interface
+    by MAC address, using hwaddr= on the command line or HWADDR in an
+    initramfs configuration file (LP: #473036).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 05 Feb 2010 11:49:34 -0800
+
 initramfs-tools (0.92bubuntu62) lucid; urgency=low
 
   * src/wait-for-root.c:
