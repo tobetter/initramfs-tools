@@ -1,3 +1,12 @@
+initramfs-tools (0.92bubuntu65) lucid; urgency=low
+
+  * scripts/init-premount/blacklist: Move to init-top so it has a chance
+    of running before udev.
+  * scripts/init-top/blacklist: Automatically blacklist vga16fb when vga=
+    or video= specified on kernel command-line. 
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed, 17 Feb 2010 12:35:22 +0000
+
 initramfs-tools (0.92bubuntu64) lucid; urgency=low
 
   * Allow specifying multiple break points using a comma delimiter.
