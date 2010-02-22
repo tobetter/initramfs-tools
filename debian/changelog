@@ -1,3 +1,19 @@
+initramfs-tools (0.92bubuntu66) lucid; urgency=low
+
+  * scripts/local-premount/resume: wait-for-root will handle both UUID= and
+    /dev/disk/by-uuid, but /bin/resume from klibc will only handle the latter,
+    so revert the changes from 0.92bubuntu59 that dropped our fix-up of
+    device name.  LP: #499940.
+  * scripts/local-premount/resume: also recognize 'swsuspend' as a valid fs
+    type for a hibernation partition, since this is what udev returns for the
+    in-kernel hibernate/resume handling.  Thanks to Peter Clifton for noticing
+    this!
+  * scripts/local-premount/resume: call 'plymouth message' before resuming,
+    to notify the user of the reason for the delay if the plymouth theme
+    supports it.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Mon, 22 Feb 2010 00:20:22 -0800
+
 initramfs-tools (0.92bubuntu65) lucid; urgency=low
 
   * scripts/init-premount/blacklist: Move to init-top so it has a chance
