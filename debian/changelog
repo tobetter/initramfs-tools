@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu67) lucid; urgency=low
+
+  * debian/control:
+    - make the Breaks: upslash (<< 0.5.50) a Conflicts to help the
+      apt resolver on hardy to lucid upgrades
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Fri, 05 Mar 2010 13:25:29 +0100
+
 initramfs-tools (0.92bubuntu66) lucid; urgency=low
 
   * scripts/local-premount/resume: wait-for-root will handle both UUID= and
