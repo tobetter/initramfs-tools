@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu68) lucid; urgency=low
+
+  * Backport from Debian:
+    - hook-functions: Cope with partitions over 9 (LP: #539577).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 19 Mar 2010 18:57:43 +0000
+
 initramfs-tools (0.92bubuntu67) lucid; urgency=low
 
   * debian/control:

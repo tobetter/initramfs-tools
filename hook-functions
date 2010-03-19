@@ -260,7 +260,7 @@ dep_add_modules()
 		if [ "${block#dm-}" != "${block}" ]; then
 			block=$(ls -1 /sys/block/${block}/slaves | head -n 1)
 		fi
-		block=${block%[0-9]*}
+		block=${block%%[0-9]*}
 	# md root new naming scheme /dev/md/X
 	elif [ "${root#/dev/md/}" != "${root}" ]; then
 		root=${root#/dev/md/}
@@ -274,7 +274,7 @@ dep_add_modules()
 	# classical root device
 	else
 		block=${root#/dev/}
-		block=${block%[0-9]*}
+		block=${block%%[0-9]*}
 	fi
 
 	# Error out if /sys lack block dev
