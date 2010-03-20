@@ -92,3 +92,13 @@ else
 	[ -d /sys/class/graphics/fb0 ] || udevadm settle
 	[ -d /sys/class/drm/card0 ] || udevadm settle
 fi
+
+# Force fb mode via /sys interface
+for x in $(cat /proc/cmdline); do
+	case ${x} in
+	fbmode=*)
+		MODE=${x#*=}
+		echo "$MODE" > /sys/class/graphics/fb0/mode
+		;;
+	esac
+done

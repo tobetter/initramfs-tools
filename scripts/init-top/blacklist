@@ -15,15 +15,6 @@ prereqs)
 	;;
 esac
 
-# sanity check
-[ -z "${blacklist}" ] && exit 0
-
-# write blacklist to modprobe.d
-IFS=','
-for b in ${blacklist}; do
-	echo "blacklist $b" >> /etc/modprobe.d/initramfs
-done
-
 # blacklist vga16fb when vga= or video= given
 for x in $(cat /proc/cmdline); do
         case ${x} in
@@ -31,4 +22,13 @@ for x in $(cat /proc/cmdline); do
 		echo "blacklist vga16fb" >> /etc/modprobe.d/initramfs
 		;;
 	esac
+done
+
+# sanity check
+[ -z "${blacklist}" ] && exit 0
+
+# write blacklist to modprobe.d
+IFS=','
+for b in ${blacklist}; do
+	echo "blacklist $b" >> /etc/modprobe.d/initramfs
 done
