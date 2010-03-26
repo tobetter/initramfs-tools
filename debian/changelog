@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu70) lucid; urgency=low
+
+  * Filter out looping or broken symlinks from the initramfs, since they
+    cause cpio to explode (LP: #540686).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 26 Mar 2010 13:08:05 +0000
+
 initramfs-tools (0.92bubuntu69) lucid; urgency=low
 
   * scripts/init-top/blacklist: move vga16fb blacklisting before the
