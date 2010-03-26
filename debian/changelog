@@ -1,3 +1,12 @@
+initramfs-tools (0.92bubuntu71) lucid; urgency=low
+
+  * init:
+    - mount /dev/pts as well as /dev so we can redirect the console early. 
+    - load the netconsole module when netconsole=* placed on the kernel
+      command-line.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 26 Mar 2010 14:45:26 +0000
+
 initramfs-tools (0.92bubuntu70) lucid; urgency=low
 
   * Filter out looping or broken symlinks from the initramfs, since they
