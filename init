@@ -17,9 +17,13 @@ tmpfs_size="10M"
 if [ -e /etc/udev/udev.conf ]; then
 	. /etc/udev/udev.conf
 fi
-mount -t tmpfs -o size=$tmpfs_size,mode=0755 udev /dev
-[ -e /dev/console ] || mknod -m 0600 /dev/console c 5 1
-[ -e /dev/null ] || mknod /dev/null c 1 3
+if ! mount -t devtmpfs -o mode=0755 none /dev; then
+	mount -t tmpfs -o size=$tmpfs_size,mode=0755 udev /dev
+	[ -e /dev/console ] || mknod -m 0600 /dev/console c 5 1
+	[ -e /dev/null ] || mknod /dev/null c 1 3
+fi
+mkdir /dev/pts
+mount -t devpts -o noexec,nosuid,gid=5,mode=0620 none /dev/pts || true
 > /dev/.initramfs-tools
 mkdir /dev/.initramfs
 
@@ -36,6 +40,8 @@ export ROOTDELAY=
 export ROOTFLAGS=
 export ROOTFSTYPE=
 export IP=
+export BOOT=
+export BOOTIF=
 export break=
 export init=/sbin/init
 export quiet=n
@@ -44,6 +50,7 @@ export rootmnt=/root
 export debug=
 export panic=
 export blacklist=
+export resume=
 export resume_offset=
 
 # Bring in the main config
@@ -120,7 +127,7 @@ for x in $(cat /proc/cmdline); do
 		BOOT=${x#boot=}
 		;;
 	resume=*)
-		RESUME="${x#resume=}"
+		resume="${x#resume=}"
 		;;
 	resume_offset=*)
 		resume_offset="${x#resume_offset=}"
@@ -165,25 +172,28 @@ for x in $(cat /proc/cmdline); do
 	blacklist=*)
 		blacklist=${x#blacklist=}
 		;;
+	netconsole=*)
+		netconsole=${x#netconsole=}
+		;;
 	esac
 done
 
-if [ -z "${noresume}" ]; then
-	export resume=${RESUME}
-else
+if [ -n "${noresume}" ]; then
 	export noresume
+	unset resume
 fi
 
-depmod -a
+[ -n "${netconsole}" ] && modprobe netconsole netconsole="${netconsole}"
+
 maybe_break top
 
 # Don't do log messages here to avoid confusing usplash
 run_scripts /scripts/init-top
 
 maybe_break modules
-log_begin_msg "Loading essential drivers"
+[ "$quiet" != "y" ] && log_begin_msg "Loading essential drivers"
 load_modules
-log_end_msg
+[ "$quiet" != "y" ] && log_end_msg
 
 maybe_break premount
 [ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-premount"
@@ -240,6 +250,8 @@ unset ROOTFSTYPE
 unset ROOTDELAY
 unset ROOT
 unset IP
+unset BOOT
+unset BOOTIF
 unset blacklist
 unset break
 unset noresume
