@@ -9,9 +9,9 @@ CONFDIR="/etc/initramfs-tools"
 verbose="n"
 errors_to="2>/dev/null"
 # BUSYBOXDIR="/usr/lib/initramfs-tools/bin/"
-BUSYBOXDIR="/bin"
+export BUSYBOXDIR="/bin"
 
-OPTIONS=`getopt -o d:ko:r:v -n "$0" -- "$@"`
+OPTIONS=`getopt -o c:d:ko:r:v -n "$0" -- "$@"`
 
 # Check for non-GNU getopt
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
@@ -20,6 +20,10 @@ eval set -- "$OPTIONS"
 
 while true; do
 	case "$1" in
+	-c)
+		compress="$2"
+		shift 2
+		;;
 	-d)
 		CONFDIR="$2"
 		shift 2
@@ -123,6 +127,25 @@ case "${version}" in
 	;;
 esac
 
+# Check userspace and kernel support for compressed initramfs images
+if [ -z "${compress}" ]; then
+	compress=${COMPRESS}
+else
+	COMPRESS=${compress}
+fi
+
+if ! command -v ${compress} >/dev/null 2>&1; then
+	compress=gzip
+	[ "${verbose}" = y ] && \
+		echo "No ${COMPRESS} in ${PATH}, using gzip"
+fi
+
+if ! `grep -q -i config_rd_${COMPRESS}=y /boot/config-${version}` ; then
+	compress=gzip
+	[ "${verbose}" = y ] && \
+		echo "linux-2.6 misses ${COMPRESS} support, using gzip"
+fi
+
 if [ -d "${outfile}" ]; then
 	echo "${outfile} is a directory"
 	exit 1
@@ -131,14 +154,15 @@ fi
 MODULESDIR="/lib/modules/${version}"
 
 if [ ! -e "${MODULESDIR}" ]; then
-	echo "Cannot find ${MODULESDIR}"
-	exit 1
+	echo "WARNING: missing ${MODULESDIR}"
+	echo "Device driver support needs thus be built-in linux image!"
 fi
 if [ ! -e "${MODULESDIR}/modules.dep" ]; then
 	depmod ${version}
 fi
 
 DESTDIR="$(mktemp -t -d mkinitramfs_XXXXXX)" || exit 1
+chmod 755 "${DESTDIR}"
 __TMPCPIOGZ="$(mktemp -t mkinitramfs-OL_XXXXXX)" || exit 1
 
 DPKG_ARCH=`dpkg --print-architecture`
@@ -153,6 +177,7 @@ export DPKG_ARCH
 export verbose
 export KEYMAP
 export MODULES
+export BUSYBOX
 
 # Private, used by 'catenate_cpiogz'.
 export __TMPCPIOGZ
@@ -199,11 +224,6 @@ esac
 # Have to do each file, because cpio --dereference doesn't recurse down
 # symlinks.
 
-# klibc
-ln -s /usr/lib/klibc/bin/* ${DESTDIR}/bin
-ln -s /lib/klibc-*.so ${DESTDIR}/lib
-rm -f ${DESTDIR}/bin/kinit* ${DESTDIR}/bin/gzip
-
 cp -p /usr/share/initramfs-tools/init ${DESTDIR}/init
 
 # add existant boot scripts
@@ -236,27 +256,11 @@ if [ -n "${ROOT}" ]; then
 	echo "ROOT=${ROOT}" > ${DESTDIR}/conf/conf.d/root
 fi
 
-# Busybox
-if [ "${BUSYBOX}" = "n" ] || [ ! -e ${BUSYBOXDIR}/busybox ]; then
-	mv ${DESTDIR}/bin/sh.shared ${DESTDIR}/bin/sh
-	# those root need busybox
-	eval "$(mount | awk '/ \/ / {print "r_dev=" $1; exit}')"
-	if [ "${r_dev#/dev/mapper/}" != "${r_dev}" ]; then
-		echo "Warning: Busybox is required for successful boot!"
-	fi
-else
-	rm -f ${DESTDIR}/bin/sh
-	rm -f ${DESTDIR}/bin/busybox
-	copy_exec ${BUSYBOXDIR}/busybox /bin/busybox
-	ln -s ${BUSYBOXDIR}/busybox ${DESTDIR}/bin/sh
-fi
-
-# Modutils
+# module-init-tools
 copy_exec /sbin/modprobe /sbin
-copy_exec /sbin/depmod /sbin
 copy_exec /sbin/rmmod /sbin
 mkdir -p "${DESTDIR}/etc/modprobe.d"
-cp -a /etc/modprobe.d/* "${DESTDIR}/etc/modprobe.d/"
+cp -a /etc/modprobe.d/*.conf "${DESTDIR}/etc/modprobe.d/"
 
 # workaround: libgcc always needed on old-abi arm
 if [ "$DPKG_ARCH" = arm ] || [ "$DPKG_ARCH" = armeb ]; then
@@ -266,10 +270,23 @@ fi
 run_scripts /usr/share/initramfs-tools/hooks
 run_scripts "${CONFDIR}"/hooks
 
+# cache boot run order
+for b in $(cd "${DESTDIR}/scripts" && find . -mindepth 1 -type d); do
+	cache_run_scripts "${DESTDIR}" "/scripts/${b#./}"
+done
+
+# generate module deps
+depmod -a -b "${DESTDIR}" ${version}
+rm -f "${DESTDIR}/lib/modules/${version}"/modules.*map
+
 # Apply DSDT to initramfs
 if [ -e "${CONFDIR}/DSDT.aml" ]; then
 	copy_exec "${CONFDIR}/DSDT.aml" /
 fi
+
+# Remove any looping or broken symbolic links, since they break cpio.
+find "${DESTDIR}" -type l -printf '%p %Y\n' | sed -n 's/ [LN]$//p' \
+	| xargs -rL1 rm -f
 
 [ "${verbose}" = y ] && echo "Building cpio ${outfile} initramfs"
 (
@@ -284,7 +301,7 @@ eval `
         find . 4>&-; echo "ec1=$?;" >&4
     } | {
         cpio --quiet --dereference -o -H newc 4>&-; echo "ec2=$?;" >&4
-    } | gzip >"${outfile}"
+    } | ${compress} >"${outfile}"
     echo "ec3=$?;" >&4
 `
 if [ "$ec1" -ne 0 ]; then exit "$ec1"; fi
