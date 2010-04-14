@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu72) lucid; urgency=low
+
+  * make sure we can use mmc cards for / and add a proper sysfs handler,
+    (mmc always uses numbering in the device name like mmcblk[0-9]p[0-n], make
+    sure hook-functions only cuts off the partition but not the device number)
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Wed, 14 Apr 2010 11:40:30 +0200
+
 initramfs-tools (0.92bubuntu71) lucid; urgency=low
 
   * init:
