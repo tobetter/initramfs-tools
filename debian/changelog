@@ -1,3 +1,14 @@
+initramfs-tools (0.92bubuntu74) lucid; urgency=low
+
+  * debian/control, debian/rules:
+    - force libc6 dependency to >= 2.11 (and libc6.1 on ia64, the libc6
+      has a different packages name on this architecture) to workaround a
+      bug in libapt  when it orders the install for essential packages
+      (LP: #559582)
+      This can be removed after lucid
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Fri, 16 Apr 2010 13:13:50 +0200
+
 initramfs-tools (0.92bubuntu73) lucid; urgency=low
 
   * Change to ${DESTDIR} before running find to filter out looping or broken
