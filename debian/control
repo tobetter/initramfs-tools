@@ -26,7 +26,7 @@ Description: tools for generating an initramfs
 
 Package: initramfs-tools-bin
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libc6 (>= 2.11) [armel amd64 i386 powerpc sparc], libc6.1 (>= 2.11) [ia64]
 Description: binaries used by initramfs-tools
  This package contains binaries used inside the initramfs images generated
  by initramfs-tools.
