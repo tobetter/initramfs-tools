@@ -374,7 +374,7 @@ configure_networking()
 		for iface in /sys/class/net/*; do
 			[ -f "$iface/address" ] || continue
 			if [ "$(cat "$iface/address")" = "${HWADDR}" ]; then
-				DEVICE="$iface"
+				DEVICE="${iface#/sys/class/net/}"
 			fi
 		done
 	fi
