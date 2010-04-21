@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu75) lucid; urgency=low
+
+  * When specifying a network interface by MAC address, set DEVICE to (e.g.)
+    eth0 rather than /sys/class/net/eth0 (LP: #546964).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 21 Apr 2010 12:40:42 +0100
+
 initramfs-tools (0.92bubuntu74) lucid; urgency=low
 
   * debian/control, debian/rules:
