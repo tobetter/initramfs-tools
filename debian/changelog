@@ -1,3 +1,10 @@
+initramfs-tools (0.92bubuntu76) lucid; urgency=low
+
+  * hooks/compcache: add option to disable usage of compcache completely on
+    the kernel cmdline using the nocompcache option
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Thu, 22 Apr 2010 14:53:05 +0200
+
 initramfs-tools (0.92bubuntu75) lucid; urgency=low
 
   * When specifying a network interface by MAC address, set DEVICE to (e.g.)
