@@ -70,8 +70,8 @@ if [ "\${BOOT}" = "casper" ]; then
     fi
 fi
 
-for x in $(cat /proc/cmdline); do
-        case ${x} in
+for x in \$(cat /proc/cmdline); do
+        case \${x} in
         nocompcache)
                 exit 0
         ;;
