@@ -1,7 +1,5 @@
 #!/bin/sh
 
-echo "Loading, please wait..."
-
 [ -d /dev ] || mkdir -m 0755 /dev
 [ -d /root ] || mkdir -m 0700 /root
 [ -d /sys ] || mkdir /sys
@@ -11,14 +9,12 @@ mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid none /sys 
 mount -t proc -o nodev,noexec,nosuid none /proc 
 
+grep -q '\<quiet\>' /proc/cmdline || echo "Loading, please wait..."
+
 # Note that this only becomes /dev on the real filesystem if udev's scripts
 # are used; which they will be, but it's worth pointing out
-tmpfs_size="10M"
-if [ -e /etc/udev/udev.conf ]; then
-	. /etc/udev/udev.conf
-fi
 if ! mount -t devtmpfs -o mode=0755 none /dev; then
-	mount -t tmpfs -o size=$tmpfs_size,mode=0755 udev /dev
+	mount -t tmpfs -o mode=0755 udev /dev
 	[ -e /dev/console ] || mknod -m 0600 /dev/console c 5 1
 	[ -e /dev/null ] || mknod /dev/null c 1 3
 fi
@@ -117,8 +113,26 @@ for x in $(cat /proc/cmdline); do
 			;;
 		esac
 		;;
+	resumedelay=*)
+		RESUMEDELAY="${x#resumedelay=}"
+		;;
+	loop=*)
+		LOOP="${x#loop=}"
+		;;
+	loopflags=*)
+		LOOPFLAGS="-o ${x#loopflags=}"
+		;;
+	loopfstype=*)
+		LOOPFSTYPE="${x#loopfstype=}"
+		;;
+	cryptopts=*)
+		cryptopts="${x#cryptopts=}"
+		;;
 	nfsroot=*)
 		NFSROOT="${x#nfsroot=}"
+		;;
+	netboot=*)
+		NETBOOT="${x#netboot=}"
 		;;
 	ip=*)
 		IP="${x#ip=}"
@@ -178,6 +192,9 @@ for x in $(cat /proc/cmdline); do
 	BOOTIF=*)
 		BOOTIF=${x#BOOTIF=}
 		;;
+	hwaddr=*)
+		BOOTIF=${x#BOOTIF=}
+		;;
 	esac
 done
 
@@ -191,6 +208,10 @@ fi
 [ -n "${netconsole}" ] && modprobe netconsole netconsole="${netconsole}"
 
 maybe_break top
+
+# export BOOT variable value for compcache,
+# so we know if we run from casper
+export BOOT
 
 # Don't do log messages here to avoid confusing usplash
 run_scripts /scripts/init-top
@@ -267,5 +288,5 @@ unset resume
 unset resume_offset
 
 # Chain to real filesystem
-exec run-init ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console
+exec run-init ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 panic "Could not execute run-init."
