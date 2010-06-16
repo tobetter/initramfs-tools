@@ -1,3 +1,11 @@
+initramfs-tools (0.96.1ubuntu4) maverick; urgency=low
+
+  * Only make the extra commands conditional on dh_listpackages, not the
+    override_dh_install target as a whole, as dh gets confused and avoids
+    calling dh_install at all when we're only building binary-arch.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 16 Jun 2010 20:35:31 +0000
+
 initramfs-tools (0.96.1ubuntu3) maverick; urgency=low
 
   * Revert change from 0.96.1ubuntu2; instead, only override dh_install if
