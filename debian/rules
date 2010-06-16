@@ -9,9 +9,11 @@ override_dh_auto_build:
 override_dh_auto_clean:
 	make -C src clean
 
+ifneq (,$(filter initramfs-tools,$(shell dh_listpackages)))
 override_dh_install:
 	dh_install
 	cp -a scripts/init-top/keymap \
 		debian/initramfs-tools/usr/share/initramfs-tools/scripts/panic/keymap
 	sed -i -e "/^OPTION=/d" \
 		debian/initramfs-tools/usr/share/initramfs-tools/scripts/panic/keymap
+endif

@@ -1,3 +1,10 @@
+initramfs-tools (0.96.1ubuntu3) maverick; urgency=low
+
+  * Revert change from 0.96.1ubuntu2; instead, only override dh_install if
+    we're building the architecture-independent package.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 16 Jun 2010 16:13:07 +0100
+
 initramfs-tools (0.96.1ubuntu2) maverick; urgency=low
 
   * Make sure /usr/share/initramfs-tools/scripts/panic/ exists before trying
