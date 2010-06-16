@@ -6,49 +6,25 @@ pre_mountroot()
 	run_scripts /scripts/local-top
 	[ "$quiet" != "y" ] && log_end_msg
 
-	wait_for_udev 10
-
 	# Don't wait for a root device that doesn't have a corresponding
 	# device in /dev (ie, mtd0)
 	if [ "${ROOT#/dev}" = "${ROOT}" ]; then
 		return
 	fi
 
-	# If the root device hasn't shown up yet, give it a little while
-	# to deal with removable devices
-	if [ ! -e "${ROOT}" ] || ! $(get_fstype "${ROOT}" >/dev/null); then
-		log_begin_msg "Waiting for root file system"
+	while [ -z "${FSTYPE}" ]; do
+		FSTYPE=$(wait-for-root "${ROOT}" ${ROOTDELAY:-30})
 
-		# Default delay is 180s
-		if [ -z "${ROOTDELAY}" ]; then
-			slumber=180
-		else
-			slumber=${ROOTDELAY}
+		# Run failure hooks, hoping one of them can fix up the system
+		# and we can restart the wait loop.  If they all fail, abort
+		# and move on to the panic handler and shell.
+		if [ -z "${FSTYPE}" ] && ! try_failure_hooks; then
+			break
 		fi
-		if [ -x /sbin/usplash_write ]; then
-			/sbin/usplash_write "TIMEOUT ${slumber}" || true
-		fi
-
-		slumber=$(( ${slumber} * 10 ))
-		while [ ! -e "${ROOT}" ] \
-		|| ! $(get_fstype "${ROOT}" >/dev/null); do
-			/bin/sleep 0.1
-			slumber=$(( ${slumber} - 1 ))
-			[ ${slumber} -gt 0 ] || break
-		done
-
-		if [ ${slumber} -gt 0 ]; then
-			log_end_msg 0
-		else
-			log_end_msg 1 || true
-		fi
-		if [ -x /sbin/usplash_write ]; then
-			/sbin/usplash_write "TIMEOUT 15" || true
-		fi
-	fi
+	done
 
 	# We've given up, but we'll let the user fix matters if they can
-	while [ ! -e "${ROOT}" ]; do
+	while [ -z "${FSTYPE}" -a ! -e "${ROOT}" ]; do
 		# give hint about renamed root
 		case "${ROOT}" in 
 		/dev/hd*)
@@ -83,7 +59,8 @@ mountroot()
 
 	# Get the root filesystem type if not set
 	if [ -z "${ROOTFSTYPE}" ]; then
-		FSTYPE=$(get_fstype "${ROOT}")
+		[ -n "${FSTYPE}" ] || FSTYPE=$(blkid -s TYPE -o value "${ROOT}")
+		ROOTFSTYPE="${FSTYPE}"
 	else
 		FSTYPE=${ROOTFSTYPE}
 	fi
@@ -92,21 +69,70 @@ mountroot()
 	run_scripts /scripts/local-premount
 	[ "$quiet" != "y" ] && log_end_msg
 
-	if [ "${readonly}" = "y" ]; then
+	if [ "${readonly}" = "y" ] && \
+	   [ -z "$LOOP" ]; then
 		roflag=-r
 	else
 		roflag=-w
 	fi
 
 	# FIXME This has no error checking
-	modprobe ${FSTYPE}
+	[ -n "${FSTYPE}" ] && modprobe ${FSTYPE}
 
 	# FIXME This has no error checking
 	# Mount root
-	if [ "${FSTYPE}" != "unknown" ]; then
-		mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
-	else
-		mount ${roflag} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+	mount ${roflag} ${FSTYPE:+-t ${FSTYPE} }${ROOTFLAGS} ${ROOT} ${rootmnt}
+	mountroot_status="$?"
+	if [ "$LOOP" ]; then
+		if [ "$mountroot_status" != 0 ]; then
+			if [ ${FSTYPE} = ntfs ] || [ ${FSTYPE} = vfat ]; then
+				panic "
+Could not mount the partition ${ROOT}.
+This could also happen if the file system is not clean because of an operating
+system crash, an interrupted boot process, an improper shutdown, or unplugging
+of a removable device without first unmounting or ejecting it.  To fix this,
+simply reboot into Windows, let it fully start, log in, run 'chkdsk /r', then
+gracefully shut down and reboot back into Windows. After this you should be
+able to reboot again and resume the installation.
+(filesystem = ${FSTYPE}, error code = $mountroot_status)
+"
+			fi
+		fi
+	
+		mkdir -p /host
+		mount -o move ${rootmnt} /host
+
+		while [ ! -e "/host/${LOOP#/}" ]; do
+			panic "ALERT!  /host/${LOOP#/} does not exist.  Dropping to a shell!"
+		done
+
+		# Get the loop filesystem type if not set
+		if [ -z "${LOOPFSTYPE}" ]; then
+			eval $(fstype < "/host/${LOOP#/}")
+		else
+			FSTYPE="${LOOPFSTYPE}"
+		fi
+		if [ "$FSTYPE" = "unknown" ] && [ -x /sbin/blkid ]; then
+			FSTYPE=$(/sbin/blkid -s TYPE -o value "/host/${LOOP#/}")
+			[ -z "$FSTYPE" ] && FSTYPE="unknown"
+		fi
+
+		if [ ${readonly} = y ]; then
+			roflag=-r
+		else
+			roflag=-w
+		fi
+
+		# FIXME This has no error checking
+		modprobe loop
+		modprobe ${FSTYPE}
+
+		# FIXME This has no error checking
+		mount ${roflag} -o loop -t ${FSTYPE} ${LOOPFLAGS} "/host/${LOOP#/}" ${rootmnt}
+
+		if [ -d ${rootmnt}/host ]; then
+			mount -o move /host ${rootmnt}/host
+		fi
 	fi
 
 	[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/local-bottom"
