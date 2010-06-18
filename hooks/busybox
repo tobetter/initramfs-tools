@@ -4,15 +4,15 @@ PREREQ=""
 
 prereqs()
 {
-       echo "$PREREQ"
+	echo "$PREREQ"
 }
 
 case $1 in
 # get pre-requisites
 prereqs)
-       prereqs
-       exit 0
-       ;;
+	prereqs
+	exit 0
+	;;
 esac
 
 # busybox
@@ -20,7 +20,7 @@ if [ "${BUSYBOX}" = "n" ] || [ ! -e ${BUSYBOXDIR}/busybox ]; then
 	# those root need busybox
 	eval "$(mount | awk '/ \/ / {print "r_dev=" $1; exit}')"
 	if [ "${r_dev#/dev/mapper/}" != "${r_dev}" ]; then
-		echo "Warning: Busybox is required for successful boot!"
+		echo "W: Busybox is required for successful boot!"
 	fi
 else
 	. /usr/share/initramfs-tools/hook-functions
