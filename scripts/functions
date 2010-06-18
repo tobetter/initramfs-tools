@@ -42,6 +42,11 @@ panic()
 	if [ -x /sbin/usplash_write ]; then
 		/sbin/usplash_write "QUIT"
 	fi
+
+	if command -v chvt >/dev/null 2>&1; then
+		chvt 1
+	fi
+
 	# Disallow console access
 	if [ -n "${panic}" ]; then
 		sleep ${panic}
@@ -95,6 +100,13 @@ set_initlist()
 			continue
 		fi
 
+		# skip bad syntax
+		if ! sh -n ${si_x} ; then
+			[ "${verbose}" = "y" ] \
+			&& echo "$si_x ignored: bad syntax"
+			continue
+		fi
+
 		initlist="${initlist} ${si_x#${initdir}/}"
 	done
 }
@@ -111,13 +123,12 @@ reduce_satisfied()
 			;;
 		esac
 		# skip non executable scripts
-		if [ ! -x ${initdir}/${rs_y} ]; then
-			continue
-		fi
+		[ ! -x ${initdir}/${rs_y} ] && continue
 		# skip directories
-		if [ -d ${initdir}/${rs_y} ]; then
-			continue
-		fi
+		[ -d ${initdir}/${rs_y} ] && continue
+		# skip bad syntax
+		sh -n ${initdir}/${rs_y} || continue
+
 		tmpdeplist="${tmpdeplist} ${rs_y}"
 	done
 	deplist=${tmpdeplist}
@@ -200,6 +211,8 @@ get_prereq_pairs()
 
 call_scripts()
 {
+	# allow hooks to abort build:
+	set -e
 	for cs_x in ${runlist}; do
 		[ -f ${initdir}/${cs_x} ] || continue
 		# mkinitramfs verbose output
@@ -212,13 +225,14 @@ call_scripts()
 			. /conf/param.conf
 		fi
 	done
+	set +e
 }
 
 run_scripts()
 {
 	initdir=${1}
 	[ ! -d ${initdir} ] && return
-	
+
 	if [ -f ${initdir}/ORDER ]; then
 		. ${initdir}/ORDER
 	elif command -v tsort >/dev/null 2>&1; then
@@ -285,7 +299,7 @@ get_fstype ()
 	local FS FSTYPE FSSIZE RET
 	FS="${1}"
 
-	# vol_id has a more complete list of file systems,
+	# blkid has a more complete list of file systems,
 	# but fstype is more robust
 	eval $(fstype "${FS}" 2> /dev/null)
 	if [ "$FSTYPE" = "unknown" ] &&  command -v blkid >/dev/null 2>&1 ; then

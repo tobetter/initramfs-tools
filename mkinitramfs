@@ -7,13 +7,14 @@ export PATH='/usr/bin:/sbin:/bin'
 keep="n"
 CONFDIR="/etc/initramfs-tools"
 verbose="n"
-# BUSYBOXDIR="/usr/lib/initramfs-tools/bin/"
-export BUSYBOXDIR="/bin"
+test -e /bin/busybox && BUSYBOXDIR=/bin
+test -e /usr/lib/initramfs-tools/bin/busybox && BUSYBOXDIR=/usr/lib/initramfs-tools/bin
+export BUSYBOXDIR
 
 OPTIONS=`getopt -o c:d:ko:r:v -n "$0" -- "$@"`
 
 # Check for non-GNU getopt
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+if [ $? != 0 ] ; then echo "W: non-GNU getopt" >&2 ; exit 1 ; fi
 
 eval set -- "$OPTIONS"
 
@@ -69,7 +70,7 @@ for i in /usr/share/initramfs-tools/conf.d/* ${CONFDIR}/conf.d/*; do
 		| grep '^[[:alnum:]][[:alnum:]\._-]*$' | grep -v '\.dpkg-.*$')";
 done
 # FIXME: deprecated those settings on mkinitramfs run
-#        these conf dirs are for boot scripts and land on initramfs
+# 	 these conf dirs are for boot scripts and land on initramfs
 for i in ${EXTRA_CONF}; do
 	if [ -e  ${CONFDIR}/conf.d/${i} ]; then
 		. ${CONFDIR}/conf.d/${i}
@@ -148,7 +149,7 @@ fi
 [ "${compress}" = lzop ] && compress="lzop -9"
 
 if [ -d "${outfile}" ]; then
-	echo "${outfile} is a directory"
+	echo "${outfile} is a directory" >&2
 	exit 1
 fi
 
@@ -198,7 +199,7 @@ done
 # Copy the modules.order file in
 if [ -f "${MODULESDIR}/modules.order" ]; then
 	cp -p "${MODULESDIR}/modules.order" \
-	      "${DESTDIR}${MODULESDIR}/modules.order"
+		"${DESTDIR}${MODULESDIR}/modules.order"
 fi
 
 # MODULES=list case.  Always honour.
@@ -224,8 +225,8 @@ list)
 	# nothing to add
 	;;
 *)
-	echo "mkinitramfs: Warning unsupported MODULES setting: ${MODULES}."
-	echo "mkinitramfs: Falling back to MODULES=most."
+	echo "W: mkinitramfs: unsupported MODULES setting: ${MODULES}."
+	echo "W: mkinitramfs: Falling back to MODULES=most."
 	auto_add_modules
 	;;
 esac
@@ -266,7 +267,7 @@ if [ -n "${ROOT:-}" ]; then
 fi
 
 if ! command -v ldd >/dev/null 2>&1 ; then
-	echo "WARNING: no ldd around - install libc-bin"
+	echo "WARNING: no ldd around - install libc-bin" >&2
 	exit 1
 fi
 
@@ -286,7 +287,7 @@ run_scripts "${CONFDIR}"/hooks
 
 # cache boot run order
 if [ -n "$NOEXEC" ]; then
-	echo "Warning: TMPDIR is mounted noexec, will not cache run scripts."
+	echo "W: TMPDIR is mounted noexec, will not cache run scripts."
 else
 	for b in $(cd "${DESTDIR}/scripts" && find . -mindepth 1 -type d); do
 		cache_run_scripts "${DESTDIR}" "/scripts/${b#./}"
@@ -304,8 +305,8 @@ fi
 
 # Remove any looping or broken symbolic links, since they break cpio.
 [ "${verbose}" = y ] && xargs_verbose="-t"
-find "${DESTDIR}" -type l -printf '%p %Y\n' | sed -n 's/ [LN]$//p' \
-	| xargs ${xargs_verbose:-} -rL1 rm -f
+(cd "${DESTDIR}" && find . -type l -printf '%p %Y\n' | sed -n 's/ [LN]$//p' \
+	| xargs ${xargs_verbose:-} -rL1 rm -f)
 
 [ "${verbose}" = y ] && echo "Building cpio ${outfile} initramfs"
 (
@@ -313,15 +314,15 @@ find "${DESTDIR}" -type l -printf '%p %Y\n' | sed -n 's/ [LN]$//p' \
 # cd "${DESTDIR}" && find . | cpio --quiet --dereference -o -H newc | gzip >"${outfile}" || exit 1
 exec 3>&1
 eval `
-    # http://cfaj.freeshell.org/shell/cus-faq-2.html
-    exec 4>&1 >&3 3>&-
-    cd  "${DESTDIR}" 
-    {
-        find . 4>&-; echo "ec1=$?;" >&4
-    } | {
-        cpio --quiet --dereference -o -H newc 4>&-; echo "ec2=$?;" >&4
-    } | ${compress} >"${outfile}"
-    echo "ec3=$?;" >&4
+	# http://cfaj.freeshell.org/shell/cus-faq-2.html
+	exec 4>&1 >&3 3>&-
+	cd  "${DESTDIR}"
+	{
+		find . 4>&-; echo "ec1=$?;" >&4
+	} | {
+		cpio --quiet --dereference -o -H newc 4>&-; echo "ec2=$?;" >&4
+	} | ${compress} >"${outfile}"
+	echo "ec3=$?;" >&4
 `
 if [ "$ec1" -ne 0 ]; then exit "$ec1"; fi
 if [ "$ec2" -ne 0 ]; then exit "$ec2"; fi
