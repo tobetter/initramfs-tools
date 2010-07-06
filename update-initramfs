@@ -223,8 +223,10 @@ run_bootloader()
 	if [ -r /etc/zipl.conf ]; then
 		zipl
 	fi
-	if flash-kernel --supported >/dev/null 2>&1; then
-		flash-kernel ${version}
+	if [ -r /etc/kernel-img.conf ] && grep -q '^postinst_hook[[:space:]]*=[[:space:]]*[^[:space:]]' /etc/kernel-img.conf; then
+		if flash-kernel --supported >/dev/null 2>&1; then
+			flash-kernel ${version}
+		fi
 	fi
 }
 
@@ -430,7 +432,7 @@ altered_check()
 verbose=0
 yes=0
 # We default to takeover=1 in Ubuntu, but not Debian
-takeover=0
+takeover=1
 
 ##
 
