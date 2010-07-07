@@ -39,6 +39,13 @@ add_modules_from_file()
 	done
 }
 
+# Is this module available?
+have_module()
+{
+	modprobe --set-version="${version}" --ignore-install \
+		--show-depends "${1}" >/dev/null 2>&1
+}
+
 # Add dependent modules + eventual firmware
 manual_add_modules()
 {
@@ -395,7 +402,12 @@ auto_add_modules()
 	base)
 		for x in ehci-hcd ohci-hcd uhci-hcd usbhid xhci hid-apple \
 		hid-microsoft \
+		hid-a4tech hid-belkin hid-bright hid-cherry hid-chicony \
+		hid-cypress hid-dell hid-ezkey hid-gyration hid-logitech \
+		hid-monterey hid-petalynx hid-pl hid-samsung hid-sony \
+		hid-sunplus hid-tmff hid-zpff \
 		btrfs ext2 ext3 ext4 ext4dev isofs jfs nfs reiserfs udf xfs \
+		vfat nls_cp437 nls_iso8859-1 \
 		af_packet atkbd i8042 virtio_pci; do
 			manual_add_modules "${x}"
 		done
@@ -403,7 +415,8 @@ auto_add_modules()
 	net)
 		copy_modules_dir kernel/drivers/net \
 			appletalk arcnet bonding can hamradio irda pcmcia \
-			tokenring usb wan wimax wireless
+			tokenring usb wan wimax wireless \
+			bnx2.ko
 	;;
 	ide)
 		copy_modules_dir kernel/drivers/ide
