@@ -10,7 +10,7 @@ version=""
 update_initramfs=yes
 backup_initramfs=no
 
-set -eu
+set -e
 
 [ -r ${CONF} ] && . ${CONF}
 
@@ -190,6 +190,14 @@ run_lilo()
 # Invoke bootloader
 run_bootloader()
 {
+	# invoke policy conformant bootloader hooks
+	if [ -d /etc/initramfs/post-update.d/ ]; then
+		run-parts --arg=${version} --arg=${initramfs} \
+			/etc/initramfs/post-update.d/
+		return 0
+	fi
+
+	# FIXME: to be removed postsqueeze release
 	# if both lilo and grub around, figure out if lilo needs to be run
 	if ( command -v update-grub >/dev/null 2>&1 \
 		|| [ -e /boot/grub/menu.lst ] || [ -e /boot/grub/grub.cfg ] ) \
@@ -222,9 +230,11 @@ run_bootloader()
 	fi
 	if [ -r /etc/zipl.conf ]; then
 		zipl
+		return 0
 	fi
 	if flash-kernel --supported >/dev/null 2>&1; then
 		flash-kernel ${version}
+		return 0
 	fi
 }
 
@@ -502,11 +512,8 @@ if [ "${version}" = "all" ] \
 		OPTS="${OPTS} -y"
 	fi
 	for u_version in ${version_list}; do
-		# Don't stop if one version doesn't work.
-		set +e
 		verbose "Execute: ${0} -${mode} -k \"${u_version}\" ${OPTS}"
 		"${0}" -${mode} -k "${u_version}" ${OPTS}
-		set -e
 	done
 	exit 0
 fi

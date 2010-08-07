@@ -136,7 +136,7 @@ fi
 
 if ! command -v "${compress}" >/dev/null 2>&1; then
 	compress=gzip
-	COMPRESS=GZIP
+	COMPRESS=gzip
 	[ "${verbose}" = y ] && \
 		echo "No ${COMPRESS} in ${PATH}, using gzip"
 fi
@@ -322,12 +322,21 @@ eval `
 		find . 4>&-; echo "ec1=$?;" >&4
 	} | {
 		cpio --quiet --dereference -o -H newc 4>&-; echo "ec2=$?;" >&4
-	} | "${compress}" >"${outfile}"
+	} | ${compress} >"${outfile}"
 	echo "ec3=$?;" >&4
 `
-if [ "$ec1" -ne 0 ]; then exit "$ec1"; fi
-if [ "$ec2" -ne 0 ]; then exit "$ec2"; fi
-if [ "$ec3" -ne 0 ]; then exit "$ec3"; fi
+if [ "$ec1" -ne 0 ]; then
+	echo "E: mkinitramfs failure find $ec1 cpio $ec2 $compress $ec3"
+	exit "$ec1"
+fi
+if [ "$ec2" -ne 0 ]; then
+	echo "E: mkinitramfs failure cpio $ec2 $compress $ec3"
+	exit "$ec2"
+fi
+if [ "$ec3" -ne 0 ]; then
+	echo "E: mkinitramfs failure $compress $ec3"
+	exit "$ec3"
+fi
 ) || exit 1
 
 if [ -s "${__TMPCPIOGZ}" ]; then

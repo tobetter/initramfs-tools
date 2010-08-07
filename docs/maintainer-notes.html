@@ -80,14 +80,17 @@ or online at <a
 </pre>
 </li>
 
-<li>Set environment variables (e.g. through your ~/.bashrc or ~/.zshrc) for git and devscripts (git dch):
+<li>Set environment variables (e.g. through your ~/.bashrc or ~/.zshrc) for devscripts (git dch):
 <pre>
 <b>export DEBEMAIL=$mailaddress
-export DEBFULLNAME=$yourname
-export GIT_AUTHOR_EMAIL=$mailaddress
-export GIT_AUTHOR_NAME=$yourname
-export GIT_COMMITTER_EMAIL=$mailaddress
-export GIT_COMMITTER_NAME=$yourname</b>
+export DEBFULLNAME=$yourname</b>
+</pre>
+</li>
+
+<li>Set user name and email address for git (drop the --global option to use configuration per-repo basis):
+<pre>
+<b>% git config --global user.name  "$yourname"
+% git config --global user.email "$mailaddress"</b>
 </pre>
 </li>
 
@@ -180,6 +183,13 @@ on.
 </pre>
 </li>
 
+<li>If a branch is removed from the server it will stay locally. You can get of
+any stale remote branches locally by executing:
+<pre>
+<b>% git remote prune origin</b>
+</pre>
+</li>
+
 </ol>
 
 <h3><a name="test">3.3 Test specific branch</a></h3>
@@ -252,6 +262,12 @@ on.
 <b>% git send-email --to=initramfs-tools@packages.qa.debian.org $PATCHFILE[S]</b>
 </pre>
 </li>
+
+<li>The development mailinglists are <a
+  href="mailto:debian-kernel@lists.debian.org">debian-kernel@lists.debian.org</a>
+and <a href="mailto:initramfs@vger.kernel.org">initramfs@vger.kernel.org</a>.
+Discussion of features, bugs and patches are more than welcome on one
+of these lists.</li>
 
 </ol>
 
