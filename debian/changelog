@@ -1,3 +1,11 @@
+initramfs-tools (0.97.2ubuntu2) maverick; urgency=low
+
+  * drop check for flash-kernel entry in kernel-img.conf, debian dropped
+    kernel-img.conf usage for flash-kernel and this code snippet prevents
+    flash-kernel from being run. 
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Tue, 09 Aug 2010 17:48:01 +0200
+
 initramfs-tools (0.97.2ubuntu1) maverick; urgency=low
 
   * Resynchronise with Debian:
