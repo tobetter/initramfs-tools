@@ -440,7 +440,7 @@ altered_check()
 verbose=0
 yes=0
 # We default to takeover=1 in Ubuntu, but not Debian
-takeover=0
+takeover=1
 
 ##
 
