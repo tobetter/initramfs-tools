@@ -27,12 +27,7 @@ else
 fi
 
 copy_exec /sbin/swapon
-
-mkdir -p "$DESTDIR"/etc/udev/rules.d
-cat >"$DESTDIR"/etc/udev/rules.d/80-compcache.rules <<EOF
-KERNEL=="ramzswap0", ACTION=="add", \\
-  RUN+="/sbin/swapon -p 100 /dev/ramzswap0 2>/dev/null"
-EOF
+copy_exec /usr/lib/initramfs-tools/bin/rzscontrol /sbin
 
 mem_total="\$(sed -nre 's/^MemTotal:\\s*([0-9]+) kB\$/\\1/p' /proc/meminfo)"
 
@@ -43,6 +38,19 @@ M) kbytes=$(($number * 1024))                ;;
 G) kbytes=$(($number * 1024 * 1024))         ;;
 T) kbytes=$(($number * 1024 * 1024 * 1024))  ;;
 esac
+
+mkdir -p "$DESTDIR"/etc/udev/rules.d
+if [ "$name" = ramzswap ]; then
+  cat >"$DESTDIR"/etc/udev/rules.d/80-compcache.rules <<EOF
+KERNEL=="ramzswap0", ACTION=="add", \\
+  RUN+="/sbin/rzscontrol /dev/ramzswap0 --disksize_kb="$kbytes" --init && /sbin/swapon -p 100 /dev/ramzswap0 2>/dev/null"
+EOF
+else
+  cat >"$DESTDIR"/etc/udev/rules.d/80-compcache.rules <<EOF
+KERNEL=="ramzswap0", ACTION=="add", \\
+  RUN+="/sbin/swapon -p 100 /dev/ramzswap0 2>/dev/null"
+EOF
+fi
 
 cat >"$DESTDIR"/scripts/init-top/compcache <<EOF
 #!/bin/sh
@@ -82,7 +90,7 @@ EOF
 
 if [ "$name" = ramzswap ]; then
   cat >>"$DESTDIR"/scripts/init-top/compcache <<EOF
-modprobe -q --ignore-install ramzswap disksize_kb="$kbytes"
+modprobe -q --ignore-install ramzswap
 EOF
 else
   cat >>"$DESTDIR"/scripts/init-top/compcache <<EOF

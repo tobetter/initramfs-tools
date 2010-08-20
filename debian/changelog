@@ -1,3 +1,16 @@
+initramfs-tools (0.98ubuntu2) maverick; urgency=low
+
+  * The ramzswap device changed its interface so that the disk size needs to
+    be given using an ioctl rather than as a module parameter.  Incorporate
+    the rzscontrol tool from the compcache project
+    (http://code.google.com/p/compcache/) so that we can control current
+    ramzswap devices (LP: #600782).  This is a strictly temporary measure,
+    as recent versions of compcache change the interface (and module name)
+    again to involve writing to sysfs files, which won't require any special
+    tools.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 20 Aug 2010 09:46:26 +0100
+
 initramfs-tools (0.98ubuntu1) maverick; urgency=low
 
   * Resynchronise with Debian.  Remaining changes:
