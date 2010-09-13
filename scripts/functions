@@ -61,6 +61,9 @@ try_failure_hooks()
 		/sbin/usplash_write "QUIT"
 	fi
 	chvt 1
+	if [ -x /bin/plymouth ] && plymouth --ping; then
+		/bin/plymouth hide-splash > /dev/null 2>&1
+	fi
 
 	for hook in /tmp/mountroot-fail-hooks.d/*; do
 		if [ -x ${hook} ] && ${hook} mountfail; then
