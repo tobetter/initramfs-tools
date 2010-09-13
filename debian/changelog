@@ -1,3 +1,10 @@
+initramfs-tools (0.98.1ubuntu2) maverick; urgency=low
+
+  * scripts/functions: Adding plymouth hide-splash to see the initramfs prompt
+    messages on VT. (LP: #628400)
+
+ -- Surbhi Palande <surbhi.palande@canonical.com>  Mon, 13 Sep 2010 10:24:22 +0100
+
 initramfs-tools (0.98.1ubuntu1) maverick; urgency=low
 
   * Resynchronise with Debian.  Remaining changes:
