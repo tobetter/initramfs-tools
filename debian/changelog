@@ -1,3 +1,12 @@
+initramfs-tools (0.98.1ubuntu3) maverick; urgency=low
+
+  * hooks/thermal: Force load thermal modules on powerpc for now, as there are
+    no modaliases for these modules, so udev won't touch them. Longer term,
+    scripts will need to be written to better identify which thermal module
+    needs to be loaded. (LP: #631358)
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Wed, 15 Sep 2010 18:08:15 +1000
+
 initramfs-tools (0.98.1ubuntu2) maverick; urgency=low
 
   * scripts/functions: Adding plymouth hide-splash to see the initramfs prompt
