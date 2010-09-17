@@ -8,6 +8,8 @@
 mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid none /sys
 mount -t proc -o nodev,noexec,nosuid none /proc
+# Some things don't work properly without /etc/mtab.
+ln -sf /proc/mounts /etc/mtab
 
 grep -q '\<quiet\>' /proc/cmdline || echo "Loading, please wait..."
 

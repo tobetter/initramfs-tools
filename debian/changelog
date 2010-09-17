@@ -1,3 +1,12 @@
+initramfs-tools (0.98.1ubuntu4) maverick; urgency=low
+
+  * Make /etc/mtab a symlink to /proc/mounts on startup, since e.g. current
+    ntfs-3g doesn't work otherwise (LP: #641306).  (We can't make it a
+    symlink directly in the initramfs, since mkinitramfs uses 'cpio
+    --dereference'.)
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Fri, 17 Sep 2010 18:14:31 +0100
+
 initramfs-tools (0.98.1ubuntu3) maverick; urgency=low
 
   * hooks/thermal: Force load thermal modules on powerpc for now, as there are
