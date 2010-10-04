@@ -1,3 +1,10 @@
+initramfs-tools (0.98.1ubuntu5) maverick; urgency=low
+
+  * Ignore errors from iscan hook, due to a widely-deployed third-party
+    package causing upgrade problems (LP: #603053).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Mon, 04 Oct 2010 10:42:30 +0100
+
 initramfs-tools (0.98.1ubuntu4) maverick; urgency=low
 
   * Make /etc/mtab a symlink to /proc/mounts on startup, since e.g. current
