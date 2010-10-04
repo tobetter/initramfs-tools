@@ -304,7 +304,8 @@ call_scripts()
 		# allow hooks to abort build:
 		# (except for iscan, due to a widely-deployed third-party
 		# package causing upgrade problems)
-		if [ "$ec" -ne 0 ] && [ "${cs_x}" != iscan ]; then
+		if [ "$ec" -ne 0 ] && [ "${cs_x}" != iscan ] && \
+		   [ "${cs_x}" != iscan-data ]; then
 			echo "E: ${initdir}/${cs_x} failed with return $ec."
 			# only errexit on mkinitramfs
 			[ -n "${version}" ] && exit $ec
