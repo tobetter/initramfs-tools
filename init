@@ -53,6 +53,11 @@ export blacklist=
 export resume=
 export resume_offset=
 
+# mdadm needs hostname to be set. This has to be done before the udev rules are called!
+if [ -f "/etc/hostname" ]; then
+        /bin/hostname -b -F /etc/hostname 2>&1 1>/dev/null
+fi
+
 # Bring in the main config
 . /conf/initramfs.conf
 for conf in conf/conf.d/*; do

@@ -1,3 +1,12 @@
+initramfs-tools (0.98.1ubuntu7) natty; urgency=low
+
+  * mdadm autoassembly works by matching hostname with what is stored in the
+    uuid bits of the array. So hostname needs to be set at boot time for the
+    rootfs to be mounted, when the rootfs is on an array which has to be
+    auto-assembled. Added support for setting the hostname. (LP: #330399)
+
+ -- Surbhi Palande <surbhi.palande@canonical.com>  Wed, 06 Oct 2010 17:53:20 +0300
+
 initramfs-tools (0.98.1ubuntu6) maverick; urgency=low
 
   * Apparently the iscan hook is sometimes called iscan-data, so ignore
