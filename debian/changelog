@@ -1,3 +1,11 @@
+initramfs-tools (0.98.1ubuntu8) natty; urgency=low
+
+  * If the root= argument is numeric, set ROOT to the appropriate
+    /dev/block/N:N symlink instead of mknod'ing a /dev/root device. This
+    makes wait-for-root able to detect those devices. (LP: #576429)
+
+ -- Evan Broder <evan@ebroder.net>  Fri, 26 Nov 2010 19:01:30 -0800
+
 initramfs-tools (0.98.1ubuntu7) natty; urgency=low
 
   * mdadm autoassembly works by matching hostname with what is stored in the

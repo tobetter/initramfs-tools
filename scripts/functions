@@ -364,8 +364,8 @@ parse_numeric() {
 		return
 		;;
 	[0-9]*:[0-9]*)
-		minor=${1#*:}
-		major=${1%:*}
+		minor=$(echo ${1#*:} | sed -e 's/^0*//')
+		major=$(echo ${1%:*} | sed -e 's/^0*//')
 		;;
 	[A-Fa-f0-9]*)
 		value=$(( 0x${1} ))
@@ -377,8 +377,7 @@ parse_numeric() {
 		;;
 	esac
 
-	mknod -m 600 /dev/root b ${major} ${minor}
-	ROOT=/dev/root
+	ROOT=/dev/block/${major}:${minor}
 }
 
 # Parameter: device node to check
