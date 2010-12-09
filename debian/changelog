@@ -1,3 +1,10 @@
+initramfs-tools (0.98.1ubuntu9) natty; urgency=low
+
+  [ dann frazier ]
+  * framebuffer: consolidate calls to 'udevadm settle' (LP: #687588).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Thu, 09 Dec 2010 12:28:27 +0000
+
 initramfs-tools (0.98.1ubuntu8) natty; urgency=low
 
   * If the root= argument is numeric, set ROOT to the appropriate

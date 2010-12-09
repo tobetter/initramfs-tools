@@ -88,9 +88,9 @@ if [ -n "${FB}" ]; then
 	udevadm settle
 else
 	# If we have no graphics devices yet, wait for udev to settle
-	[ -d /sys/class/graphics/fbcon ] || udevadm settle
-	[ -d /sys/class/graphics/fb0 ] || udevadm settle
-	[ -d /sys/class/drm/card0 ] || udevadm settle
+	[ -d /sys/class/graphics/fbcon ] && \
+	[ -d /sys/class/graphics/fb0   ] && \
+	[ -d /sys/class/drm/card0      ] || udevadm settle
 fi
 
 # Force fb mode via /sys interface
