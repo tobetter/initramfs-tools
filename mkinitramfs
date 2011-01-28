@@ -169,7 +169,7 @@ chmod 755 "${DESTDIR}"
 
 # do not execute cache_run_scripts() if mounted with noexec
 NOEXEC=""
-fs=$(df $DESTDIR | tail -1 | awk '{print $6}')
+fs=$(df -P $DESTDIR | tail -1 | awk '{print $6}')
 if [ -n "$fs" ] && mount | grep -q "on $fs .*noexec" ; then
 	NOEXEC=1
 fi
@@ -231,6 +231,9 @@ list)
 	auto_add_modules
 	;;
 esac
+
+# Resolve hidden dependencies
+hidden_dep_add_modules
 
 # Have to do each file, because cpio --dereference doesn't recurse down
 # symlinks.
