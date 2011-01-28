@@ -229,7 +229,7 @@ dep_add_modules()
 
 	# On failure fallback to /proc/mounts if readable
 	if [ -z "$root" ] && [ -r /proc/mounts ]; then
-		eval "$(awk '/\/dev\// {if ($2 == "/") {print "root=" $1 "\nFSTYPE=" $5; exit}}' /proc/mounts)"
+		eval "$(awk '!/^rootfs / {if ($2 == "/") {print "root=" $1 "\nFSTYPE=" $3; exit}}' /proc/mounts)"
 	fi
 
 	# recheck root device
@@ -482,6 +482,20 @@ auto_add_modules()
 		auto_add_modules usb_storage
 	;;
 	esac
+}
+
+# 'depmod' only looks at symbol dependencies; there is no way for
+# modules to declare explicit dependencies through module information,
+# so dependencies on e.g. crypto providers are hidden.  Until this is
+# fixed, we need to handle those hidden dependencies.
+hidden_dep_add_modules()
+{
+	for dep in "lib/libcrc32c crc32c"; do
+		set -- $dep
+		if [ -f "${DESTDIR}/lib/modules/${version}/kernel/$1.ko" ]; then
+			manual_add_modules "$2"
+		fi
+	done
 }
 
 # mkinitramfs help message
