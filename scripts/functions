@@ -37,6 +37,42 @@ log_end_msg()
 	_log_msg "done.\n"
 }
 
+# Add failure hook
+add_mountroot_fail_hook()
+{
+	mkdir -p /tmp/mountroot-fail-hooks.d
+	ln -s "$0" /tmp/mountroot-fail-hooks.d/"$1"
+}
+
+# Run failure hooks.
+# When a failure hook exits "1", it has not done anything to correct the
+# system.  Exiting "0" means that something has been attempted to resolve
+# the lack of a root filesystem.
+# Hooks are run in lexigraphical order, and are responsible for removing
+# themselves if they should not re-run in a later cycle.  When one exits
+# "0", the stack is stopped, so the caller can return to the main rootfs
+# wait loop.
+try_failure_hooks()
+{
+	local hook
+
+	# Disable usplash so text from hooks can be seen
+	if [ -x /sbin/usplash_write ]; then
+		/sbin/usplash_write "QUIT"
+	fi
+	chvt 1
+	if [ -x /bin/plymouth ] && plymouth --ping; then
+		/bin/plymouth hide-splash > /dev/null 2>&1
+	fi
+
+	for hook in /tmp/mountroot-fail-hooks.d/*; do
+		if [ -x ${hook} ] && ${hook} mountfail; then
+			return 0
+		fi
+	done
+	return 1
+}
+
 panic()
 {
 	if [ -x /sbin/usplash_write ]; then
@@ -54,13 +90,16 @@ panic()
 	fi
 	modprobe i8042
 	modprobe atkbd
+
+	run_scripts /scripts/panic
+
 	echo "$@"
 	REASON="$@" PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
 
 maybe_break()
 {
-	if [ "${break:-}" = "$1" ]; then
+	if echo "${break:-}" | egrep -q "(,|^)$1(,|$)"; then
 		panic "Spawning shell within the initramfs"
 	fi
 }
@@ -116,20 +155,58 @@ reduce_satisfied()
 	deplist="$(render array_${1})"
 	unset tmpdeplist
 	for rs_y in ${deplist}; do
-		# only allow variable name chars
+		# check if there are alternatives
 		case ${rs_y} in
-		*[![:alnum:]\._-]*)
-			continue
+		*\|*)
+			OLD_IFS="$IFS"
+			IFS="|"
+			for rs_z in ${rs_y}; do
+				IFS="$OLD_IFS"
+				# only allow variable name chars
+				case ${rs_z} in
+				*[![:alnum:]\._-]*)
+						IFS="|"
+						continue
+						;;
+				esac
+				# skip non executable scripts
+				if [ ! -x ${initdir}/${rs_z} ]; then
+					IFS="|"
+					continue
+				fi
+				# skip directories
+				if [ -d ${initdir}/${rs_z} ]; then
+					IFS="|"
+					continue
+				fi
+				# skip bad syntax
+				if ! sh -n ${initdir}/${rs_z}; then
+					IFS="|"
+					continue
+				fi
+
+				tmpdeplist="${tmpdeplist} ${rs_z}"
+				break
+			done
+			IFS="$OLD_IFS"
+			;;
+		*)
+			# only allow variable name chars
+			case ${rs_y} in
+			*[![:alnum:]\._-]*)
+				continue
+				;;
+			esac
+			# skip non executable scripts
+			[ ! -x ${initdir}/${rs_y} ] && continue
+			# skip directories
+			[ -d ${initdir}/${rs_y} ] && continue
+			# skip bad syntax
+			sh -n ${initdir}/${rs_y} || continue
+
+			tmpdeplist="${tmpdeplist} ${rs_y}"
 			;;
 		esac
-		# skip non executable scripts
-		[ ! -x ${initdir}/${rs_y} ] && continue
-		# skip directories
-		[ -d ${initdir}/${rs_y} ] && continue
-		# skip bad syntax
-		sh -n ${initdir}/${rs_y} || continue
-
-		tmpdeplist="${tmpdeplist} ${rs_y}"
 	done
 	deplist=${tmpdeplist}
 	for rs_x in ${runlist}; do
@@ -214,13 +291,21 @@ call_scripts()
 	set -e
 	for cs_x in ${runlist}; do
 		[ -f ${initdir}/${cs_x} ] || continue
+		if [ x"$1" = "xoptional" ]; then
+			option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${initdir}/${cs_x}")
+			[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+		fi
+
 		# mkinitramfs verbose output
 		if [ "${verbose}" = "y" ]; then
 			echo "Calling hook ${cs_x}"
 		fi
 		${initdir}/${cs_x} && ec=$? || ec=$?
 		# allow hooks to abort build:
-		if [ "$ec" -ne 0 ]; then
+		# (except for iscan, due to a widely-deployed third-party
+		# package causing upgrade problems)
+		if [ "$ec" -ne 0 ] && [ "${cs_x}" != iscan ] && \
+		   [ "${cs_x}" != iscan-data ]; then
 			echo "E: ${initdir}/${cs_x} failed with return $ec."
 			# only errexit on mkinitramfs
 			[ -n "${version}" ] && exit $ec
@@ -246,7 +331,7 @@ run_scripts()
 	else
 		get_prereqs
 		reduce_prereqs
-		call_scripts
+		call_scripts $2
 	fi
 }
 
@@ -279,8 +364,8 @@ parse_numeric() {
 		return
 		;;
 	[0-9]*:[0-9]*)
-		minor=${1#*:}
-		major=${1%:*}
+		minor=$(echo ${1#*:} | sed -e 's/^0*//')
+		major=$(echo ${1%:*} | sed -e 's/^0*//')
 		;;
 	[A-Fa-f0-9]*)
 		value=$(( 0x${1} ))
@@ -292,8 +377,7 @@ parse_numeric() {
 		;;
 	esac
 
-	mknod -m 600 /dev/root b ${major} ${minor}
-	ROOT=/dev/root
+	ROOT=/dev/block/${major}:${minor}
 }
 
 # Parameter: device node to check
