@@ -431,8 +431,7 @@ auto_add_modules()
 	net)
 		copy_modules_dir kernel/drivers/net \
 			appletalk arcnet bonding can hamradio irda pcmcia \
-			tokenring usb wan wimax wireless \
-			bnx2.ko
+			tokenring usb wan wimax wireless
 	;;
 	ide)
 		copy_modules_dir kernel/drivers/ide
