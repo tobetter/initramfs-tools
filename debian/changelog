@@ -1,3 +1,11 @@
+initramfs-tools (0.98.8ubuntu2) natty; urgency=low
+
+  * Restore bnx2 to the initramfs; firmware loading should work these days,
+    and lots of other modules need firmware.  Suggested by maximilian
+    attems.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 09 Feb 2011 18:13:23 +0000
+
 initramfs-tools (0.98.8ubuntu1) natty; urgency=low
 
   * Resynchronise with Debian.  Remaining changes:
