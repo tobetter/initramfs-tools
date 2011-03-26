@@ -1,3 +1,12 @@
+initramfs-tools (0.98.8ubuntu3) natty; urgency=low
+
+  * If copy_exec finds libraries to copy which are only accessible to the
+    runtime linker by virtue of being listed in /etc/ld.so.conf*, then
+    install those libraries to /lib or /usr/lib as appropriate instead
+    (LP: #728611).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Sat, 26 Mar 2011 01:12:48 +0000
+
 initramfs-tools (0.98.8ubuntu2) natty; urgency=low
 
   * Restore bnx2 to the initramfs; firmware loading should work these days,
