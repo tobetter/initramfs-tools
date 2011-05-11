@@ -43,7 +43,7 @@ div.right { text-align: right; }
 
 <li><a href="#contribute">4. Contribute</a></li>
 <li><a href="#release">5. Release new version</a></li>
-<li><a href="#ressources">6. Ressources</a></li>
+<li><a href="#resources">6. Resources</a></li>
 <li><a href="#credits">7. Credits</a></li>
 <li><a href="#license">8. License</a></li>
 
@@ -74,7 +74,7 @@ or online at <a
 
 <ol>
 
-<li>Install required software (notice: git is named git-core on Debian/stable):
+<li>Install required software (notice: git is named git-core on Debian/oldstable):
 <pre>
 <b># apt-get install git git-buildpackage dpkg-dev</b>
 </pre>
@@ -211,7 +211,7 @@ any stale remote branches locally by executing:
 <li>Adjust debian/changelog accordingly:
 <pre>
 <b>% git dch --debian-branch=&quot;$(git branch | awk -F\*\&nbsp;&nbsp; '/^* / { print $2}' )&quot; \
-  --since=&quot;v$(dpkg-parsechangelog | awk '/^Version:/ {print $2}')&quot; -S --id-length=7 --meta</b>
+  --since=&quot;v$(dpkg-parsechangelog | awk '/^Version:/ {print $2}')&quot; -S --id-length=7 --meta --multimaint-merge</b>
 </pre>
 </li>
 
@@ -233,7 +233,7 @@ any stale remote branches locally by executing:
 <li>Adjust debian/changelog accordingly:
 <pre>
 <b>% git dch --debian-branch=&quot;$(git branch | awk -F\*\&nbsp;&nbsp; '/^* / { print $2}' )&quot; \
-  --since=&quot;$(dpkg-parsechangelog | awk '/^Version:/ {print $2}')&quot; -S --id-length=7 --meta</b>
+  --since=&quot;v$(dpkg-parsechangelog | awk '/^Version:/ {print $2}')&quot; -S --id-length=7 --meta --multimaint-merge</b>
 </pre>
 </li>
 
@@ -259,7 +259,7 @@ any stale remote branches locally by executing:
 
 <li>Send patch file(s) to maintainers via mail (requires Debian package git-email):
 <pre>
-<b>% git send-email --to=initramfs-tools@packages.qa.debian.org $PATCHFILE[S]</b>
+<b>% git send-email --to=initramfs-tools@packages.debian.org $PATCHFILE[S]</b>
 </pre>
 </li>
 
@@ -287,12 +287,11 @@ of these lists.</li>
 or more dynamically:
 
 <pre>
-<b>% git dch --meta --release --since v$(dpkg-parsechangelog | awk '/^Version:/ {print $2}') --debian-branch=&quot;$(git branch | awk -F\*\  '/^* / { print $2}' )&quot; [--id-length=7] [--full]</b>
+<b>% git dch --meta --release --since v$(dpkg-parsechangelog | awk '/^Version:/ {print $2}') --debian-branch=&quot;$(git branch | awk -F\*\  '/^* / { print $2}' )&quot; --id-length=7 --meta --multimaint-merge</b>
 </pre>
 
 <b>NOTE:</b> we do not use history based sorting for the changelog entries but
-sort them by author (doing that manually when reviewing the changelog, see <a
-  href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=586165">#586165</a>).
+sort them by author.
 
 </li>
 
@@ -327,7 +326,7 @@ shortlog (generated through &quot;git shortlog $TAG..&quot;).</li>
 <div class="right"><a href="#toc">^</a></div>
 <hr />
 
-<h2><a name="ressources">6. Ressources</a></h2>
+<h2><a name="resources">6. Resources</a></h2>
 
 <ul>
   <li><a href="http://git.debian.org/?p=kernel/initramfs-tools.git">initramfs-tools git web interface</a></li>
