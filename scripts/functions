@@ -23,38 +23,29 @@ log_warning_msg()
 
 log_begin_msg()
 {
-	if [ -x /sbin/usplash_write ]; then
-		/sbin/usplash_write "TEXT $@"
-	fi
 	_log_msg "Begin: $@ ... "
 }
 
 log_end_msg()
 {
-	if [ -x /sbin/usplash_write ]; then
-		/sbin/usplash_write "SUCCESS ok"
-	fi
 	_log_msg "done.\n"
 }
 
 panic()
 {
-	if [ -x /sbin/usplash_write ]; then
-		/sbin/usplash_write "QUIT"
-	fi
-
 	if command -v chvt >/dev/null 2>&1; then
 		chvt 1
 	fi
 
+	echo "$@"
 	# Disallow console access
 	if [ -n "${panic}" ]; then
+		echo "Rebooting automatically due to panic= boot argument"
 		sleep ${panic}
 		reboot
 	fi
 	modprobe i8042
 	modprobe atkbd
-	echo "$@"
 	REASON="$@" PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
 
@@ -279,8 +270,8 @@ parse_numeric() {
 		return
 		;;
 	[0-9]*:[0-9]*)
-		minor=${1#*:}
-		major=${1%:*}
+		minor=$(( ${1#*:} ))
+		major=$(( ${1%:*} ))
 		;;
 	[A-Fa-f0-9]*)
 		value=$(( 0x${1} ))
@@ -292,8 +283,12 @@ parse_numeric() {
 		;;
 	esac
 
-	mknod -m 600 /dev/root b ${major} ${minor}
-	ROOT=/dev/root
+	if command -v udevd >/dev/null 2>&1; then
+		ROOT=/dev/block/${major}:${minor}
+	else
+		mknod -m 600 /dev/root b ${major} ${minor}
+		ROOT=/dev/root
+	fi
 }
 
 # Parameter: device node to check
@@ -364,7 +359,7 @@ configure_networking()
 	[ -n "${DEVICE}" ] && [ -e /tmp/net-"${DEVICE}".conf ] && return 0
 
 	# support ip options see linux sources
-	# Documentation/filesystems/nfsroot.txt
+	# Documentation/filesystems/nfs/nfsroot.txt
 	# Documentation/frv/booting.txt
 
 	for ROUNDTTT in 2 3 4 6 9 16 25 36 64 100; do
