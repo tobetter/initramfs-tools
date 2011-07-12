@@ -39,6 +39,13 @@ add_modules_from_file()
 	done
 }
 
+# Is this module available?
+have_module()
+{
+	modprobe --set-version="${version}" --ignore-install \
+		--show-depends "${1}" >/dev/null 2>&1
+}
+
 # Add dependent modules + eventual firmware
 manual_add_modules()
 {
@@ -143,6 +150,21 @@ copy_exec() {
 
 		libname=$(basename "${x}")
 		dirname=$(dirname "${x}")
+
+		# Avoid installing to directories which require ld.so.conf
+		# in order to work.  (Running ldconfig over the initramfs
+		# would be better, but the way we symlink libraries during
+		# creation stymies that.)
+		if grep -qsx "${dirname}" /etc/ld.so.conf /etc/ld.so.conf.d/*; then
+			case ${dirname} in
+			/usr/lib/*)
+				dirname=/usr/lib
+			;;
+			/lib/*)
+				dirname=/lib
+			;;
+			esac
+		fi
 
 		# FIXME inst_lib
 		mkdir -p "${DESTDIR}/${dirname}"
@@ -405,9 +427,14 @@ auto_add_modules()
 {
 	case "${1:-}" in
 	base)
-		for x in ehci-hcd ohci-hcd uhci-hcd usbhid xhci xhci-hcd \
-		hid-apple hid-cherry hid-logitech hid-microsoft hid-sunplus \
+		for x in ehci-hcd ohci-hcd uhci-hcd usbhid xhci xhci-hcd hid-apple \
+		hid-cherry hid-logitech hid-microsoft \
+		hid-a4tech hid-belkin hid-bright hid-chicony \
+		hid-cypress hid-dell hid-ezkey hid-gyration \
+		hid-monterey hid-petalynx hid-pl hid-samsung hid-sony \
+		hid-sunplus hid-tmff hid-zpff \
 		btrfs ext2 ext3 ext4 ext4dev isofs jfs nfs reiserfs udf xfs \
+		vfat nls_cp437 nls_iso8859-1 \
 		af_packet atkbd i8042 virtio_pci; do
 			manual_add_modules "${x}"
 		done
