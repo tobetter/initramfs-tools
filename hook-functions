@@ -151,21 +151,6 @@ copy_exec() {
 		libname=$(basename "${x}")
 		dirname=$(dirname "${x}")
 
-		# Avoid installing to directories which require ld.so.conf
-		# in order to work.  (Running ldconfig over the initramfs
-		# would be better, but the way we symlink libraries during
-		# creation stymies that.)
-		if grep -qsx "${dirname}" /etc/ld.so.conf /etc/ld.so.conf.d/*; then
-			case ${dirname} in
-			/usr/lib/*)
-				dirname=/usr/lib
-			;;
-			/lib/*)
-				dirname=/lib
-			;;
-			esac
-		fi
-
 		# FIXME inst_lib
 		mkdir -p "${DESTDIR}/${dirname}"
 		if [ ! -e "${DESTDIR}/${dirname}/${libname}" ]; then

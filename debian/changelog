@@ -1,3 +1,15 @@
+initramfs-tools (0.99ubuntu2) oneiric; urgency=low
+
+  * hook-functions: Revert changes from 0.98.8ubuntu3. With the current
+    implementation of copying, and /etc/ld.so.conf now existing in initramfs,
+    we can leave libraries at their original location. Thanks to maks for
+    pointing out!
+  * init: Add back compatibility symlink for /dev/.initramfs, until all
+    packages using /dev/.initramfs have been moved to /run/initramfs.
+    (LP: #810221)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 15 Jul 2011 11:20:32 +0200
+
 initramfs-tools (0.99ubuntu1) oneiric; urgency=low
 
   * Merge with Debian unstable. See 0.98.8ubuntu1 for remaining Ubuntu
