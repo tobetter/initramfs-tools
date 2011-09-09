@@ -1,3 +1,10 @@
+initramfs-tools (0.99ubuntu3) oneiric; urgency=low
+
+  * remove hardcoded flash-kernel call from update-initramfs, flash-kernel
+    ships the same as /etc/initramfs/post-update.d/ script now
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Fri, 09 Sep 2011 12:14:01 +0200
+
 initramfs-tools (0.99ubuntu2) oneiric; urgency=low
 
   * hook-functions: Revert changes from 0.98.8ubuntu3. With the current
