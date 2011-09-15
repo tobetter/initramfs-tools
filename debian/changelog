@@ -1,3 +1,10 @@
+initramfs-tools (0.99ubuntu4) oneiric; urgency=low
+
+  * init: When receiving "recovery" on cmdline, start upstart with
+    --startup-event=recovery (LP: #575469)
+
+ -- Stéphane Graber <stgraber@ubuntu.com>  Thu, 15 Sep 2011 16:07:54 -0400
+
 initramfs-tools (0.99ubuntu3) oneiric; urgency=low
 
   * remove hardcoded flash-kernel call from update-initramfs, flash-kernel
