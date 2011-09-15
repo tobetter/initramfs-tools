@@ -54,6 +54,7 @@ export panic=
 export blacklist=
 export resume=
 export resume_offset=
+export recovery=
 
 # mdadm needs hostname to be set. This has to be done before the udev rules are called!
 if [ -f "/etc/hostname" ]; then
@@ -209,6 +210,9 @@ for x in $(cat /proc/cmdline); do
 	hwaddr=*)
 		BOOTIF=${x#BOOTIF=}
 		;;
+	recovery)
+		recovery=y
+		;;
 	esac
 done
 
@@ -345,5 +349,5 @@ unset resume
 unset resume_offset
 
 # Chain to real filesystem
-exec run-init ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
+exec run-init ${rootmnt} ${init} "$@" ${recovery:+--startup-event=recovery} <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 panic "Could not execute run-init."
