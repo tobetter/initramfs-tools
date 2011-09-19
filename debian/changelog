@@ -1,3 +1,14 @@
+initramfs-tools (0.99ubuntu5) oneiric; urgency=low
+
+  * hooks/compcache: udev RUN commands cannot include double quotes (")
+    nor do they support shell syntax.  Move to an external helper script
+    to provision and add the memory swap partitions.
+  * hooks/compcache: add support for the updated zram staging driver
+    which requires the size to be pushed into sysfs and the partition be
+    initialised before adding.  (LP: #832694)
+
+ -- Andy Whitcroft <apw@canonical.com>  Mon, 19 Sep 2011 15:40:32 +0100
+
 initramfs-tools (0.99ubuntu4) oneiric; urgency=low
 
   * init: When receiving "recovery" on cmdline, start upstart with
