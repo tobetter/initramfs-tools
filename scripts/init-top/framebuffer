@@ -91,6 +91,23 @@ else
 	[ -d /sys/class/graphics/fbcon ] && \
 	[ -d /sys/class/graphics/fb0   ] && \
 	[ -d /sys/class/drm/card0      ] || udevadm settle
+
+	# If we still have no graphics device, fall back to vesafb like
+	# we do in the post-initramfs case in
+	# /etc/init/udev-fallback-graphics.conf.
+	# There is a higher risk of racing the regular video driver init
+	# than there is in the post-initramfs case, because this is earlier
+	# in boot and the kernel has had less time to finish probing the
+	# video drivers; and if we probe vesafb when we aren't meant to it
+	# will cause problems later.  In practice this doesn't appear to
+	# happen.
+	if    ! [ -d /sys/class/graphics/fbcon ] \
+	   || ! [ -d /sys/class/graphics/fb0   ] \
+	   || ! [ -d /sys/class/drm/card0      ]
+	then
+		modprobe -q vesafb
+		udevadm settle
+	fi
 fi
 
 # Force fb mode via /sys interface

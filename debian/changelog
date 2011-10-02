@@ -1,3 +1,13 @@
+initramfs-tools (0.99ubuntu6) oneiric; urgency=low
+
+  * scripts/init-top/framebuffer: fall back to vesafb if no other
+    framebuffer is found/configured, so we can take full advantage of the
+    grub gfxpayload handoff support.  This ensures we get a clean
+    framebuffer-based plymouth screen even when using binary video drivers.
+    LP: #864149, LP: #563878, LP: #771905.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Sat, 01 Oct 2011 20:53:15 -0700
+
 initramfs-tools (0.99ubuntu5) oneiric; urgency=low
 
   * hooks/compcache: udev RUN commands cannot include double quotes (")
