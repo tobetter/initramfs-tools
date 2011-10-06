@@ -105,7 +105,7 @@ else
 	   || ! [ -d /sys/class/graphics/fb0   ] \
 	   || ! [ -d /sys/class/drm/card0      ]
 	then
-		modprobe -q vesafb
+		modprobe -q vesafb 2>/dev/null
 		udevadm settle
 	fi
 fi
