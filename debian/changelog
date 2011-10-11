@@ -1,3 +1,14 @@
+initramfs-tools (0.99ubuntu8) oneiric-proposed; urgency=low
+
+  * Too optimistic in thinking that the DRM driver will always be loaded
+    in time for scripts/init-top/framebuffer to load; some users find that
+    vesafb gets loaded first anyway, scrambling their console state in the
+    initramfs.  Add a one-second sleep before checking if we should fall back
+    to vesafb, which seems to be long enough to work around this.
+    LP: #869119.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Mon, 10 Oct 2011 19:28:38 -0700
+
 initramfs-tools (0.99ubuntu7) oneiric; urgency=low
 
   * When falling back to vesafb, suppress stderr output from modprobe;
