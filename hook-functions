@@ -475,6 +475,12 @@ auto_add_modules()
 	usb_storage)
 		copy_modules_dir kernel/drivers/usb/storage
 	;;
+	virtual)
+		# Hyper-V
+		for x in hv_vmbus hv_utils hv_netvsc hv_mouse hv_storvsc; do
+			manual_add_modules "${x}"
+		done
+	;;
 	*)
 		auto_add_modules base
 		auto_add_modules net
@@ -488,6 +494,7 @@ auto_add_modules()
 		auto_add_modules firewire
 		auto_add_modules mmc
 		auto_add_modules usb_storage
+		auto_add_modules virtual
 	;;
 	esac
 }
