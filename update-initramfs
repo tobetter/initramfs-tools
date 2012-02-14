@@ -176,25 +176,9 @@ generate_initramfs()
 		mkinitramfs_return="$?"
 		remove_initramfs_bak
 		rm -f "${initramfs}.new"
-		if [ "$mkinitramfs_return" = "2" ]; then
-			# minversion wasn't met, exit 0
-			exit 0
-		fi
 		echo "update-initramfs: failed for ${initramfs} with $mkinitramfs_return." >&2
 		exit $mkinitramfs_return
 	fi
-}
-
-# lilo call
-run_lilo()
-{
-	# show lilo errors on failure
-	if ! lilo -t  > /dev/null 2>&1 ; then
-		echo "ERROR lilo fails for new ${initramfs}:" >&2
-		echo
-		lilo -t
-	fi
-	lilo
 }
 
 # Invoke bootloader
@@ -330,6 +314,8 @@ create()
 	fi
 
 	generate_initramfs
+
+	run_bootloader
 }
 
 update()
