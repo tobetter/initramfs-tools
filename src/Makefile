@@ -1,5 +1,6 @@
-UDEV_CFLAGS = $(shell pkg-config --cflags libudev)
-UDEV_LIBS = $(shell pkg-config --libs libudev)
+PKG_CONFIG = pkg-config
+UDEV_CFLAGS = $(shell $(PKG_CONFIG) --cflags libudev)
+UDEV_LIBS = $(shell $(PKG_CONFIG) --libs libudev)
 
 CC = gcc
 CFLAGS = -g -Wall -O2 $(UDEV_CFLAGS)

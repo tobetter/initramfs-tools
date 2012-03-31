@@ -1,3 +1,9 @@
+initramfs-tools (0.99ubuntu12) precise; urgency=low
+
+  * Fix cross-building.
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Sat, 31 Mar 2012 01:35:00 +0100
+
 initramfs-tools (0.99ubuntu11) precise; urgency=low
 
   * make sure fixrtc only updates the RTC setting if last mount time is actually 
