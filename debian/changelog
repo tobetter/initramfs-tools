@@ -1,3 +1,10 @@
+initramfs-tools (0.99ubuntu13) precise; urgency=low
+
+  * Deal with the uniquely broken situation of armhf having two linkers
+    by creating both if we find either one in the target (LP: #984007)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 17 Apr 2012 11:44:12 -0600
+
 initramfs-tools (0.99ubuntu12) precise; urgency=low
 
   * Fix cross-building.
