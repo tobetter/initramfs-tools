@@ -1,3 +1,11 @@
+initramfs-tools (0.92bubuntu78.1) lucid-proposed; urgency=low
+
+  * hooks-functions::mkinitramfs: Add helper function to resolve the
+    hidden dependencies of libcrc32c/crc32c (LP: #415353). Patch
+    backported from Debian (Author: Ben Hutchings).
+
+ -- Stefan Bader <stefan.bader@canonical.com>  Thu, 31 May 2012 17:01:46 +0200
+
 initramfs-tools (0.92bubuntu78) lucid; urgency=low
 
   * hooks/compcache: Escape $-expansions inside <<EOF (thanks, Eugene San;
