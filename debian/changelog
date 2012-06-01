@@ -1,3 +1,12 @@
+initramfs-tools (0.103ubuntu0) quantal; urgency=low
+
+  * NOTE: Not an actual merge, just a cherry-pick and reving the
+    version number to avoid having to touch the Breaks in klibc-utils
+  * Cherry-pick the changes from 0.102 to 0.103 to move ipconfig
+    bits from /tmp to /run to match the new behaviour of klibc-utils
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 01 Jun 2012 10:00:59 +0800
+
 initramfs-tools (0.99ubuntu13) precise; urgency=low
 
   * Deal with the uniquely broken situation of armhf having two linkers
