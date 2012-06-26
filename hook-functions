@@ -417,7 +417,7 @@ auto_add_modules()
 		hid-a4tech hid-belkin hid-bright hid-chicony \
 		hid-cypress hid-dell hid-ezkey hid-gyration \
 		hid-monterey hid-petalynx hid-pl hid-samsung hid-sony \
-		hid-sunplus hid-tmff hid-zpff \
+		hid-sunplus hid-tmff hid-zpff hid-generic \
 		btrfs ext2 ext3 ext4 ext4dev isofs jfs nfs reiserfs udf xfs \
 		vfat nls_cp437 nls_iso8859-1 \
 		af_packet atkbd i8042 virtio_pci; do
