@@ -1,3 +1,9 @@
+initramfs-tools (0.103ubuntu0.1) quantal; urgency=low
+
+  * hook-functions: Add hid-generic (LP: #1017991).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Tue, 26 Jun 2012 16:50:54 +0100
+
 initramfs-tools (0.103ubuntu0) quantal; urgency=low
 
   * NOTE: Not an actual merge, just a cherry-pick and reving the
