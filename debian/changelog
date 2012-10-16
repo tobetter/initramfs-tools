@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu0.2) quantal; urgency=low
+
+  * Add hid-logitech-dj to the static module list to re-enable some
+    keyboards that stopped working with recent kernels (LP: #1066376)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 16 Oct 2012 03:39:23 +0100
+
 initramfs-tools (0.103ubuntu0.1) quantal; urgency=low
 
   * hook-functions: Add hid-generic (LP: #1017991).
