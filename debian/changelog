@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu0.3) raring; urgency=low
+
+  * Add nfsv3, nfsv4 and nfs_acl to the base modules.
+    This should fix nfs from initramfs.
+
+ -- Stéphane Graber <stgraber@ubuntu.com>  Thu, 22 Nov 2012 09:43:09 -0500
+
 initramfs-tools (0.103ubuntu0.2) quantal; urgency=low
 
   * Add hid-logitech-dj to the static module list to re-enable some
