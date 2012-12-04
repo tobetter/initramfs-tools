@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu0.4) raring; urgency=low
+
+  * [71ece149] Cherry pick mkinitramfs: Copy modules.builtin into initramfs
+    (Closes: #659866) (LP: #1075422).
+
+ -- Dmitrijs Ledkovs <dmitrij.ledkov@ubuntu.com>  Tue, 04 Dec 2012 11:51:05 +0000
+
 initramfs-tools (0.103ubuntu0.3) raring; urgency=low
 
   * Add nfsv3, nfsv4 and nfs_acl to the base modules.
