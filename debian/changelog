@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu0.5) raring; urgency=low
+
+  * When copying firmware, don't use copy_exec; running ldd on random
+    firmware files is annoying and, if libc-x32 is installed, may cause
+    crashes due to lack of kernel support.  LP: #1115875.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 12 Feb 2013 07:22:19 +0000
+
 initramfs-tools (0.103ubuntu0.4) raring; urgency=low
 
   * [71ece149] Cherry pick mkinitramfs: Copy modules.builtin into initramfs

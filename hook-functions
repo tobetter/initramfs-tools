@@ -96,10 +96,16 @@ manual_add_modules()
 			fi
 
 			if [ -e "/lib/firmware/${version}/${firmware}" ]; then
-				copy_exec "/lib/firmware/${version}/${firmware}"
+				firmware="/lib/firmware/$version/$firmware"
 			else
-				copy_exec "/lib/firmware/${firmware}"
+				firmware="/lib/firmware/$firmware"
 			fi
+
+			target_dir="$DESTDIR/$(dirname "$firmware")"
+			if ! [ -d "$target_dir" ]; then
+				mkdir -p "$target_dir"
+			fi
+			cp -a "$firmware" "$target_dir"
 			if [ "${verbose}" = "y" ]; then
 				echo "Adding firmware ${firmware}"
 			fi
