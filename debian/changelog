@@ -1,3 +1,9 @@
+initramfs-tools (0.103ubuntu0.5b1) raring; urgency=low
+
+  * No-change rebuild against libudev1
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Wed, 13 Mar 2013 07:01:34 +0000
+
 initramfs-tools (0.103ubuntu0.5) raring; urgency=low
 
   * When copying firmware, don't use copy_exec; running ldd on random
