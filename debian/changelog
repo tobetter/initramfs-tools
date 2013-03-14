@@ -1,3 +1,9 @@
+initramfs-tools (0.103ubuntu0.6) raring; urgency=low
+
+  * Sync the mount options for /run from /lib/init/fstab.  LP: #1152744.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 13 Mar 2013 17:52:02 -0700
+
 initramfs-tools (0.103ubuntu0.5) raring; urgency=low
 
   * When copying firmware, don't use copy_exec; running ldd on random
