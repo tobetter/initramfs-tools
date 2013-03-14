@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 
 static int device_queued   (struct udev *udev, const char *path);
@@ -30,6 +31,7 @@ main (int   argc,
 	struct stat          devstat;
 	struct udev_device * udev_device;
 	const char *         type;
+	int		     flags;
 
 	if (argc != 3) {
 		fprintf (stderr, "Usage: %s DEVICE TIMEOUT\n", argv[0]);
@@ -84,6 +86,12 @@ main (int   argc,
 			udev_device_unref (udev_device);
 		}
 	}
+
+	/* udev monitor socket is nonblocking by default, but we want to wait
+	 * for events */
+	flags = fcntl (udev_monitor_get_fd (udev_monitor), F_GETFL, 0);
+	flags &= ~O_NONBLOCK;
+	fcntl (udev_monitor_get_fd (udev_monitor), F_SETFL, flags);
 
 	/* When the device doesn't exist yet, or is still being processed
 	 * by udev, use the monitor socket to wait it to be done.
