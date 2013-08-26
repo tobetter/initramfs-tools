@@ -1,3 +1,10 @@
+initramfs-tools (0.99ubuntu13.2) precise; urgency=low
+
+  * Add nfsv3, nfsv4 and nfs_acl to the base modules to fix nfs booting with 
+    newer kernels. (LP: #1217041)
+
+ -- Ryan Tandy <rtandy@sd63.bc.ca>  Mon, 26 Aug 2013 10:46:56 -0700
+
 initramfs-tools (0.99ubuntu13.1) precise; urgency=low
 
   * Add hid-generic and hid-logitech-dj modules to the static list
