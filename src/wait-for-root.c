@@ -96,7 +96,11 @@ main (int   argc,
 	/* When the device doesn't exist yet, or is still being processed
 	 * by udev, use the monitor socket to wait it to be done.
 	 */
-	while ((udev_device = udev_monitor_receive_device (udev_monitor)) != NULL) {
+	while (1) {
+                /* even though we use a blocking socket this might still fail
+                 * due to ENOBUFS or similar. */
+                while ((udev_device = udev_monitor_receive_device (udev_monitor)) == NULL)
+                        sleep (1);
 		if (matching_device (udev_device, devpath)) {
 			type = udev_device_get_property_value (udev_device, "ID_FS_TYPE");
 			if (type) {
