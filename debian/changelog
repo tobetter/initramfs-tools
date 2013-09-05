@@ -1,3 +1,12 @@
+initramfs-tools (0.103ubuntu0.8) raring; urgency=low
+
+  * src/wait-for-root.c: udev_monitor_receive_device() might still
+    return NULL even with a blocking socket if recvmsg() fails with
+    ENOBUFS. Retry every second in that case. Thanks to Tetsuo Handa for
+    debugging this and the patch! (LP: #1215911)
+
+ -- Chris J Arges <chris.j.arges@canonical.com>  Thu, 05 Sep 2013 16:20:14 -0500
+
 initramfs-tools (0.103ubuntu0.7) raring; urgency=low
 
   * src/wait-for-root.c: Set udev monitor socket to blocking, as we want to
