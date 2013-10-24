@@ -82,6 +82,7 @@ panic()
 	fi
 	modprobe i8042
 	modprobe atkbd
+	modprobe usbhid
 
 	run_scripts /scripts/panic
 
