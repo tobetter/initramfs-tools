@@ -418,7 +418,7 @@ auto_add_modules()
 {
 	case "${1:-}" in
 	base)
-		for x in ehci-hcd ohci-hcd uhci-hcd usbhid xhci xhci-hcd hid-apple \
+		for x in ehci-hcd ohci-hcd ohci-pci uhci-hcd usbhid xhci xhci-hcd hid-apple \
 		hid-cherry hid-logitech hid-logitech-dj hid-microsoft \
 		hid-a4tech hid-belkin hid-bright hid-chicony \
 		hid-cypress hid-dell hid-ezkey hid-gyration \
