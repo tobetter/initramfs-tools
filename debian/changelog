@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu3) trusty; urgency=low
+
+  * wait-for-root.c: Set udev monitor buffer size like udev does, to avoid
+    losing events due to ENOBUFS errors. Side issue in LP #1215911, thanks to
+    Kay Sievers for pointing out!
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 03 Dec 2013 16:29:24 +0100
+
 initramfs-tools (0.103ubuntu2) trusty; urgency=low
 
   * Include usbhid in the list of modules we probe in the panic function,
