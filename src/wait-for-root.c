@@ -63,6 +63,7 @@ main (int   argc,
 
 	udev_monitor_filter_add_match_subsystem_devtype (udev_monitor, "block", NULL);
 	udev_monitor_enable_receiving (udev_monitor);
+	udev_monitor_set_receive_buffer_size(udev_monitor, 128*1024*1024);
 
 	/* If the device is not being processed, check to see whether it
 	 * exists already on the filesystem.  If this is true, we don't need
