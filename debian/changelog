@@ -1,3 +1,13 @@
+initramfs-tools (0.103ubuntu4) trusty; urgency=medium
+
+  * Cherrypick v0.113 changes (LP: #1194370):
+    [ Henrique de Moraes Holschuh ]
+    * [f59e716] implement early initramfs support (Closes: #712521)
+    * [b8295f0] lsinitramfs(8): document failure to deal with early
+      initramfs
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Mon, 03 Mar 2014 08:11:20 +0000
+
 initramfs-tools (0.103ubuntu3) trusty; urgency=low
 
   * wait-for-root.c: Set udev monitor buffer size like udev does, to avoid
