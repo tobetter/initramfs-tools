@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu0.2.2) quantal-security; urgency=medium
+
+  * SECURITY UPDATE: incorrect tmpfs mount options (LP: #1152744)
+    - init: Sync the mount options for /run from /lib/init/fstab.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Fri, 21 Mar 2014 12:45:59 -0400
+
 initramfs-tools (0.103ubuntu0.2.1) quantal; urgency=low
 
   * src/wait-for-root.c: udev_monitor_receive_device() might still
