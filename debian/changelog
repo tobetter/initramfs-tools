@@ -1,3 +1,10 @@
+initramfs-tools (0.99ubuntu13.5) precise-security; urgency=medium
+
+  * SECURITY UPDATE: incorrect tmpfs mount options (LP: #1152744)
+    - init: Sync the mount options for /run from /lib/init/fstab.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Fri, 21 Mar 2014 12:40:40 -0400
+
 initramfs-tools (0.99ubuntu13.4) precise; urgency=low
 
   * Add ohci_pci to the list of USB host modules included in the initramfs,
