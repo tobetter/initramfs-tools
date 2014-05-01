@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu5) utopic; urgency=medium
+
+  * hook-functions/auto_add_modules: include psmouse as some keyboards
+    are connected to the "pass-thru" port on the PS2 mouse port (because
+    that is such a good idea). (LP: #1314764)
+
+ -- Andy Whitcroft <apw@canonical.com>  Thu, 01 May 2014 10:49:19 +0100
+
 initramfs-tools (0.103ubuntu4) trusty; urgency=medium
 
   * Cherrypick v0.113 changes (LP: #1194370):
