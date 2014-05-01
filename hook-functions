@@ -436,7 +436,7 @@ auto_add_modules()
 		hid-sunplus hid-tmff hid-zpff hid-generic \
 		btrfs ext2 ext3 ext4 ext4dev isofs jfs nfs nfsv3 nfsv4 nfs_acl \
 		reiserfs udf xfs vfat nls_cp437 nls_iso8859-1 \
-		af_packet atkbd i8042 virtio_pci; do
+		af_packet atkbd i8042 virtio_pci psmouse; do
 			manual_add_modules "${x}"
 		done
 	;;
