@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu6) utopic; urgency=medium
+
+  * Create /bin/egrep -> busybox symlink, because initramfs-tools
+    scripts/functions expect to have it & our busybox hook is executed
+    after zz-busybox one. (LP: #1315755)
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Tue, 06 May 2014 21:30:41 +0100
+
 initramfs-tools (0.103ubuntu5) utopic; urgency=medium
 
   * hook-functions/auto_add_modules: include psmouse as some keyboards
