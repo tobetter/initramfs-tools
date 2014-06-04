@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu4.2) trusty; urgency=medium
+
+  * Default to a rootdelay of 180 on powerpc/ppc64/ppc64el to account
+    for the slower device discovery on IPR controllers (LP: #1326199)
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Tue, 03 Jun 2014 21:39:01 -0600
+
 initramfs-tools (0.103ubuntu4.1) trusty; urgency=medium
 
   * hook-functions/auto_add_modules: include psmouse as some keyboards
