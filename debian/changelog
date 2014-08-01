@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu8) utopic; urgency=medium
+
+  * Add readlink symlink for busybox in the busybox hook, needed to
+    support /sbin/init as a readlink (LP: #1351295).
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 01 Aug 2014 16:46:35 +0100
+
 initramfs-tools (0.103ubuntu7) utopic; urgency=medium
 
   * Default to a rootdelay of 180 on powerpc/ppc64/ppc64el to account
