@@ -357,6 +357,11 @@ dep_add_modules()
 		block=${root#/dev/}
 		block=${block%%p[0-9]*}
 
+	# nbd root /dev/nbdXpX
+	elif [ "${root#/dev/nbd}" != "${root}" ]; then
+		block=${root#/dev/}
+		block=${block%%p[0-9]*}
+
 	# DAC960 - good old mylex raid - root dev format /dev/rd/cXdXpX
 	elif [ "${root#/dev/rd/c}" != "${root}" ]; then
 		block="rd!c${root#/dev/rd/c}"
@@ -366,6 +371,11 @@ dep_add_modules()
 	elif [ "${root#/dev/etherd/}" != "${root}" ]; then
 		block=${root#/dev/etherd/*}
 		block="etherd!${block%p*}"
+	# i2o raid device
+	elif [ "${root#/dev/i2o/}" != "${root}" ]; then
+		block=${root#/dev/i2o/}
+		block=${block%%[0-9]*}
+		block='i2o!'$block
 	# classical root device
 	else
 		block=${root#/dev/}
@@ -399,7 +409,7 @@ dep_add_modules()
 	fi
 
 	if [ -e /sys/bus/virtio ] ; then
-		modules="$modules virtio_pci"
+		modules="$modules virtio_pci virtio_mmio"
 	fi
 
 	if [ -e /sys/bus/i2o/devices/ ]; then
@@ -437,7 +447,8 @@ auto_add_modules()
 			modules="$modules btrfs ext2 ext3 ext4 ext4dev "
 			modules="$modules isofs jfs reiserfs udf xfs"
 			modules="$modules nfs nfsv2 nfsv3 nfsv4"
-			modules="$modules af_packet atkbd i8042 virtio_pci"
+			modules="$modules af_packet atkbd i8042"
+			modules="$modules virtio_pci virtio_mmio"
 
 			# Include all HID drivers unless we're sure they
 			# don't support keyboards.  hid-*ff covers various
@@ -511,7 +522,9 @@ auto_add_modules()
 hidden_dep_add_modules()
 {
 	local modules=
-	for dep in "lib/libcrc32c crc32c" "fs/ubifs/ubifs deflate zlib lzo"; do
+	for dep in "lib/libcrc32c crc32c" \
+			"fs/ubifs/ubifs deflate zlib lzo" \
+			"fs/btrfs/btrfs crc32c"; do
 		set -- $dep
 		if [ -f "${DESTDIR}/lib/modules/${version}/kernel/$1.ko" ]; then
 			shift
