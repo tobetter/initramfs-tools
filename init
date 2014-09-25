@@ -55,6 +55,10 @@ export blacklist=
 export resume=
 export resume_offset=
 export drop_caps=
+export fastboot=n
+export forcefsck=n
+export fsckfix=n
+
 
 # Bring in the main config
 . /conf/initramfs.conf
@@ -71,41 +75,11 @@ for x in $(cat /proc/cmdline); do
 		;;
 	root=*)
 		ROOT=${x#root=}
-		case $ROOT in
-		LABEL=*)
-			ROOT="${ROOT#LABEL=}"
-
-			# support any / in LABEL= path (escape to \x2f)
-			case "${ROOT}" in
-			*/*)
-			if command -v sed >/dev/null 2>&1; then
-				ROOT="$(echo ${ROOT} | sed 's,/,\\x2f,g')"
-			else
-				if [ "${ROOT}" != "${ROOT#/}" ]; then
-					ROOT="\x2f${ROOT#/}"
-				fi
-				if [ "${ROOT}" != "${ROOT%/}" ]; then
-					ROOT="${ROOT%/}\x2f"
-				fi
-				IFS='/'
-				newroot=
-				for s in $ROOT; do
-					newroot="${newroot:+${newroot}\\x2f}${s}"
-				done
-				unset IFS
-				ROOT="${newroot}"
-			fi
-			esac
-			ROOT="/dev/disk/by-label/${ROOT}"
-			;;
-		UUID=*)
-			ROOT="/dev/disk/by-uuid/${ROOT#UUID=}"
-			;;
-		/dev/nfs)
-			[ -z "${BOOT}" ] && BOOT=nfs
-			;;
-		esac
-		;;
+		ROOT=$(resolve_device "$ROOT")
+		if [ -z "${BOOT}" ] && [ "$ROOT" = "/dev/nfs" ]; then
+			BOOT=nfs
+		fi
+                ;;
 	rootflags=*)
 		ROOTFLAGS="-o ${x#rootflags=}"
 		;;
@@ -191,6 +165,15 @@ for x in $(cat /proc/cmdline); do
 	BOOTIF=*)
 		BOOTIF=${x#BOOTIF=}
 		;;
+	fastboot)
+		fastboot=y
+		;;
+	forcefsck)
+		forcefsck=y
+		;;
+	fsckfix)
+		fsckfix=y
+		;;
 	esac
 done
 
@@ -225,11 +208,28 @@ run_scripts /scripts/init-premount
 
 maybe_break mount
 log_begin_msg "Mounting root file system"
+# Always load local and nfs (since these might be needed for /etc or
+# /usr, irrespective of the boot script used to mount the rootfs).
+. /scripts/local
+. /scripts/nfs
 . /scripts/${BOOT}
 parse_numeric ${ROOT}
 maybe_break mountroot
+mount_top
+mount_premount
 mountroot
 log_end_msg
+
+if read_fstab_entry /usr; then
+	log_begin_msg "Mounting /usr file system"
+	mountfs /usr
+	log_end_msg
+fi
+
+# Mount cleanup
+mount_bottom
+nfs_bottom
+local_bottom
 
 maybe_break bottom
 [ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-bottom"
@@ -322,6 +322,9 @@ unset quiet
 unset readonly
 unset resume
 unset resume_offset
+unset fastboot
+unset forcefsck
+unset fsckfix
 
 # Move virtual filesystems over to the real filesystem
 mount -n -o move /sys ${rootmnt}/sys
