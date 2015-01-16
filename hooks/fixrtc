@@ -3,7 +3,7 @@
 # without battery
 
 MINKVER="2.6.24"
-PREREQ=""
+PREREQ="udev"
 
 # Output pre-requisites
 prereqs()

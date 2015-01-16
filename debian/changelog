@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu9) vivid; urgency=medium
+
+  * Add udevadm settle in scripts/local-premount/fixrtc; required for
+    /dev/disk/by-*/ symlinks to be added; add udev has a dependency in the
+    hook.
+
+ -- Loïc Minier <loic.minier@ubuntu.com>  Fri, 16 Jan 2015 15:40:20 +0100
+
 initramfs-tools (0.103ubuntu8) utopic; urgency=medium
 
   * Add readlink symlink for busybox in the busybox hook, needed to

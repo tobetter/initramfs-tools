@@ -50,6 +50,9 @@ for x in $(cat /proc/cmdline); do
 done
 
 if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ];then
+        # need udev settle for /dev/disk/by-* symlinks to be added
+        udevadm settle
+
         ROOTDISK=$(readlink -f "$ROOTDEV")
 
         TIMESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Last mount time")
