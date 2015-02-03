@@ -58,14 +58,15 @@ if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ];then
         TIMESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Last mount time")
         TIME=${TIMESTR#*:}
 
-	hwclock -s
+        hwclock -s || true
 
-	MOUNTTIME=$(date --utc --date  "${TIME}"  +%s)
-	CURDATE=$(date --utc --date "$(date)" +%s)
+        MOUNTTIME=$(date --utc --date  "${TIME}"  +%s)
+        CURDATE=$(date --utc --date "$(date)" +%s)
 
-	if [ "$MOUNTTIME" -gt "$CURDATE" ]; then
-        	date --set="${TIME} 1 minute" >/dev/null 2>&1
-	fi
+        if [ "$MOUNTTIME" -gt "$CURDATE" ]; then
+            	date --set="${TIME} 1 minute" >/dev/null 2>&1
+        fi
+
 fi
 
 # This script is best-effort.  If we couldn't fudge the clock as desired,

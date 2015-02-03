@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu10) vivid; urgency=medium
+
+  * scripts/local-premount/fixrtc: do not fail if "hwclock -s" can not work
+    properly, so we set the new date in any case.
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Tue, 03 Feb 2015 12:03:55 +0100
+
 initramfs-tools (0.103ubuntu9) vivid; urgency=medium
 
   * Add udevadm settle in scripts/local-premount/fixrtc; required for
