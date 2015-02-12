@@ -1,3 +1,14 @@
+initramfs-tools (0.103ubuntu11) vivid; urgency=medium
+
+  * scripts/local-premount/fixrtc:
+    - Make it work with busybox (different date syntax)
+    - Add support to retrieve the last mount time from the ubuntu touch system
+      partition
+    - Make it able to extract the filesystem created timestamp (useful when
+      last mounted is older) LP: #1420473
+
+ -- Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>  Thu, 12 Feb 2015 04:34:46 -0200
+
 initramfs-tools (0.103ubuntu10) vivid; urgency=medium
 
   * scripts/local-premount/fixrtc: do not fail if "hwclock -s" can not work
