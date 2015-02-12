@@ -23,6 +23,8 @@ esac
 
 BROKEN_CLOCK=""
 ROOTDEV=""
+# System partition is currently used by ubuntu touch only
+SYSTEMPART=""
 
 for x in $(cat /proc/cmdline); do
         case ${x} in
@@ -30,7 +32,6 @@ for x in $(cat /proc/cmdline); do
                 value=${x#*=}
 
                 # Find the device node path depending on the form of root= :
-
                 case ${value} in
                 UUID=*)
                         ROOTDEV=/dev/disk/by-uuid/${value#UUID=}
@@ -43,28 +44,67 @@ for x in $(cat /proc/cmdline); do
                         ;;
                 esac
         ;;
+        systempart=*)
+                value=${x#*=}
+
+                # Find the device node path depending on the form of root= :
+                case ${value} in
+                UUID=*)
+                        SYSTEMPART=/dev/disk/by-uuid/${value#UUID=}
+                        ;;
+                LABEL=*)
+                        SYSTEMPART=/dev/disk/by-label/${value#LABEL=}
+                        ;;
+                *)
+                        SYSTEMPART=${value}
+                        ;;
+                esac
+        ;;
         fixrtc)
                 BROKEN_CLOCK=1
         ;;
         esac
 done
 
-if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ];then
+# Touch devices might not have a valid 'root', so use system part if available
+if [ -z "$ROOTDEV" -a -n "$SYSTEMPART" ]; then
+        ROOTDEV=$SYSTEMPART
+fi
+
+if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ]; then
         # need udev settle for /dev/disk/by-* symlinks to be added
         udevadm settle
 
         ROOTDISK=$(readlink -f "$ROOTDEV")
 
-        TIMESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Last mount time")
-        TIME=${TIMESTR#*:}
+        MOUNTDATESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Last mount time")
+        MOUNTDATE=`echo ${MOUNTDATESTR#*:} | xargs`
+
+        CREATEDATESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Filesystem created") || true
+        CREATEDATE=`echo ${CREATEDATESTR#*:} | xargs`
 
         hwclock -s || true
 
-        MOUNTTIME=$(date --utc --date  "${TIME}"  +%s)
-        CURDATE=$(date --utc --date "$(date)" +%s)
+        # make sure we're also compatible with busybox, if available
+        DATE="/bin/date -D%c"
+        date -D%c 2>/dev/null || DATE=/bin/date
 
-        if [ "$MOUNTTIME" -gt "$CURDATE" ]; then
-            	date --set="${TIME} 1 minute" >/dev/null 2>&1
+        TIMESRT=$MOUNTDATE
+        TIME=$(${DATE} --utc --date "${TIMESRT}" +%s)
+
+        CURTIME=$(${DATE} --utc +%s)
+
+        # in case the created time is newer than last mount, use that instead
+        if [ -n "$CREATEDATE" ]; then
+                CREATETIME=$(${DATE} --utc --date "${CREATEDATE}" +%s)
+                if [ "$CREATETIME" -gt "$TIME" ]; then
+                        TIMESRT=$CREATEDATE
+                        TIME=$CREATETIME
+                fi
+        fi
+
+        if [ "$TIME" -gt "$CURTIME" ]; then
+                ${DATE} --set="${TIMESRT} 1 minute" >/dev/null 2>&1
         fi
 
 fi
