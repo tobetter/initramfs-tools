@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu12) vivid; urgency=medium
+
+  * scripts/local-premount/fixrtc:
+    - Avoid using xargs, echo is already enough to trim the variable
+    - Also use wait-for-root before trying to extract the fs metadata
+
+ -- Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>  Fri, 13 Feb 2015 13:20:30 -0200
+
 initramfs-tools (0.103ubuntu11) vivid; urgency=medium
 
   * scripts/local-premount/fixrtc:

@@ -75,13 +75,17 @@ if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ]; then
         # need udev settle for /dev/disk/by-* symlinks to be added
         udevadm settle
 
+        wait-for-root "$ROOTDEV" "${ROOTDELAY:-180}"
+
         ROOTDISK=$(readlink -f "$ROOTDEV")
 
         MOUNTDATESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Last mount time")
-        MOUNTDATE=`echo ${MOUNTDATESTR#*:} | xargs`
+        # Trim whitespace for busybox
+        MOUNTDATE=`echo ${MOUNTDATESTR#*:}`
 
         CREATEDATESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Filesystem created") || true
-        CREATEDATE=`echo ${CREATEDATESTR#*:} | xargs`
+        # Trim whitespace for busybox
+        CREATEDATE=`echo ${CREATEDATESTR#*:}`
 
         hwclock -s || true
 
@@ -89,8 +93,8 @@ if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ]; then
         DATE="/bin/date -D%c"
         date -D%c 2>/dev/null || DATE=/bin/date
 
-        TIMESRT=$MOUNTDATE
-        TIME=$(${DATE} --utc --date "${TIMESRT}" +%s)
+        TIMESTR=$MOUNTDATE
+        TIME=$(${DATE} --utc --date "${TIMESTR}" +%s)
 
         CURTIME=$(${DATE} --utc +%s)
 
@@ -98,13 +102,13 @@ if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ]; then
         if [ -n "$CREATEDATE" ]; then
                 CREATETIME=$(${DATE} --utc --date "${CREATEDATE}" +%s)
                 if [ "$CREATETIME" -gt "$TIME" ]; then
-                        TIMESRT=$CREATEDATE
+                        TIMESTR=$CREATEDATE
                         TIME=$CREATETIME
                 fi
         fi
 
         if [ "$TIME" -gt "$CURTIME" ]; then
-                ${DATE} --set="${TIMESRT} 1 minute" >/dev/null 2>&1
+                ${DATE} --set="${TIMESTR} 1 minute" >/dev/null 2>&1
         fi
 
 fi
