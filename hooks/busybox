@@ -39,8 +39,10 @@ if [ "${BUSYBOX}" != "n" ] && [ -e ${BUSYBOXDIR}/busybox ]; then
 	ln -s busybox ${DESTDIR}/bin/sleep
 	# ... our scripts expect /bin/egrep to exist. LP: #1315755
 	ln -s busybox ${DESTDIR}/bin/egrep
-	# ... and we need readlink to support /sbin/init to be a symlink LP: #1351295
+	# ... and we need readlink and chroot to support /sbin/init to be a symlink
+        # (LP: #1351295, #527336)
 	ln -s busybox ${DESTDIR}/bin/readlink
+	ln -s busybox ${DESTDIR}/bin/chroot
 	# Useless
 	for cmd in minips nuke sh.shared; do
 		rm -f ${DESTDIR}/bin/${cmd}
