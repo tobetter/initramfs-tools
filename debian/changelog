@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu13) vivid; urgency=medium
+
+  * hooks/busybox: Create /bin/chroot symlink, to fix absolute symlinks when
+    busybox-static is not installed. (LP: #1421117)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 24 Feb 2015 11:56:53 +0100
+
 initramfs-tools (0.103ubuntu12) vivid; urgency=medium
 
   * scripts/local-premount/fixrtc:
