@@ -68,184 +68,14 @@ render()
 	eval "echo -n \${$@}"
 }
 
-set_initlist()
-{
-	unset initlist
-	for si_x in ${initdir}/*; do
-		# skip empty dirs without warning
-		[ "${si_x}" = "${initdir}/*" ] && return
-
-		# only allow variable name chars
-		case ${si_x#${initdir}/} in
-		*[![:alnum:]\._-]*)
-			[ "${verbose}" = "y" ] \
-			&& echo "$si_x ignored: not alphanumeric or '_' file" >&2
-			continue
-			;;
-		esac
-
-		# skip non executable scripts
-		if [ ! -x ${si_x} ]; then
-			[ "${verbose}" = "y" ] \
-			&& echo "$si_x ignored: not executable" >&2
-			continue
-		fi
-
-		# skip directories
-		if [ -d ${si_x} ]; then
-			[ "${verbose}" = "y" ] \
-			&& echo "$si_x ignored: a directory" >&2
-			continue
-		fi
-
-		# skip bad syntax
-		if ! sh -n ${si_x} ; then
-			[ "${verbose}" = "y" ] \
-			&& echo "$si_x ignored: bad syntax" >&2
-			continue
-		fi
-
-		initlist="${initlist:-} ${si_x#${initdir}/}"
-	done
-}
-
-reduce_satisfied()
-{
-	deplist="$(render array_${1})"
-	unset tmpdeplist
-	for rs_y in ${deplist}; do
-		# only allow variable name chars
-		case ${rs_y} in
-		*[![:alnum:]\._-]*)
-			continue
-			;;
-		esac
-		# skip non executable scripts
-		[ ! -x ${initdir}/${rs_y} ] && continue
-		# skip directories
-		[ -d ${initdir}/${rs_y} ] && continue
-		# skip bad syntax
-		sh -n ${initdir}/${rs_y} || continue
-
-		tmpdeplist="${tmpdeplist} ${rs_y}"
-	done
-	deplist=${tmpdeplist}
-	for rs_x in ${runlist}; do
-		pop_list_item ${rs_x} ${deplist}
-		deplist=${tmppop}
-	done
-	eval array_${1}=\"${deplist}\"
-}
-
-get_prereqs()
-{
-	set_initlist
-	for gp_x in ${initlist}; do
-		tmp=$(${initdir}/${gp_x} prereqs)
-		eval array_${gp_x}=\"${tmp}\"
-	done
-}
-
-count_unsatisfied()
-{
-	set -- ${@}
-	return ${#}
-}
-
-# Removes $1 from initlist
-pop_list_item()
-{
-	item=${1}
-	shift
-	set -- ${@}
-	unset tmppop
-	# Iterate
-	for pop in ${@}; do
-		if [ ${pop} = ${item} ]; then
-			continue
-		fi
-		tmppop="${tmppop} ${pop}"
-	done
-
-}
-
-# This function generates the runlist, so we clear it first.
-reduce_prereqs()
-{
-	unset runlist
-	set -- ${initlist}
-	i=$#
-	# Loop until there's no more in the queue to loop through
-	while [ ${i} -ne 0 ]; do
-		oldi=${i}
-		for rp_x in ${initlist}; do
-			reduce_satisfied ${rp_x}
-			count_unsatisfied $(render array_${rp_x})
-			cnt=${?}
-			if [ ${cnt} -eq 0 ]; then
-				runlist="${runlist} ${rp_x}"
-				pop_list_item ${rp_x} ${initlist}
-				initlist=${tmppop}
-				i=$((${i} - 1))
-			fi
-		done
-		if [ ${i} -eq ${oldi} ]; then
-			panic "PANIC: Circular dependancy.  Exiting."
-		fi
-	done
-}
-
-get_prereq_pairs()
-{
-	set_initlist
-	for gp_x in ${initlist:-}; do
-		echo ${gp_x} ${gp_x}
-		prereqs=$(${initdir}/${gp_x} prereqs)
-		for prereq in ${prereqs}; do
-			echo ${prereq} ${gp_x}
-		done
-	done
-}
-
-call_scripts()
-{
-	set -e
-	for cs_x in ${runlist}; do
-		[ -f ${initdir}/${cs_x} ] || continue
-		# mkinitramfs verbose output
-		if [ "${verbose}" = "y" ]; then
-			echo "Calling hook ${cs_x}"
-		fi
-		${initdir}/${cs_x} && ec=$? || ec=$?
-		# allow hooks to abort build:
-		if [ "$ec" -ne 0 ]; then
-			echo "E: ${initdir}/${cs_x} failed with return $ec."
-			# only errexit on mkinitramfs
-			[ -n "${version}" ] && exit $ec
-		fi
-		# allow boot scripts to modify exported boot parameters
-		if [ -e /conf/param.conf ]; then
-			. /conf/param.conf
-		fi
-	done
-	set +e
-}
-
+# For boot time only; this is overridden at build time in hook-functions
 run_scripts()
 {
 	initdir=${1}
 	[ ! -d ${initdir} ] && return
 
-	if [ -f ${initdir}/ORDER ]; then
-		. ${initdir}/ORDER
-	elif command -v tsort >/dev/null 2>&1; then
-		runlist=$(get_prereq_pairs | tsort)
-		call_scripts ${2:-}
-	else
-		get_prereqs
-		reduce_prereqs
-		call_scripts
-	fi
+	shift
+	. ${initdir}/ORDER
 }
 
 # Load custom modules first
@@ -503,7 +333,7 @@ resolve_device() {
 # Check a file system.
 # $1=device
 # $2=mountpoint (for diagnostics only)
-checkfs()
+_checkfs_once()
 {
 	DEV="$1"
 	NAME="$2"
@@ -554,47 +384,30 @@ checkfs()
 	# If there was a failure, drop into a shell.
 	#
 	# NOTE: "failure" is defined as exiting with a return code of
-	# 4 or larger. A return code of 1 indicates that file system
-	# errors were corrected but that the boot may proceed. A return
-	# code of 2 or 3 indicates that the system should immediately reboot.
+	# 4, possibly or-ed with other flags. A return code of 1
+	# indicates that file system errors were corrected but that
+	# the boot may proceed.
 	#
 	if [ "$FSCKCODE" -eq 32 ]
 	then
 		log_warning_msg "File system check was interrupted by user"
-	elif [ "$FSCKCODE" -gt 3 ]
+	elif [ $((FSCKCODE & 4)) -eq 4 ]
 	then
-		# Surprise! Re-directing from a HERE document (as in "cat << EOF")
-		# does not work because the fs is currently read-only.
-		log_failure_msg "An automatic file system check (fsck) of the $NAME filesystem failed.
-A manual fsck must be performed, then the system restarted.
-The fsck should be performed in maintenance mode with the
-$NAME filesystem mounted in read-only mode."
-		log_warning_msg "The $NAME filesystem is currently mounted in read-only mode.
-A maintenance shell will now be started.
-After performing system maintenance, press CONTROL-D
-to terminate the maintenance shell and restart the system."
-		# Start a single user shell on the console
-		if ! sulogin $CONSOLE
-		then
-			log_failure_msg "Attempt to start maintenance shell failed.
-Will restart in 5 seconds."
-			sleep 5
-		fi
-		if [ "${verbose}" = "y" ] ; then
-			log_begin_msg "Will now restart"
-		fi
-		reboot
+		log_failure_msg "File system check of the $NAME filesystem failed"
+		return 1
 	elif [ "$FSCKCODE" -gt 1 ]
 	then
-		log_failure_msg "The file system check corrected errors on the $NAME partition
-but requested that the system be restarted."
-		log_warning_msg "The system will be restarted in 5 seconds."
+		log_warning_msg "File system check failed but did not detect errors"
 		sleep 5
-		if [ "${verbose}" = "y" ] ; then
-			log_begin_msg "Will now restart"
-		fi
-		reboot
 	fi
+	return 0
+}
+
+checkfs()
+{
+	while ! _checkfs_once "$@"; do
+		panic "The $2 filesystem on $1 requires a manual fsck"
+	done
 }
 
 # Mount a file system.  We parse the information from the fstab.  This
