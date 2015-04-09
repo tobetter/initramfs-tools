@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu14) vivid; urgency=medium
+
+  * scripts/nfs: Fix nfs mount check for absolute /sbin/init symlink, to make
+    root NFS work again. Cherry-picked from Debian (commit 7bc24f829f).
+    (LP: #1439955)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 09 Apr 2015 10:03:26 +0200
+
 initramfs-tools (0.103ubuntu13) vivid; urgency=medium
 
   * hooks/busybox: Create /bin/chroot symlink, to fix absolute symlinks when
