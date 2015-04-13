@@ -59,6 +59,9 @@ for x in $(cat /proc/cmdline); do
                         SYSTEMPART=${value}
                         ;;
                 esac
+                # if systempart= is defined we do not want root=/dev/ram
+                # been taken into account
+                [ "$ROOTDEV" = "/dev/ram" ] && ROOTDEV=""
         ;;
         fixrtc)
                 BROKEN_CLOCK=1

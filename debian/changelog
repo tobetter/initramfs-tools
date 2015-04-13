@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu15) vivid; urgency=medium
+
+  * scripts/local-premount/fixrtc: if systempart= is set, we do not want to
+    take root=/dev/ram into account even if it is defined on the kernel
+    cmdline (LP: #1443329)
+
+ -- Oliver Grawert <ogra@ubuntu.com>  Mon, 13 Apr 2015 10:30:58 +0200
+
 initramfs-tools (0.103ubuntu14) vivid; urgency=medium
 
   * scripts/nfs: Fix nfs mount check for absolute /sbin/init symlink, to make
