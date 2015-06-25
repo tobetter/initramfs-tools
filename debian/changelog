@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu16) wily; urgency=medium
+
+  * hook-functions: Add nx-* and 842-* modules in order to enable PowerPC NX
+    Crypto Coprocessor. (LP: #1454687)
+
+ -- Chris J Arges <chris.j.arges@canonical.com>  Thu, 25 Jun 2015 13:59:55 -0500
+
 initramfs-tools (0.103ubuntu15) vivid; urgency=medium
 
   * scripts/local-premount/fixrtc: if systempart= is set, we do not want to

@@ -497,6 +497,13 @@ auto_add_modules()
 			manual_add_modules "${x}"
 		done
 	;;
+	nx)
+		# PowerPC NX Crypto Coprocessor
+		for x in nx-compress nx-compress-crypto nx-compress-platform \
+		nx-compress-pseries nx-compress-powernv 842-decompress; do
+			manual_add_modules "${x}"
+		done
+	;;
 	*)
 		auto_add_modules base
 		auto_add_modules net
@@ -511,6 +518,7 @@ auto_add_modules()
 		auto_add_modules mmc
 		auto_add_modules usb_storage
 		auto_add_modules virtual
+		auto_add_modules nx
 	;;
 	esac
 }
