@@ -437,7 +437,7 @@ _checkfs_once()
 		log_warning_msg "File system check failed but did not detect errors"
 		sleep 5
 	else
-		touch $FSCK_STAMPFILE
+		:> $FSCK_STAMPFILE
 	fi
 	return 0
 }
