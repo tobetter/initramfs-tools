@@ -1,3 +1,15 @@
+initramfs-tools (0.120ubuntu2) wily; urgency=medium
+
+    * update-initramfs: switch dpkg --compare-versions from > to >=
+      to avoid warnings from dpkg.  (LP: #1480340)
+    * debian/control: update Vcs-* links for Ubuntu.
+    * scripts/functions: use :> rather than touch to create fsck
+      stamp.  (LP: #1481789)
+    * hooks/busybox: revert local changes, these now need to occur
+      in the new late zz-busybox-initramfs hook.  (LP: #1481733)
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Wed, 05 Aug 2015 13:02:34 +0100
+
 initramfs-tools (0.120ubuntu1) wily; urgency=medium
 
   * Merge from debian, remaining changes (up to 0.103ubuntu15):
