@@ -526,7 +526,7 @@ auto_add_modules()
 	local modules=
 
 	if [ "$#" -eq 0 ] ; then
-		set -- base net ide scsi block ata i2o dasd ieee1394 firewire mmc usb_storage virtual
+		set -- base net ide scsi block ata i2o dasd ieee1394 firewire mmc usb_storage virtual nx
 	fi
 
 	for arg in "$@" ; do
@@ -764,10 +764,7 @@ call_scripts()
 		fi
 		${initdir}/${cs_x} && ec=$? || ec=$?
 		# allow hooks to abort build:
-		# (except for iscan, due to a widely-deployed third-party
-		# package causing upgrade problems)
-		if [ "$ec" -ne 0 ] && [ "${cs_x}" != iscan ] && \
-		   [ "${cs_x}" != iscan-data ]; then
+		if [ "$ec" -ne 0 ]; then
 			echo "E: ${initdir}/${cs_x} failed with return $ec."
 			# only errexit on mkinitramfs
 			[ -n "${version}" ] && exit $ec

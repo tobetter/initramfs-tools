@@ -1,3 +1,13 @@
+initramfs-tools (0.120ubuntu3) wily; urgency=medium
+
+  * hook-functions: fix PowerPC NX Crypto Coprocessor support (LP:
+    #1454687)
+  * Drop: Maintain compatibility with pre- /run configurations (LP:
+    #1485752)
+  * Drop: Ignore errors from iscan and iscan-data hooks (LP: #1485562)
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Tue, 18 Aug 2015 12:15:28 +0100
+
 initramfs-tools (0.120ubuntu2) wily; urgency=medium
 
     * update-initramfs: switch dpkg --compare-versions from > to >=
