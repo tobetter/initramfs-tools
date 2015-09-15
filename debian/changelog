@@ -1,3 +1,9 @@
+initramfs-tools (0.120ubuntu4) wily; urgency=medium
+
+  * init: Mount /dev with "nosuid". Thanks "Daniel". (LP: #1450960)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 15 Sep 2015 07:20:43 +0200
+
 initramfs-tools (0.120ubuntu3) wily; urgency=medium
 
   * hook-functions: fix PowerPC NX Crypto Coprocessor support (LP:
