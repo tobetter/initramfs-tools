@@ -61,6 +61,7 @@ have_module()
 manual_add_modules()
 {
 	local prefix kmod options firmware
+	local target_dir depth firmware_link
 
 	if [ $# -eq 0 ]; then
 		return
@@ -113,13 +114,35 @@ manual_add_modules()
 				firmware="/lib/firmware/$firmware"
 			fi
 
-			target_dir="$DESTDIR/$(dirname "$firmware")"
-			if ! [ -d "$target_dir" ]; then
-				mkdir -p "$target_dir"
-			fi
-			cp -a "$firmware" "$target_dir"
-			if [ "${verbose}" = "y" ]; then
-				echo "Adding firmware ${firmware}"
+			depth=10
+			while [ "$firmware" != '' -a "$depth" -gt 0 ]
+			do
+				target_dir="$DESTDIR/$(dirname "$firmware")"
+				if ! [ -d "$target_dir" ]; then
+					mkdir -p "$target_dir"
+				fi
+				cp -a "$firmware" "$target_dir"
+
+				if [ -L "$firmware" ]; then
+					if [ "${verbose}" = "y" ]; then
+						echo "Adding symlink ${firmware}"
+					fi
+
+					depth=$(($depth-1))
+					firmware_link=$(readlink "$firmware")
+					case "$firmware_link" in
+					/*)	firmware="$firmware_link" ;;
+					*)	firmware="$(dirname "$firmware")/$firmware_link" ;;
+					esac
+				else
+					if [ "${verbose}" = "y" ]; then
+						echo "Adding firmware ${firmware}"
+					fi
+					break
+				fi
+			done
+			if [ -L "$firmware" -a "${verbose}" = "y" ]; then
+				echo "Adding firmware ${firmware} -- hanging symlink"
 			fi
 		done
 	done
