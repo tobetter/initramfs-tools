@@ -1,3 +1,9 @@
+initramfs-tools (0.120ubuntu6) wily; urgency=medium
+
+  * add squashfs to list of 'most' modules (LP: #1501834)
+
+ -- Scott Moser <smoser@ubuntu.com>  Thu, 01 Oct 2015 12:48:11 -0400
+
 initramfs-tools (0.120ubuntu5) wily; urgency=medium
 
   * hook-functions: firmware -- copy symlink components into initramfs
