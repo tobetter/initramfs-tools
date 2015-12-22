@@ -1,3 +1,108 @@
+initramfs-tools (0.121~rc2) experimental; urgency=medium
+
+  * Upload to experimental, not unstable
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Tue, 22 Dec 2015 22:07:42 +0000
+
+initramfs-tools (0.121~rc1) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * [da2159f] Add .gitignore files to exclude generated and backup files
+  * [8ad7317] bash-completion: Install using dh_bash-completion
+  * [31d21d6] Rename lintian override file so dh_lintian installs it
+    automatically
+  * [9d45599] debian/control: Update and shorten description
+  * [2bf8c27] Split initramfs-tools binary packages into core and automation
+    hooks
+  * [6562e1b] debian/control,debian/copyright: Use canonical HTTP-S URLs for
+    Alioth git repos
+  * [76dab5a] hook-functions: Include soft-dependencies of all kernel modules
+    (Closes: #588452)
+  * [7285ffb] hooks/busybox: Fail if busybox is wanted but not found
+    (Closes: #785564)
+  * [852b9ab] scripts/functions: Use shell to create stamp file instead of
+    'touch' (Closes: #783291)
+  * [9aea31d] sripts/local: Remove obsolete hint about ATA device renaming
+  * [e0c8d03] hook-functions: Always use /proc/mounts, avoiding mangling of
+    /dev/root (Closes: #766920)
+  * [728f534] hook-functions: Fold sys_walk_modalias into sys_walk_mod_add
+  * [d122ab6] hook-functions: Split block device sysfs lookup into a separate
+    function
+  * [aff5209] hook-functions: Remove loop-aes support
+  * [3cb744c] hook-functions: Rewrite block device sysfs lookup to be generic
+    (Closes: #747871, #785147, #807004, #807256)
+  * [8ac52dc] hook-functions: Include modules for all components of a
+    multi-disk device (Closes: #620814)
+  * [c69313d] parse_numeric: Tighten check for whether 'root' parameter is a
+    number (Closes: #697017)
+  * [8062189] parse_numeric: Add support for 20-bit minor numbers in 'root'
+    parameter
+  * [88f98b5] parse_numeric: Replace numeric root with canonical device name
+  * [28e5a0a] update-initramfs: Use linux-version command to sort versions
+    (Closes: #770394, #795837)
+  * [4b4e578] lsinitramfs.8: Update the BUGS section to note fix for #717805
+    (Closes: #790095)
+  * [fa82bf1] hooks/fsck: Stop copying sulogin, which is no longer used
+  * [95beada] Only run fsck if enabled in /etc/fstab (pass != 0)
+    (Closes: #797361)
+  * [371221b] hooks/fsck: Use 'command' to find fsck.<type> (Closes: #784234)
+  * [e352b94] scripts/functions: Use blkid to resolve LABEL= and UUID= block
+    device IDs
+  * [7469eee] scripts/functions: Handle PARTLABEL= and PARTUUID= block device
+    IDs using blkid (Closes: #801154)
+  * [fe30453] hook-functions: Include drivers/nvme in block driver modules
+    (Closes: #807000)
+  * [fa1985b] update-initramfs: Run 'sync' after writing the initramfs
+    (Closes: #783620)
+  * [6a40a89] hook-functions: Introduce copy_file function
+  * [a7fc630] Use copy_file to copy config files and firmware, instead of
+    copy_exec
+  * [52ae50c] hook-functions: Use copy_file to install modules
+  * [b215c18] Support multiple break points using a comma delimiter
+    (Closes: #795832)
+  * [b2dfbeb] Set emacs local variables to implement our shell coding style
+  * [b1dc049] hook-functions: Preserve symlinks when copying files
+    (Closes: #799443)
+  * [319b141] hooks/fsck: Simplify by letting copy_exec handle symlinks
+  * [143b9ef] maintainer-notes.html: Update changelog command lines to use
+    'gbp dch'
+  * [f01cdd4] debian/control: Ensure lockstep upgrade of initramfs-tools and
+    -core
+  * [88f7bb6] debian/TODO: Update for released and pending changes
+  * [d136f22] scripts/local: Remove residual support for separate /etc
+    filesystem
+  * [14913b2] scripts/local: Name parameters to local_device_setup
+  * [3080087] Defer resolving block device IDs to local_device_setup
+  * [3574b56] scripts/functions: Stop resolving symlinks in resolve_device
+    (Closes: #791754)
+
+  [ Laurent Bigonville ]
+  * [27405fc] Support fsck.mode= and fsck.repair= parameters as known by
+    systemd-fsck (Closes: #783410, #792557)
+  * [8a2f298] Run new panic scripts just before dropping to a shell
+    (Closes: #602331)
+
+  [ Boris Egorov ]
+  * [c14d661] mkinitramfs: fix bashism in script (Closes: #633582)
+
+  [ Salvatore Bonaccorso ]
+  * [f78c9a9] scripts/nfs: Check return value from nfs_mount_root_impl
+    (Closes: #782641)
+
+  [ Roger Shimizu ]
+  * [50aa8e2] advance the timing of insmod netconsole
+  * [3acddcc] redirect debug info to netconsole (Closes: #793786)
+
+  [ Andy Whitcroft ]
+  * [4ba741b] Add 2>&1 to the run-init line (Closes: #795831)
+  * [1f5c193] When adding i8042 also add psmouse as some keyboards are behind
+    the mouse (Closes: #795839)
+
+  [ Roger Leigh ]
+  * [6a8d18b] init: Always migrate /run to the rootfs (Closes: #696632)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Tue, 22 Dec 2015 21:56:40 +0000
+
 initramfs-tools (0.120) unstable; urgency=medium
 
   * [23ee5f9] Add '.log' to fsck log output file, and document its existence

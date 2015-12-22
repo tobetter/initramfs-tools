@@ -53,14 +53,19 @@ panic()
 	modprobe -v uhci-hcd || true
 	modprobe -v ohci-hcd || true
 	modprobe -v usbhid || true
+
+	run_scripts /scripts/panic
+
 	REASON="$@" PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
 }
 
 maybe_break()
 {
-	if [ "${break:-}" = "$1" ]; then
+	case ",$break," in
+	*,$1,*)
 		panic "Spawning shell within the initramfs"
-	fi
+		;;
+	esac
 }
 
 render()
@@ -100,32 +105,30 @@ load_modules()
 # lilo compatibility
 parse_numeric() {
 	case $1 in
-	"")
+	*:*)
+		# Does it match /[0-9]*:[0-9]*/?
+		minor=${1#*:}
+		major=${1%:*}
+		case $major$minor in
+		*[!0-9]*)
+			# No.
+			return
+			;;
+		esac
+		;;
+	"" | *[!A-Fa-f0-9]*)
+		# "", "/*", etc.
 		return
-		;;
-	/*)
-		return
-		;;
-	[0-9]*:[0-9]*)
-		minor=$(( ${1#*:} ))
-		major=$(( ${1%:*} ))
-		;;
-	[A-Fa-f0-9]*)
-		value=$(( 0x${1} ))
-		minor=$(( ${value} % 256 ))
-		major=$(( ${value} / 256 ))
 		;;
 	*)
-		return
+		# [A-Fa-f0-9]*
+		value=$(( 0x${1} ))
+		minor=$(( (${value} & 0xff) | (${value} >> 12) & 0xfff00 ))
+		major=$(( (${value} >> 8) & 0xfff ))
 		;;
 	esac
 
-	if command -v udevd >/dev/null 2>&1; then
-		ROOT=/dev/block/${major}:${minor}
-	else
-		mknod -m 600 /dev/root b ${major} ${minor}
-		ROOT=/dev/root
-	fi
+	ROOT="$(readlink -f /dev/block/${major}:${minor})"
 }
 
 # Parameter: device node to check
@@ -294,40 +297,17 @@ read_fstab_entry() {
 resolve_device() {
 	DEV="$1"
 
-	case $DEV in
-	LABEL=*)
-		DEV="${DEV#LABEL=}"
-
-		# support any / in LABEL= path (escape to \x2f)
-		case "${DEV}" in
-		*/*)
-		if command -v sed >/dev/null 2>&1; then
-			DEV="$(echo ${DEV} | sed 's,/,\\x2f,g')"
+	case "$DEV" in
+	LABEL=* | UUID=* | PARTLABEL=* | PARTUUID=*)
+		if command -v blkid >/dev/null 2>&1; then
+			DEV="$(blkid -l -t "$DEV" -o device)" || return 1
 		else
-			if [ "${DEV}" != "${DEV#/}" ]; then
-				DEV="\x2f${DEV#/}"
-			fi
-			if [ "${DEV}" != "${DEV%/}" ]; then
-				DEV="${DEV%/}\x2f"
-			fi
-			IFS='/'
-			newroot=
-			for s in $DEV; do
-				newroot="${newroot:+${newroot}\\x2f}${s}"
-			done
-			unset IFS
-			DEV="${newroot}"
+			log_warning_msg "blkid not present, so cannot resolve $DEV"
+			return 1
 		fi
-		esac
-		DEV="/dev/disk/by-label/${DEV}"
-		;;
-	UUID=*)
-		DEV="/dev/disk/by-uuid/${DEV#UUID=}"
 		;;
 	esac
-	# Only canonicalise if a valid file, in case $DEV isn't a filename
-	[ -e "$DEV" ] && DEV=$(readlink -f "$DEV")
-	echo "$DEV"
+	[ -e "$DEV" ] && echo "$DEV"
 }
 
 # Check a file system.
@@ -346,6 +326,10 @@ _checkfs_once()
 	TYPE=$(get_fstype "$1")
 
 	FSCKCODE=0
+	if ! command -v fsck >/dev/null 2>&1; then
+		log_warning_msg "fsck not present, so skipping $NAME file system"
+		return
+	fi
 	if [ "$fastboot" = "y" ] ; then
 		log_warning_msg "Fast boot enabled, so skipping $NAME file system check."
 		return
@@ -358,9 +342,12 @@ _checkfs_once()
 		force=""
 	fi
 
-	if [ "$fsckfix" = yes ]
+	if [ "$fsckfix" = "y" ]
 	then
 		fix="-y"
+	elif [ "$fsckfix" = "n" ]
+	then
+		fix="-n"
 	else
 		fix="-a"
 	fi
@@ -398,7 +385,7 @@ _checkfs_once()
 		log_warning_msg "File system check failed but did not detect errors"
 		sleep 5
 	else
-		touch $FSCK_STAMPFILE
+		> $FSCK_STAMPFILE
 	fi
 	return 0
 }

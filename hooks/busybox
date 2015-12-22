@@ -16,7 +16,11 @@ prereqs)
 esac
 
 # busybox
-if [ "${BUSYBOX}" != "n" ] && [ -e ${BUSYBOXDIR}/busybox ]; then
+if [ "${BUSYBOX}" != "n" ]; then
+	if ! [ -e ${BUSYBOXDIR}/busybox ]; then
+		echo >&2 "E: busybox is required but not installed"
+		exit 1
+	fi
 	. /usr/share/initramfs-tools/hook-functions
 	rm -f ${DESTDIR}/bin/sh
 	rm -f ${DESTDIR}/bin/busybox

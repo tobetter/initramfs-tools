@@ -172,6 +172,8 @@ generate_initramfs()
 	if mkinitramfs ${OPTS} "${initramfs}.new" "${version}"; then
 		mv -f "${initramfs}.new" "${initramfs}"
 		set_sha1
+		# Guard against an unclean shutdown
+		sync
 	else
 		mkinitramfs_return="$?"
 		remove_initramfs_bak
@@ -228,27 +230,7 @@ ro_boot_check()
 
 get_sorted_versions()
 {
-	version_list=""
-
-	for gsv_x in "${STATEDIR}"/*; do
-		gsv_x="$(basename "${gsv_x}")"
-		if [ "${gsv_x}" = '*' ]; then
-			return 0
-		fi
-		worklist=""
-		for gsv_i in $version_list; do
-			if dpkg --compare-versions "${gsv_x}" '>' "${gsv_i}" 2>/dev/null; then
-				worklist="${worklist} ${gsv_x} ${gsv_i}"
-				gsv_x=""
-			else
-				worklist="${worklist} ${gsv_i}"
-			fi
-		done
-		if [ "${gsv_x}" != "" ]; then
-			worklist="${worklist} ${gsv_x}"
-		fi
-		version_list="${worklist}"
-	done
+	version_list="$(ls -1 "${STATEDIR}" | linux-version sort --reverse)"
 
 	verbose "Available versions: ${version_list}"
 }

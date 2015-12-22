@@ -19,7 +19,7 @@ esac
 cp -pnL /usr/lib/klibc/bin/* ${DESTDIR}/bin
 cp -pL /lib/klibc-*.so ${DESTDIR}/lib
 rm -f ${DESTDIR}/bin/kinit* ${DESTDIR}/bin/zcat
-if [ "${BUSYBOX}" = "n" ] || [ ! -e ${BUSYBOXDIR}/busybox ]; then
+if [ "${BUSYBOX}" = "n" ]; then
 	if [ -e ${DESTDIR}/bin/sh.shared ]; then
 		# Some platforms build a shared klibc/sh:
 		mv ${DESTDIR}/bin/sh.shared ${DESTDIR}/bin/sh
