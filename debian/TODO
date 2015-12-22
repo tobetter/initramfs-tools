@@ -12,9 +12,4 @@ TODO
 
  o root loop support.
 
- o MODULES=dep md replace awk magic with proper parsing.
-   -> WIP, check
-
- o Eliminate ?udev?, ?klibc?, busybox (-> glibc).
-
- o Support expanding symlinks, see #506540 + #338405
+ o Eliminate ?klibc?, busybox (-> glibc).

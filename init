@@ -61,7 +61,7 @@ export resume_offset=
 export drop_caps=
 export fastboot=n
 export forcefsck=n
-export fsckfix=n
+export fsckfix=
 
 
 # Bring in the main config
@@ -79,7 +79,6 @@ for x in $(cat /proc/cmdline); do
 		;;
 	root=*)
 		ROOT=${x#root=}
-		ROOT=$(resolve_device "$ROOT")
 		if [ -z "${BOOT}" ] && [ "$ROOT" = "/dev/nfs" ]; then
 			BOOT=nfs
 		fi
@@ -146,7 +145,11 @@ for x in $(cat /proc/cmdline); do
 	debug)
 		debug=y
 		quiet=n
-		exec >/run/initramfs/initramfs.debug 2>&1
+		if [ -n "${netconsole}" ]; then
+			exec >/dev/kmsg 2>&1
+		else
+			exec >/run/initramfs/initramfs.debug 2>&1
+		fi
 		set -x
 		;;
 	debug=*)
@@ -165,18 +168,22 @@ for x in $(cat /proc/cmdline); do
 		;;
 	netconsole=*)
 		netconsole=${x#netconsole=}
+		[ "x$debug" = "xy" ] && exec >/dev/kmsg 2>&1
 		;;
 	BOOTIF=*)
 		BOOTIF=${x#BOOTIF=}
 		;;
-	fastboot)
+	fastboot|fsck.mode=skip)
 		fastboot=y
 		;;
-	forcefsck)
+	forcefsck|fsck.mode=force)
 		forcefsck=y
 		;;
-	fsckfix)
+	fsckfix|fsck.repair=yes)
 		fsckfix=y
+		;;
+	fsck.repair=no)
+		fsckfix=n
 		;;
 	esac
 done
@@ -200,10 +207,9 @@ run_scripts /scripts/init-top
 
 maybe_break modules
 [ "$quiet" != "y" ] && log_begin_msg "Loading essential drivers"
+[ -n "${netconsole}" ] && modprobe netconsole netconsole="${netconsole}"
 load_modules
 [ "$quiet" != "y" ] && log_end_msg
-
-[ -n "${netconsole}" ] && modprobe netconsole netconsole="${netconsole}"
 
 maybe_break premount
 [ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-premount"
@@ -279,20 +285,8 @@ maybe_break bottom
 run_scripts /scripts/init-bottom
 [ "$quiet" != "y" ] && log_end_msg
 
-# Preserve information on old systems without /run on the rootfs
-if [ -d ${rootmnt}/run ]; then
-	mount -n -o move /run ${rootmnt}/run
-else
-	# The initramfs udev database must be migrated:
-	if [ -d /run/udev ] && [ ! -d /dev/.udev ]; then
-		mv /run/udev /dev/.udev
-	fi
-	# The initramfs debug info must be migrated:
-	if [ -d /run/initramfs ] && [ ! -d /dev/.initramfs ]; then
-		mv /run/initramfs /dev/.initramfs
-	fi
-	umount /run
-fi
+# Move /run to the root
+mount -n -o move /run ${rootmnt}/run
 
 # No init on rootmount
 if ! validate_init "${init}" ; then
@@ -332,9 +326,9 @@ mount -n -o move /proc ${rootmnt}/proc
 
 # Chain to real filesystem
 if [ -z "$drop_caps" ] && command -v switch_root >/dev/null 2>&1; then
-	exec switch_root ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console
+	exec switch_root ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 elif command -v run-init >/dev/null 2>&1; then
-	exec run-init ${drop_caps} ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console
+	exec run-init ${drop_caps} ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 fi
 echo "Something went badly wrong in the initramfs."
 panic "Please file a bug on initramfs-tools."
