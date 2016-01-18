@@ -1,3 +1,20 @@
+initramfs-tools (0.121) unstable; urgency=medium
+
+  [ Salvatore Bonaccorso ]
+  * [19422ac] debian/NEWS: Fix typo in reference to initramfs.conf configuration
+    file
+
+  [ Ben Hutchings ]
+  * [bf445db] Restore automatic selection between busybox and klibc by default
+    (Closes: #809204)
+  * [4251397] init: Always mount /usr before looking for the real init
+  * [c6d067c] init: Remove use of switch_root
+  * [3c8b67c] init: Use run-init -n option to validate real init
+    (Closes: #810965)
+  * [40f2132] scripts/functions: Fix fsck display options (Closes: #781239)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Mon, 18 Jan 2016 17:43:22 +0000
+
 initramfs-tools (0.121~rc2) experimental; urgency=medium
 
   * Upload to experimental, not unstable
