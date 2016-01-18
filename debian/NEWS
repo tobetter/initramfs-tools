@@ -3,8 +3,8 @@ initramfs-tools (0.121~rc1) unstable; urgency=medium
   * If initramfs-tools is configured to use busybox but it is not
     installed, mkinitramfs will now fail.  Previously it would quietly use
     klibc instead, sometimes producing a broken initramfs.  You may need
-    to modify /etc/initramfs-tools/initramfs-tools.conf or install busybox
-    when upgrading.
+    to modify /etc/initramfs-tools/initramfs.conf or install busybox when
+    upgrading.
   * Support for loop-aes has been removed.  If you use loop-aes encryption
     for the root or /usr filesystem, you will need to switch to cryptsetup.
     See the 'loop-AES extension' section in cryptsetup(8).

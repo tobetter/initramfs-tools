@@ -230,30 +230,14 @@ mount_premount
 mountroot
 log_end_msg
 
+if read_fstab_entry /usr; then
+	log_begin_msg "Mounting /usr file system"
+	mountfs /usr
+	log_end_msg
+fi
+
 validate_init() {
-	checktarget="${1}"
-
-	# Work around absolute symlinks
-	if [ -d "${rootmnt}" ] && [ -h "${rootmnt}${checktarget}" ]; then
-		checktarget="$(readlink "${rootmnt}${checktarget}")"
-		case "$checktarget" in
-		/*)
-			;;
-		*)
-			checktarget="${1%/*}/$checktarget"
-			;;
-		esac
-	fi
-
-	# Make sure the specified init can be executed
-	if [ ! -x "${rootmnt}${checktarget}" ]; then
-		return 1
-	fi
-
-	# Upstart uses /etc/init as configuration directory :-/
-	if [ -d "${rootmnt}${checktarget}" ]; then
-		return 1
-	fi
+	run-init -n "${rootmnt}" "${1}"
 }
 
 # Check init is really there
@@ -266,13 +250,6 @@ if ! validate_init "$init"; then
 			break
 		fi
 	done
-fi
-
-# Mount /usr only if init is systemd (after reading symlink)
-if [ "${checktarget##*/}" = systemd ] && read_fstab_entry /usr; then
-	log_begin_msg "Mounting /usr file system"
-	mountfs /usr
-	log_end_msg
 fi
 
 # Mount cleanup
@@ -325,10 +302,6 @@ mount -n -o move /sys ${rootmnt}/sys
 mount -n -o move /proc ${rootmnt}/proc
 
 # Chain to real filesystem
-if [ -z "$drop_caps" ] && command -v switch_root >/dev/null 2>&1; then
-	exec switch_root ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
-elif command -v run-init >/dev/null 2>&1; then
-	exec run-init ${drop_caps} ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
-fi
+exec run-init ${drop_caps} ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 echo "Something went badly wrong in the initramfs."
 panic "Please file a bug on initramfs-tools."

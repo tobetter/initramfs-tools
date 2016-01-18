@@ -352,10 +352,12 @@ _checkfs_once()
 		fix="-a"
 	fi
 
-	# spinner="-C" -- only if on an interactive terminal
 	spinner=""
+	if [ -z "${debug}" ]; then
+		spinner="-C"
+	fi
 
-	if [ "$VERBOSE" = no ]
+	if [ "${quiet}" = n ]
 	then
 		log_begin_msg "Will now check $NAME file system"
 		logsave -a -s $FSCK_LOGFILE fsck $spinner $force $fix -V -t $TYPE $DEV
@@ -363,7 +365,7 @@ _checkfs_once()
 		log_end_msg
 	else
 		log_begin_msg "Checking $NAME file system"
-		logsave -a -s $FSCK_LOGFILE fsck $spinner $force $fix -t $TYPE $DEV
+		logsave -a -s $FSCK_LOGFILE fsck $spinner $force $fix -T -t $TYPE $DEV
 		FSCKCODE=$?
 		log_end_msg
 	fi
