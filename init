@@ -236,6 +236,20 @@ if read_fstab_entry /usr; then
 	log_end_msg
 fi
 
+# Mount cleanup
+mount_bottom
+nfs_bottom
+local_bottom
+
+maybe_break bottom
+[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-bottom"
+# We expect udev's init-bottom script to move /dev to ${rootmnt}/dev
+run_scripts /scripts/init-bottom
+[ "$quiet" != "y" ] && log_end_msg
+
+# Move /run to the root
+mount -n -o move /run ${rootmnt}/run
+
 validate_init() {
 	run-init -n "${rootmnt}" "${1}"
 }
@@ -251,19 +265,6 @@ if ! validate_init "$init"; then
 		fi
 	done
 fi
-
-# Mount cleanup
-mount_bottom
-nfs_bottom
-local_bottom
-
-maybe_break bottom
-[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-bottom"
-run_scripts /scripts/init-bottom
-[ "$quiet" != "y" ] && log_end_msg
-
-# Move /run to the root
-mount -n -o move /run ${rootmnt}/run
 
 # No init on rootmount
 if ! validate_init "${init}" ; then
