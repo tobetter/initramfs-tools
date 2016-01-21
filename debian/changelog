@@ -1,3 +1,14 @@
+initramfs-tools (0.120ubuntu7) xenial; urgency=medium
+
+  [ Ben Hutchings ]
+  * hook-functions: Include drivers/nvme in block driver modules (Closes:
+    #807000) (LP: #1524879)
+
+  [ Louis Bouchard ]
+  * Add support for NVME devices when MODULES=dep is used (LP: #1532146)
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Thu, 21 Jan 2016 16:10:15 +0000
+
 initramfs-tools (0.120ubuntu6) wily; urgency=medium
 
   * add squashfs to list of 'most' modules (LP: #1501834)

@@ -470,6 +470,10 @@ dep_add_modules_mount()
 		block=${dev_node#/dev/i2o/}
 		block=${block%%[0-9]*}
 		block='i2o!'$block
+	# nvme device
+	elif [ "${root#/dev/nvme}" != "${dev_node}" ]; then
+		block=${dev_node#/dev/}
+		block="${block%%p[0-9]*}"
 	# classical block device
 	else
 		block=${dev_node#/dev/}
@@ -612,6 +616,7 @@ auto_add_modules()
 		;;
 		block)
 			copy_modules_dir kernel/drivers/block
+			copy_modules_dir kernel/drivers/nvme
 		;;
 		ubi)
 			modules="$modules deflate zlib lzo ubi ubifs"
