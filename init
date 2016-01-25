@@ -1,7 +1,5 @@
 #!/bin/sh
 
-echo "Loading, please wait..."
-
 # Default PATH differs between shells, and is not automatically exported
 # by klibc dash.  Make it consistent.
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin
@@ -14,22 +12,22 @@ export PATH=/sbin:/usr/sbin:/bin:/usr/bin
 mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid sysfs /sys
 mount -t proc -o nodev,noexec,nosuid proc /proc
+# Some things don't work properly without /etc/mtab.
+ln -sf /proc/mounts /etc/mtab
+
+grep -q '\<quiet\>' /proc/cmdline || echo "Loading, please wait..."
 
 # Note that this only becomes /dev on the real filesystem if udev's scripts
 # are used; which they will be, but it's worth pointing out
-tmpfs_size="10M"
-if [ -e /etc/udev/udev.conf ]; then
-	. /etc/udev/udev.conf
-fi
-if ! mount -t devtmpfs -o size=$tmpfs_size,mode=0755 udev /dev; then
+if ! mount -t devtmpfs -o nosuid,mode=0755 udev /dev; then
 	echo "W: devtmpfs not available, falling back to tmpfs for /dev"
-	mount -t tmpfs -o size=$tmpfs_size,mode=0755 udev /dev
+	mount -t tmpfs -o nosuid,mode=0755 udev /dev
 	[ -e /dev/console ] || mknod -m 0600 /dev/console c 5 1
 	[ -e /dev/null ] || mknod /dev/null c 1 3
 fi
 mkdir /dev/pts
 mount -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts || true
-mount -t tmpfs -o "nosuid,size=20%,mode=0755" tmpfs /run
+mount -t tmpfs -o "noexec,nosuid,size=10%,mode=0755" tmpfs /run
 mkdir -m 0755 /run/initramfs
 
 # Export the dpkg architecture
@@ -62,7 +60,13 @@ export drop_caps=
 export fastboot=n
 export forcefsck=n
 export fsckfix=
+export recovery=
 
+
+# mdadm needs hostname to be set. This has to be done before the udev rules are called!
+if [ -f "/etc/hostname" ]; then
+        /bin/hostname -b -F /etc/hostname 2>&1 1>/dev/null
+fi
 
 # Bring in the main config
 . /conf/initramfs.conf
@@ -97,8 +101,26 @@ for x in $(cat /proc/cmdline); do
 			;;
 		esac
 		;;
+	resumedelay=*)
+		RESUMEDELAY="${x#resumedelay=}"
+		;;
+	loop=*)
+		LOOP="${x#loop=}"
+		;;
+	loopflags=*)
+		LOOPFLAGS="-o ${x#loopflags=}"
+		;;
+	loopfstype=*)
+		LOOPFSTYPE="${x#loopfstype=}"
+		;;
+	cryptopts=*)
+		cryptopts="${x#cryptopts=}"
+		;;
 	nfsroot=*)
 		NFSROOT="${x#nfsroot=}"
+		;;
+	netboot=*)
+		NETBOOT="${x#netboot=}"
 		;;
 	ip=*)
 		IP="${x#ip=}"
@@ -173,6 +195,9 @@ for x in $(cat /proc/cmdline); do
 	BOOTIF=*)
 		BOOTIF=${x#BOOTIF=}
 		;;
+	hwaddr=*)
+		BOOTIF=${x#hwaddr=}
+		;;
 	fastboot|fsck.mode=skip)
 		fastboot=y
 		;;
@@ -184,6 +209,9 @@ for x in $(cat /proc/cmdline); do
 		;;
 	fsck.repair=no)
 		fsckfix=n
+		;;
+	recovery)
+		recovery=y
 		;;
 	esac
 done
@@ -201,6 +229,10 @@ else
 fi
 
 maybe_break top
+
+# export BOOT variable value for compcache,
+# so we know if we run from casper
+export BOOT
 
 # Don't do log messages here to avoid confusing graphical boots
 run_scripts /scripts/init-top
@@ -303,6 +335,6 @@ mount -n -o move /sys ${rootmnt}/sys
 mount -n -o move /proc ${rootmnt}/proc
 
 # Chain to real filesystem
-exec run-init ${drop_caps} ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
+exec run-init ${drop_caps} ${rootmnt} ${init} "$@" ${recovery:+--startup-event=recovery} <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 echo "Something went badly wrong in the initramfs."
 panic "Please file a bug on initramfs-tools."

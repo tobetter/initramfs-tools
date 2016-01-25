@@ -180,9 +180,9 @@ export CONFDIR
 export DESTDIR
 export DPKG_ARCH
 export verbose
-export KEYMAP
 export MODULES
 export BUSYBOX
+export COMPCACHE_SIZE
 
 # Private, used by 'catenate_cpiogz'.
 export __TMPCPIOGZ
@@ -239,6 +239,9 @@ cp -p /usr/share/initramfs-tools/init ${DESTDIR}/init
 # add existant boot scripts
 for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
 	-regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "/usr/share/initramfs-tools/scripts/${b}")
+	[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "/usr/share/initramfs-tools/scripts/${b}" \
@@ -246,6 +249,9 @@ for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
 done
 for b in $(cd "${CONFDIR}/scripts" && find . \
 	-regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${CONFDIR}/scripts/${b}")
+	[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "${CONFDIR}/scripts/${b}" "${DESTDIR}/scripts/$(dirname "${b}")/"
@@ -276,6 +282,9 @@ fi
 touch "${DESTDIR}/etc/fstab"
 ln -s /proc/mounts "${DESTDIR}/etc/mtab"
 
+# install wait-for-root binary.
+copy_exec /usr/lib/initramfs-tools/bin/wait-for-root /sbin
+
 # module-init-tools
 copy_exec /sbin/modprobe /sbin
 copy_exec /sbin/rmmod /sbin
@@ -287,8 +296,8 @@ if [ "$DPKG_ARCH" = arm ] || [ "$DPKG_ARCH" = armeb ]; then
 	cp -a /lib/libgcc_s.so.1 "${DESTDIR}/lib/"
 fi
 
-run_scripts /usr/share/initramfs-tools/hooks
-run_scripts "${CONFDIR}"/hooks
+run_scripts_optional /usr/share/initramfs-tools/hooks
+run_scripts_optional "${CONFDIR}"/hooks
 
 # cache boot run order
 for b in $(cd "${DESTDIR}/scripts" && find . -mindepth 1 -type d); do

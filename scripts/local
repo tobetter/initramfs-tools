@@ -47,7 +47,16 @@ local_device_setup()
 	local name="$2"
 	local real_dev
 
-	wait_for_udev 10
+	# If wait-for-root understands this prefix, then use it to wait for
+	# the device rather than settling the whole of udev.
+	case "$dev_id" in
+	UUID=*|LABEL=*|/dev/*)
+		FSTYPE=$( wait-for-root "$dev_id" 10 )
+		;;
+	*)
+		wait_for_udev 10
+		;;
+	esac
 
 	# Load ubi with the correct MTD partition and return since fstype
 	# doesn't work with a char device like ubi.
@@ -74,7 +83,14 @@ local_device_setup()
 		log_begin_msg "Waiting for ${name} file system"
 
 		# Timeout is max(30, rootdelay) seconds (approximately)
-		slumber=30
+		case $DPKG_ARCH in
+			powerpc|ppc64|ppc64el)
+				slumber=180
+				;;
+			*)
+				slumber=30
+				;;
+		esac
 		if [ ${ROOTDELAY:-0} -gt $slumber ]; then
 			slumber=$ROOTDELAY
 		fi
@@ -127,23 +143,72 @@ local_mount_root()
 
 	local_premount
 
-	if [ "${readonly}" = "y" ]; then
+	if [ "${readonly}" = "y" ] && \
+	   [ -z "$LOOP" ]; then
 		roflag=-r
 	else
 		roflag=-w
 	fi
 
 	# FIXME This has no error checking
-	modprobe ${FSTYPE}
+	[ -n "${FSTYPE}" ] && modprobe ${FSTYPE}
 
 	checkfs ${ROOT} root
 
 	# FIXME This has no error checking
 	# Mount root
-	if [ "${FSTYPE}" != "unknown" ]; then
-		mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
-	else
-		mount ${roflag} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+	mount ${roflag} ${FSTYPE:+-t ${FSTYPE} }${ROOTFLAGS} ${ROOT} ${rootmnt}
+	mountroot_status="$?"
+	if [ "$LOOP" ]; then
+		if [ "$mountroot_status" != 0 ]; then
+			if [ ${FSTYPE} = ntfs ] || [ ${FSTYPE} = vfat ]; then
+				panic "
+Could not mount the partition ${ROOT}.
+This could also happen if the file system is not clean because of an operating
+system crash, an interrupted boot process, an improper shutdown, or unplugging
+of a removable device without first unmounting or ejecting it.  To fix this,
+simply reboot into Windows, let it fully start, log in, run 'chkdsk /r', then
+gracefully shut down and reboot back into Windows. After this you should be
+able to reboot again and resume the installation.
+(filesystem = ${FSTYPE}, error code = $mountroot_status)
+"
+			fi
+		fi
+	
+		mkdir -p /host
+		mount -o move ${rootmnt} /host
+
+		while [ ! -e "/host/${LOOP#/}" ]; do
+			panic "ALERT!  /host/${LOOP#/} does not exist.  Dropping to a shell!"
+		done
+
+		# Get the loop filesystem type if not set
+		if [ -z "${LOOPFSTYPE}" ]; then
+			eval $(fstype < "/host/${LOOP#/}")
+		else
+			FSTYPE="${LOOPFSTYPE}"
+		fi
+		if [ "$FSTYPE" = "unknown" ] && [ -x /sbin/blkid ]; then
+			FSTYPE=$(/sbin/blkid -s TYPE -o value "/host/${LOOP#/}")
+			[ -z "$FSTYPE" ] && FSTYPE="unknown"
+		fi
+
+		if [ ${readonly} = y ]; then
+			roflag=-r
+		else
+			roflag=-w
+		fi
+
+		# FIXME This has no error checking
+		modprobe loop
+		modprobe ${FSTYPE}
+
+		# FIXME This has no error checking
+		mount ${roflag} -o loop -t ${FSTYPE} ${LOOPFLAGS} "/host/${LOOP#/}" ${rootmnt}
+
+		if [ -d ${rootmnt}/host ]; then
+			mount -o move /host ${rootmnt}/host
+		fi
 	fi
 }
 
