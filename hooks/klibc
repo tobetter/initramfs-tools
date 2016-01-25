@@ -18,7 +18,7 @@ esac
 # klibc
 cp -pnL /usr/lib/klibc/bin/* ${DESTDIR}/bin
 cp -pL /lib/klibc-*.so ${DESTDIR}/lib
-rm -f ${DESTDIR}/bin/kinit* ${DESTDIR}/bin/zcat
+rm -f ${DESTDIR}/bin/kinit* ${DESTDIR}/bin/zcat ${DESTDIR}/bin/gzip
 if [ "${BUSYBOX}" = "n" ] || \
    { [ "${BUSYBOX}" != "y" ] && ! [ -e ${BUSYBOXDIR}/busybox ]; }; then
 	if [ -e ${DESTDIR}/bin/sh.shared ]; then
