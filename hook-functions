@@ -484,7 +484,8 @@ auto_add_modules()
 			modules="$modules nfs nfsv2 nfsv3 nfsv4"
 			modules="$modules af_packet atkbd i8042 psmouse"
 			modules="$modules virtio_pci virtio_mmio"
-			modules="$modules vfat"
+			# nls not automatically pulled in as ubuntu has built-in vfat
+			modules="$modules vfat nls_cp437 nls_iso8859-1"
 
 			# Include all HID drivers unless we're sure they
 			# don't support keyboards.  hid-*ff covers various

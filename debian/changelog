@@ -1,3 +1,9 @@
+initramfs-tools (0.122ubuntu2) xenial; urgency=medium
+
+  * fix vfat support (LP: #1540522) from initramfs.
+
+ -- Scott Moser <smoser@ubuntu.com>  Mon, 08 Feb 2016 16:10:45 -0500
+
 initramfs-tools (0.122ubuntu1) xenial; urgency=medium
 
   * Merge with Debian v0.122, known to fix:
