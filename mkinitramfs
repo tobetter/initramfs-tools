@@ -7,8 +7,8 @@ export PATH='/usr/bin:/sbin:/bin'
 keep="n"
 CONFDIR="/etc/initramfs-tools"
 verbose="n"
-test -e /bin/busybox && BUSYBOXDIR=/bin
-test -e /usr/lib/initramfs-tools/bin/busybox && BUSYBOXDIR=/usr/lib/initramfs-tools/bin
+# Will be updated by busybox's conf hook, if present
+BUSYBOXDIR=
 export BUSYBOXDIR
 
 OPTIONS=`getopt -o c:d:ko:r:v -n "$0" -- "$@"`
@@ -90,6 +90,12 @@ for i in /usr/share/initramfs-tools/conf-hooks.d/*; do
 	fi
 done
 
+# Check busybox dependency
+if [ "${BUSYBOX}" = "y" ] && [ -z "${BUSYBOXDIR}" ]; then
+	echo >&2 "E: @BUSYBOX_PACKAGES@, version @BUSYBOX_MIN_VERSION@ or later, is required but not installed"
+	exit 1
+fi
+
 if [ -n "${UMASK:-}" ]; then
 	umask "${UMASK}"
 fi
@@ -163,10 +169,26 @@ if [ ! -e "${MODULESDIR}/modules.dep" ]; then
 	depmod ${version}
 fi
 
+# Prepare to clean up temporary files on exit
+DESTDIR=
+__TMPCPIOGZ=
+__TMPEARLYCPIO=
+clean_on_exit() {
+	if [ "${keep}" = "y" ]; then
+		echo "Working files in ${DESTDIR:-<not yet created>}, early initramfs in ${__TMPEARLYCPIO:-<not yet created>} and overlay in ${__TMPCPIOGZ:-<not yet created>}"
+	else
+		for path in "${DESTDIR}" "${__TMPCPIOGZ}" "${__TMPEARLYCPIO}"; do
+			test -z "${path}" || rm -rf "${path}"
+		done
+	fi
+}
+trap clean_on_exit EXIT
+trap "exit 1" INT TERM	# makes the EXIT trap effective even when killed
+
+# Create temporary directory and files for initramfs contents
 [ -n "${TMPDIR}" ] && [ ! -w "${TMPDIR}" ] && unset TMPDIR
 DESTDIR="$(mktemp -d ${TMPDIR:-/var/tmp}/mkinitramfs_XXXXXX)" || exit 1
 chmod 755 "${DESTDIR}"
-
 __TMPCPIOGZ="$(mktemp ${TMPDIR:-/var/tmp}/mkinitramfs-OL_XXXXXX)" || exit 1
 __TMPEARLYCPIO="$(mktemp ${TMPDIR:-/var/tmp}/mkinitramfs-FW_XXXXXX)" || exit 1
 
@@ -290,6 +312,9 @@ fi
 run_scripts /usr/share/initramfs-tools/hooks
 run_scripts "${CONFDIR}"/hooks
 
+# Avoid double sleep when using older udev scripts
+sed -i 's/^\s*sleep \$ROOTDELAY$/:/' "${DESTDIR}/scripts/init-top/udev"
+
 # cache boot run order
 for b in $(cd "${DESTDIR}/scripts" && find . -mindepth 1 -type d); do
 	cache_run_scripts "${DESTDIR}" "/scripts/${b#./}"
@@ -376,14 +401,6 @@ fi
 
 if [ -s "${__TMPCPIOGZ}" ]; then
 	cat "${__TMPCPIOGZ}" >>"${outfile}" || exit 1
-fi
-
-if [ "${keep}" = "y" ]; then
-	echo "Working files in ${DESTDIR}, early initramfs in ${__TMPEARLYCPIO} and overlay in ${__TMPCPIOGZ}"
-else
-	rm -rf "${DESTDIR}"
-	rm -rf "${__TMPCPIOGZ}"
-	rm -rf "${__TMPEARLYCPIO}"
 fi
 
 exit 0

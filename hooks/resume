@@ -18,8 +18,7 @@ esac
 # First check if a location is set and is a valid swap partition
 test -r /etc/initramfs-tools/conf.d/resume \
 	&& . /etc/initramfs-tools/conf.d/resume
-if [ -n "$RESUME" ] && command -v blkid >/dev/null 2>&1 \
-	&& blkid -p -n swap $RESUME >/dev/null 2>&1; then
+if [ -n "$RESUME" ] && blkid -p -n swap $RESUME >/dev/null 2>&1; then
 	# As mkinitramfs copies the config file nothing to do.
 	exit 0
 fi
@@ -42,7 +41,7 @@ chrooted() {
 
 # Try to autodetect the RESUME partition, using biggest swap?
 RESUME=$(grep ^/dev/ /proc/swaps | sort -rk3 | head -n 1 | cut -d " " -f 1)
-if [ -n "$RESUME" ] && command -v blkid >/dev/null 2>&1; then
+if [ -n "$RESUME" ]; then
 	UUID=$(blkid -s UUID -o value "$RESUME" || true)
 	if [ -n "$UUID" ]; then
 			RESUME="UUID=$UUID"

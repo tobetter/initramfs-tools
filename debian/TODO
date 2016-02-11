@@ -11,5 +11,3 @@ TODO
    copy_exec, maybe use dracut copy logic.
 
  o root loop support.
-
- o Eliminate ?klibc?, busybox (-> glibc).

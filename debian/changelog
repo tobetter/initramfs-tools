@@ -1,3 +1,76 @@
+initramfs-tools (0.123) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * [3084929] debian/control: Remove redundant dependency on
+    klibc-utils|busybox
+  * [913a861] debian/control: Recommend the right busybox packages for the
+    target distribution
+  * [d4febbd] Remove busybox hook in favour of busybox's own (Closes: #810154)
+  * [b5303a1] Update TODO for removal of busybox hook
+  * [6cc3d85] hook-functions: Include any modular RTC drivers in the initramfs
+  * [ceff05e] hooks/fsck: Stop setting e2fsck broken_system_clock option
+    (Closes: #804071)
+  * [9c105f0] Assume blkid is always installed, and remove fallbacks
+  * [aaba4cb] hooks/fsck: Use get_fstype rather than blkid to probe filesystem
+    type
+  * [a8ed874] hooks/fsck: Always use get_fstype to probe type of root
+    filesystem (Closes: #767471)
+  * [e798629] Pass filesystem type from /etc/fstab to fsck when checking /usr
+  * [55e075c] hook-functions: Include drivers for all keyboards when
+    MODULES=dep (Closes: #639876)
+  * [704bfa5] scripts/functions: Explicitly load keyboard drivers only at
+    break=top
+  * [c5b54ae] scripts/functions: Use more sensible modprobe options at
+    break=top
+  * [39e90c8] scripts/functions: Load more USB host controllers drivers on
+    break=top
+  * [8c437f5] scripts/functions: Load HID drivers at break=top
+  * [619f2ca] scripts/functions: Connect panic shell to normal tty device
+    (Closes: #512679)
+  * [8b8b28c] hook-functions: Clean up split between dep_add_modules and
+    dep_add_modules_mount
+  * [5f34b94] hook-functions: Include modules for resume partition when
+    MODULES=dep (Closes: #588770)
+  * [31ab487] hook-functions: Stop force-loading drivers found through sysfs
+    when MODULES=dep (Closes: #792910)
+  * [07f2c88] kernel/postinst.d: Make test for update-initramfs consistent with
+    invocation (Closes: #768913)
+  * [e5476bf] copy_file: Skip duplicating symlink if it points to the target
+    file (Closes: #812404)
+  * [d0f4d06] initramfs-tools: Include empty /etc/initramfs-tools/conf.d
+    directory (Closes: #809206)
+  * [245d584] initramfs-tools.8: Update list of variables exported to hook
+    scripts
+  * [941429d] initramfs-tools.8: Add a new section for the general description
+    of scripts
+  * [3ff5d57] initramfs-tools.8: Add brief description of configuration hooks
+    and files (Closes: #807527)
+  * [c17a21a] Remove klibc hook in favour of klibc's own
+  * [ea7e02d] bash-completion: Simplify by using _get_comp_words_by_ref
+  * [9e23444] init: Use "case" rather than loop to look for "quiet" parameter
+  * [49e4a05] init: Remove fallback from devtmpfs to tmpfs
+  * [ab91306] init: Take over handling of rootdelay parameter from udev boot
+    script (Closes: #809740)
+  * [56dfe39] bash-completion: Rename our completion script so that it works
+    again
+  * [ac6d31f] mkinitramfs: Delete or report temporary files on failure
+    (Closes: #814345)
+  * [c8c932d] Move initramfs.conf around in maintainer scripts to avoid it
+    being 'obsolete' (Closes: #813229)
+  * [138af73] hook-functions: Dereference links when looking up block device
+    number
+
+  [ Andy Whitcroft ]
+  * [7774fa3] Don't display "Loading, please wait..." message when 'quiet' is
+    in /proc/cmdline.
+  * [c4ea209] Mount /dev with the default tmpfs size rather than sourcing
+    udev.conf.
+  * [b418ad4] Sync the mount options for /run from /lib/init/fstab
+    (LP: #1152744)
+  * [c44df0c] init: Mount /dev with "nosuid". Thanks to Daniel (LP: #1450960)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Thu, 11 Feb 2016 02:13:23 +0000
+
 initramfs-tools (0.122) unstable; urgency=medium
 
   * [4fa3fe4] init: Validate the real init after devtmpfs is mounted under the
