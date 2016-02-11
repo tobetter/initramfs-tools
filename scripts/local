@@ -136,7 +136,7 @@ local_mount_root()
 	# FIXME This has no error checking
 	modprobe ${FSTYPE}
 
-	checkfs ${ROOT} root
+	checkfs ${ROOT} root "${FSTYPE}"
 
 	# FIXME This has no error checking
 	# Mount root
@@ -166,7 +166,7 @@ local_mount_fs()
 	modprobe "${MNT_TYPE}"
 
 	if [ "$MNT_PASS" != 0 ]; then
-		checkfs "$MNT_FSNAME" "$MNT_DIR"
+		checkfs "$MNT_FSNAME" "$MNT_DIR" "${MNT_TYPE}"
 	fi
 
 	# FIXME This has no error checking

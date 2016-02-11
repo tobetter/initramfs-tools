@@ -134,13 +134,17 @@ copy_file() {
 	mkdir -p "${DESTDIR}/${target%/*}"
 
 	if [ -h "${src}" ]; then
-		[ "${verbose}" = "y" ] && echo "Adding ${type}-link ${src}"
-
 		# We don't need to replicate a chain of links completely;
-		# just link directly to the ultimate target.  Create a
-		# relative link so it always points to the right place.
+		# just link directly to the ultimate target
 		link_target="$(readlink -f "${src}")" || return $(($? + 1))
-		ln -rs "${DESTDIR}/${link_target}" "${DESTDIR}/${target}"
+
+		if [ "${link_target}" != "${target}" ]; then
+			[ "${verbose}" = "y" ] && echo "Adding ${type}-link ${src}"
+
+			# Create a relative link so it always points
+			# to the right place
+			ln -rs "${DESTDIR}/${link_target}" "${DESTDIR}/${target}"
+		fi
 
 		# Copy the link target if it doesn't already exist
 		src="${link_target}"
@@ -228,7 +232,7 @@ sys_walk_mod_add()
 		if [ -e "${device_path}/modalias" ]; then
 			modalias=$(cat "${device_path}/modalias")
 			if [ -n "${modalias}" ]; then
-				force_load "${modalias}"
+				manual_add_modules "${modalias}"
 			fi
 		fi
 
@@ -237,7 +241,7 @@ sys_walk_mod_add()
 		if [ -e "$driver_path" ]; then
 			module="$(basename $(readlink -f $driver_path))"
 			if [ -n "${module}" ]; then
-				force_load "${module}"
+				manual_add_modules "${module}"
 			fi
 		fi
 
@@ -273,7 +277,7 @@ block_dev_mod_add()
 	dev_node="$1"
 
 	# Look up device number and convert to decimal as it appears in sysfs
-	dev_num="$(stat -c %t:%T "$dev_node")"
+	dev_num="$(stat -L -c %t:%T "$dev_node")"
 	dev_num="$((0x${dev_num%:*})):$((0x${dev_num#*:}))"
 
 	# Look up device in sysfs
@@ -318,7 +322,6 @@ add_loaded_modules()
 dep_add_modules_mount()
 {
 	local dir dev_node FSTYPE
-	local modules=
 
 	dir="$1"
 
@@ -400,12 +403,28 @@ dep_add_modules_mount()
 	fi
 
 	# Add filesystem
-	modules="$modules ${FSTYPE}"
+	manual_add_modules ${FSTYPE}
 
 	block_dev_mod_add "$dev_node"
+}
+
+dep_add_modules()
+{
+	local device dev_node
+	local modules=
+
+	dep_add_modules_mount /
+	dep_add_modules_mount /usr
+
+	if [ -n "${RESUME}" ]; then
+		dev_node="$(resolve_device "${RESUME}")"
+		if [ -n "${dev_node}" ]; then
+			block_dev_mod_add "${dev_node}"
+		fi
+	fi
 
 	# sys walk some important device classes
-	for class in gpio phy regulator; do
+	for class in gpio phy regulator rtc; do
 		for device in /sys/class/$class/*; do
 			device="$(readlink -f "$device")" \
 				&& sys_walk_mod_add "$device"
@@ -417,6 +436,17 @@ dep_add_modules_mount()
 	add_loaded_modules 'clk[-_]*'
 	add_loaded_modules 'phy[-_]*'
 	add_loaded_modules 'pinctrl[-_]*'
+
+	# Sys walk keyboards.  We identify keyboards as input devices
+	# that can generate at least key events 1-31; udev has the
+	# same heuristic.  Note that the format of the bitmap
+	# properties depends on the word size of the process reading
+	# the uevent file!
+	for device in /sys/class/input/input*; do
+		if grep -qs "^KEY=.*fffffff[ef]$" "${device}/uevent"; then
+			sys_walk_mod_add "$(readlink -f "$device")"
+		fi
+	done
 
 	# catch old-style IDE
 	if [ -e /sys/bus/ide/devices/ ]; then
@@ -449,12 +479,6 @@ dep_add_modules_mount()
 	fi
 
 	manual_add_modules $modules
-}
-
-dep_add_modules()
-{
-	dep_add_modules_mount /
-	dep_add_modules_mount /usr
 }
 
 # The modules "most" classes added per default to the initramfs
@@ -502,6 +526,9 @@ auto_add_modules()
 			copy_modules_dir kernel/drivers/pinctrl
 			copy_modules_dir kernel/drivers/regulator
 			copy_modules_dir kernel/drivers/usb/phy
+
+			# Needed for periodic fsck
+			copy_modules_dir kernel/drivers/rtc
 		;;
 		net)
 			copy_modules_dir kernel/drivers/net \

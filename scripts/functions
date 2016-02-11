@@ -33,6 +33,8 @@ log_end_msg()
 
 panic()
 {
+	local console rest
+
 	if command -v chvt >/dev/null 2>&1; then
 		chvt 1
 	fi
@@ -45,24 +47,46 @@ panic()
 		reboot
 		exit  # in case reboot fails, force kernel panic
 	fi
-	modprobe -v i8042 || true
-	modprobe -v atkbd || true
-	modprobe -v ehci-pci || true
-	modprobe -v ehci-orion || true
-	modprobe -v ehci-hcd || true
-	modprobe -v uhci-hcd || true
-	modprobe -v ohci-hcd || true
-	modprobe -v usbhid || true
 
 	run_scripts /scripts/panic
 
-	REASON="$@" PS1='(initramfs) ' /bin/sh -i </dev/console >/dev/console 2>&1
+	# Try to use setsid, which will enable job control in the shell
+	# and paging in more
+	if command -v setsid >/dev/null 2>&1; then
+		read console rest </proc/consoles
+		if [ "${console}" = "tty0" ]; then
+			# Need to choose a specific VT
+			console="tty1"
+		fi
+		# We don't have 'setsid -c' so we need to setsid, open
+		# the tty, and finally exec an interactive shell
+		REASON="$@" PS1='(initramfs) ' setsid sh -c "exec sh -i <>/dev/${console} 1>&0 2>&1"
+	else
+		REASON="$@" PS1='(initramfs) ' sh -i </dev/console >/dev/console 2>&1
+	fi
 }
 
 maybe_break()
 {
 	case ",$break," in
 	*,$1,*)
+		if [ "$1" = "top" ]; then
+			# udev is not yet running, so load keyboard drivers
+			if [ "${quiet}" = "y" ]; then
+				opts="-q"
+			else
+				opts="-v"
+			fi
+			modprobe ${opts} -a i8042 atkbd ehci-pci ehci-orion \
+				 ehci-hcd ohci-hcd ohci-pci uhci-hcd usbhid xhci \
+				 xhci-pci xhci-hcd
+			sleep 2
+			for modalias in /sys/bus/hid/devices/*/modalias; do
+				if [ -f "${modalias}" ]; then
+					modprobe ${opts} -b "$(cat ${modalias})"
+				fi
+			done
+		fi
 		panic "Spawning shell within the initramfs"
 		;;
 	esac
@@ -143,10 +167,8 @@ get_fstype ()
 	# but fstype is more robust
 	FSTYPE="unknown"
 	eval $(fstype "${FS}" 2> /dev/null)
-	if [ "$FSTYPE" = "unknown" ] &&  command -v blkid >/dev/null 2>&1 ; then
+	if [ "$FSTYPE" = "unknown" ]; then
 		FSTYPE=$(blkid -o value -s TYPE "${FS}")
-	elif [ "$FSTYPE" = "unknown" ] && [ -x /lib/udev/vol_id ]; then
-		FSTYPE=$(/lib/udev/vol_id -t "${FS}" 2> /dev/null)
 	fi
 	RET=$?
 
@@ -299,12 +321,7 @@ resolve_device() {
 
 	case "$DEV" in
 	LABEL=* | UUID=* | PARTLABEL=* | PARTUUID=*)
-		if command -v blkid >/dev/null 2>&1; then
-			DEV="$(blkid -l -t "$DEV" -o device)" || return 1
-		else
-			log_warning_msg "blkid not present, so cannot resolve $DEV"
-			return 1
-		fi
+		DEV="$(blkid -l -t "$DEV" -o device)" || return 1
 		;;
 	esac
 	[ -e "$DEV" ] && echo "$DEV"
@@ -313,17 +330,21 @@ resolve_device() {
 # Check a file system.
 # $1=device
 # $2=mountpoint (for diagnostics only)
+# $3=type (may be "auto")
 _checkfs_once()
 {
 	DEV="$1"
 	NAME="$2"
+	TYPE="$3"
 	if [ "$NAME" = "/" ] ; then
 		NAME="root"
 	fi
 	FSCK_LOGFILE=/run/initramfs/fsck.log
 	FSCK_STAMPFILE=/run/initramfs/fsck-${NAME#/}
 
-	TYPE=$(get_fstype "$1")
+	if [ "${TYPE}" = "auto" ]; then
+		TYPE="$(get_fstype "${DEV}")"
+	fi
 
 	FSCKCODE=0
 	if ! command -v fsck >/dev/null 2>&1; then

@@ -30,6 +30,8 @@ initramfs-tools (0.119) unstable; urgency=medium
     following lines in /etc/e2fsck.conf:
         [options]
         broken_system_clock=1
+    [As of e2fsprogs version 1.42.13 this message is informational, and
+     no configuration change is required.]
 
  -- Ben Hutchings <ben@decadent.org.uk>  Mon, 13 Apr 2015 01:00:21 +0100
 
