@@ -1,3 +1,10 @@
+initramfs-tools (0.122ubuntu4) xenial; urgency=medium
+
+  [ Manoj Iyer ]
+  * Add support for uppercase and lowercase uuids. (LP: #1548120)
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Sun, 21 Feb 2016 22:12:36 +0000
+
 initramfs-tools (0.122ubuntu3) xenial; urgency=medium
 
   * initramfs-tools-core uses initramfs-tools-bin add dependancy (LP:
