@@ -1,3 +1,14 @@
+initramfs-tools (0.122ubuntu5) xenial; urgency=medium
+
+  [ Andy Whitcroft ]
+  * uuids: busybox tr does not support symbolic ranges expand manually
+    (LP: #1548120)
+
+  [ Martin Pitt ]
+  * wait-for-root.c: Drop check if device is queued in udev (LP: #1539195)
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Wed, 24 Feb 2016 14:26:59 +0000
+
 initramfs-tools (0.122ubuntu4) xenial; urgency=medium
 
   [ Manoj Iyer ]
