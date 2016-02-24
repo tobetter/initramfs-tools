@@ -336,14 +336,14 @@ resolve_device() {
 	case "$DEV" in
 	LABEL=* | UUID=* | PARTLABEL=* | PARTUUID=*)
 		# Support uppercase and lowercase UUIDs -- see RFC#4122:
-		#   "Each field is treated as an integer and has its value printed as                             
-		#    a zero-filled hexadecimal digit string with the most significant                             
-		#    digit first.  The hexadecimal values "a" through "f" are output as                           
-		#    lower case characters and are case insensitive on input."                                    
+		#   "Each field is treated as an integer and has its value printed as
+		#    a zero-filled hexadecimal digit string with the most significant
+		#    digit first.  The hexadecimal values "a" through "f" are output as
+		#    lower case characters and are case insensitive on input."
 		case "$DEV" in
 		UUID=* | PARTUUID=*)
 			local type=$(echo ${DEV} | cut -f 1 -d =)
-			local value=$(echo ${DEV} | cut -f 2 -d = | tr '[:upper:]' '[:lower:]')
+			local value=$(echo ${DEV} | cut -f 2 -d = | tr '[A-F]' '[a-f]')
 			DEV="${type}=${value}"
 			;;
 		esac

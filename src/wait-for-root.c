@@ -13,7 +13,6 @@
 #include <fcntl.h>
 
 
-static int device_queued   (struct udev *udev, const char *path);
 static int matching_device (struct udev_device *device, const char *path);
 
 static void alarm_handler (int signum);
@@ -65,14 +64,11 @@ main (int   argc,
 	udev_monitor_enable_receiving (udev_monitor);
 	udev_monitor_set_receive_buffer_size(udev_monitor, 128*1024*1024);
 
-	/* If the device is not being processed, check to see whether it
-	 * exists already on the filesystem.  If this is true, we don't need
-	 * to wait for it can obtain the filesystem type by looking up the
-	 * udevdb record by major/minor.
+	/* Check to see whether the device exists already on the filesystem.
+	 * If this is true, we don't need to wait for it can obtain the
+	 * filesystem type by looking up the udevdb record by major/minor.
 	 */
-	if ((! device_queued (udev, devpath))
-	    && (stat (path, &devstat) == 0)
-	    && S_ISBLK (devstat.st_mode))
+	if (stat (path, &devstat) == 0 && S_ISBLK (devstat.st_mode))
 	{
 		udev_device = udev_device_new_from_devnum (udev, 'b', devstat.st_rdev);
 		if (udev_device) {
@@ -123,37 +119,6 @@ exit:
 	exit (0);
 }
 
-
-static int
-device_queued (struct udev *udev,
-	       const char * devpath)
-{
-	struct udev_queue *     udev_queue;
-	struct udev_list_entry *queue_entry;
-	int                     found = 0;
-
-	udev_queue = udev_queue_new (udev);
-
-	for (queue_entry = udev_queue_get_queued_list_entry (udev_queue);
-	     queue_entry != NULL;
-	     queue_entry = udev_list_entry_get_next (queue_entry)) {
-		const char *        syspath;
-		struct udev_device *udev_device;
-
-		syspath = udev_list_entry_get_name (queue_entry);
-		udev_device = udev_device_new_from_syspath (udev, syspath);
-		if (udev_device) {
-			if (matching_device (udev_device, devpath))
-				found = 1;
-
-			udev_device_unref (udev_device);
-		}
-	}
-
-	udev_queue_unref (udev_queue);
-
-	return found;
-}
 
 static int
 matching_device (struct udev_device *device,
