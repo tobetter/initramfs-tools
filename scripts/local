@@ -84,6 +84,8 @@ mountroot()
 	run_scripts /scripts/local-premount
 	[ "$quiet" != "y" ] && log_end_msg
 
+	ROOT=$(resolve_device "$ROOT")
+
 	if [ "${readonly}" = "y" ] && \
 	   [ -z "$LOOP" ]; then
 		roflag=-r

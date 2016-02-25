@@ -1,3 +1,21 @@
+initramfs-tools (0.103ubuntu4.3) trusty; urgency=medium
+
+  [ Dimitri John Ledkov ]
+
+  * Create /bin/egrep -> busybox symlink, because initramfs-tools
+    scripts/functions expect to have it & our busybox hook is executed
+    after zz-busybox one. (LP: #1315755)
+
+  [ Dave Chiluk]
+
+  * Add resolve_device to initramfs-tools so that actual devices show up
+    in df and /proc/self/mountinfo instead of the UUID symlink. This is 
+    a backport of commits f135e7cf, be18fee1, f1d6fb37  from
+    git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/initramfs-tools
+    (LP: #1535349)
+
+ -- Andy Whitcroft <apw@canonical.com>  Thu, 25 Feb 2016 18:55:04 +0000
+
 initramfs-tools (0.103ubuntu4.2) trusty; urgency=medium
 
   * Default to a rootdelay of 180 on powerpc/ppc64/ppc64el to account
