@@ -37,6 +37,8 @@ if [ "${BUSYBOX}" != "n" ] && [ -e ${BUSYBOXDIR}/busybox ]; then
 	ln -s busybox ${DESTDIR}/bin/mount
 	# ... but some scripts expect /bin/sleep to exist. Boo.
 	ln -s busybox ${DESTDIR}/bin/sleep
+	# ... our scripts expect /bin/egrep to exist. LP: #1315755
+	ln -s busybox ${DESTDIR}/bin/egrep
 	# Useless
 	for cmd in minips nuke sh.shared; do
 		rm -f ${DESTDIR}/bin/${cmd}
