@@ -1,3 +1,15 @@
+initramfs-tools (0.122ubuntu6) xenial; urgency=medium
+
+  [ Andy Whitcroft ]
+  * uuids: only apply case mapping to RFC#4122 format uuids (LP: #1553107,
+    #1548120)
+
+  [ Timo Aaltonen ]
+  * hooks/framebuffer: Copy kernel/ubuntu/i915 backport driver too. (LP:
+    #1500751)
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Fri, 04 Mar 2016 10:12:42 +0000
+
 initramfs-tools (0.122ubuntu5) xenial; urgency=medium
 
   [ Andy Whitcroft ]
