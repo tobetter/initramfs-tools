@@ -557,7 +557,7 @@ auto_add_modules()
 		;;
 		virtual)
 			# Hyper-V
-			modules="$modules hv_vmbus hv_utils hv_netvsc hv_mouse hv_storvsc"
+			modules="$modules hv_vmbus hv_utils hv_netvsc hv_mouse hv_storvsc hyperv-keyboard"
 		;;
 		nx)
 			# PowerPC NX Crypto Coprocessor
