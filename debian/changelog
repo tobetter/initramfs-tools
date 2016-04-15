@@ -1,3 +1,11 @@
+initramfs-tools (0.122ubuntu8) xenial; urgency=medium
+
+  * init: busybox hostname doesn't support the '-b' argument, and it's
+    not relevant in this context anyway, as we test -f /etc/hostname.
+  * init: Also fix the wrong redirection of stdout for the above call.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 15 Apr 2016 14:37:22 -0600
+
 initramfs-tools (0.122ubuntu7) xenial; urgency=medium
 
   * hook-functions: add hyperv-keyboard for Generation 2 VMs
