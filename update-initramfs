@@ -3,7 +3,6 @@
 STATEDIR=/var/lib/initramfs-tools
 BOOTDIR=/boot
 CONF=/etc/initramfs-tools/update-initramfs.conf
-USETRIGGERS=true
 mode=""
 version=""
 update_initramfs=yes
@@ -23,8 +22,7 @@ linux-image-*)
 	fi
 	;;
 ?*)
-	if	   $USETRIGGERS						\
-		&& [ $# = 1 ]						\
+	if	   [ $# = 1 ]						\
 		&& [ x"$1" = x-u ]					\
 		&& dpkg-trigger --check-supported 2>/dev/null
 	then

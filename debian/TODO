@@ -11,3 +11,7 @@ TODO
    copy_exec, maybe use dracut copy logic.
 
  o root loop support.
+
+ o Currently updating linux-image-foo and linux-image-foo-signed builds a
+   broken initramfs (without module signatures) and then a working one
+   (with signatures).  This is both dangerous and a waste of time.
