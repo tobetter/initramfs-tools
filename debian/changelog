@@ -1,3 +1,18 @@
+initramfs-tools (0.124) unstable; urgency=medium
+
+  * [e05fc3e] hook-functions: Add detached module signatures if present
+    (Closes: #820037)
+  * [99dadac] hook-functions: Create ORDER files even if there are no valid
+    scripts (Closes: #814965)
+  * [57a9f2a] mkinitramfs: Exclude VCS directories when copying
+    /etc/initramfs-tools/scripts
+  * [eff1806] parse_numeric: Do not attempt to canonicalise root device name
+    (Closes: #815555)
+  * [7a820e1] auto_add_modules: Include most USB host drivers (Closes: #762634)
+  * [35751d4] auto_add_modules: Include all bus driver modules
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 17 Apr 2016 01:56:13 +0100
+
 initramfs-tools (0.123) unstable; urgency=medium
 
   [ Ben Hutchings ]

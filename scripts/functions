@@ -152,7 +152,7 @@ parse_numeric() {
 		;;
 	esac
 
-	ROOT="$(readlink -f /dev/block/${major}:${minor})"
+	ROOT="/dev/block/${major}:${minor}"
 }
 
 # Parameter: device node to check
