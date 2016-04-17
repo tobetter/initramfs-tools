@@ -1,3 +1,13 @@
+initramfs-tools (0.125) unstable; urgency=medium
+
+  * [74597dd] update-initramfs: Remove $USETRIGGERS variable and condition
+  * [b19d13e] initramfs-tools: Install script to be invoked by linux-signed
+     postinst
+  * [79c0204] mkinitramfs: Fix wildcard for excluding dot-files
+    (Closes: #821346)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 17 Apr 2016 23:13:33 +0100
+
 initramfs-tools (0.124) unstable; urgency=medium
 
   * [e05fc3e] hook-functions: Add detached module signatures if present

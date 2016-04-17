@@ -267,7 +267,7 @@ for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
 		"${DESTDIR}/scripts/$(dirname "${b}")/"
 done
 # Prune dot-files/directories and limit depth to exclude VCS files
-for b in $(cd "${CONFDIR}/scripts" && find . -maxdepth 2 -name '.*' -prune -o \
+for b in $(cd "${CONFDIR}/scripts" && find . -maxdepth 2 -name '.?*' -prune -o \
 	-regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f -print); do
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
