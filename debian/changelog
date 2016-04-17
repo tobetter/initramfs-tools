@@ -1,3 +1,12 @@
+initramfs-tools (0.120+deb8u2) jessie; urgency=medium
+
+  * [7863219] hook-functions: Include drivers/nvme in block driver modules
+    (Closes: #807000)
+  * [fcef753] hook-functions: Create ORDER files even if there are no valid
+    scripts (Closes: #814965)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 17 Apr 2016 18:20:09 +0100
+
 initramfs-tools (0.120+deb8u1) jessie; urgency=medium
 
   [ Ben Hutchings ]
