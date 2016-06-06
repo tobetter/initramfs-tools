@@ -1,3 +1,10 @@
+initramfs-tools (0.122ubuntu8.1) xenial; urgency=medium
+
+  * hook-functions: include ehci-msm in auto_add_modules_list
+    (LP: #1588946)
+
+ -- dann frazier <dannf@ubuntu.com>  Mon, 06 Jun 2016 12:31:45 -0600
+
 initramfs-tools (0.122ubuntu8) xenial; urgency=medium
 
   * init: busybox hostname doesn't support the '-b' argument, and it's
