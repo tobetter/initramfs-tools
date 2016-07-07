@@ -2,11 +2,14 @@ Source: initramfs-tools
 Section: utils
 Priority: optional
 Uploaders: maximilian attems <maks@debian.org>, Michael Prokop <mika@debian.org>, Adam Conrad <adconrad@0c3.net>, Ben Hutchings <ben@decadent.org.uk>
-Maintainer: Debian kernel team <debian-kernel@lists.debian.org>
-Build-Depends: debhelper (>= 7.0), bash-completion
+XSBC-Original-Maintainer: Debian kernel team <debian-kernel@lists.debian.org>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Build-Depends: debhelper (>= 7.0), bash-completion, pkg-config, libudev-dev
 Standards-Version: 3.9.6
-Vcs-Browser: https://anonscm.debian.org/cgit/kernel/initramfs-tools.git
-Vcs-Git: https://anonscm.debian.org/git/kernel/initramfs-tools.git
+Vcs-Browser: https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/initramfs-tools/
+Vcs-Git: git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/initramfs-tools
+X-Debian-Vcs-Browser: https://anonscm.debian.org/cgit/kernel/initramfs-tools.git
+X-Debian-Vcs-Git: https://anonscm.debian.org/git/kernel/initramfs-tools.git
 
 Package: initramfs-tools
 Architecture: all
@@ -15,7 +18,7 @@ Depends: initramfs-tools-core (= ${binary:Version}), linux-base, ${misc:Depends}
 Suggests: bash-completion
 Provides: linux-initramfs-tool
 Conflicts: linux-initramfs-tool, usplash (<< 0.5.50)
-Breaks: cryptsetup (<< 2:1.6.6-4~), elilo (<< 3.12-3.1~), lilo (<< 22.8-8.2~), s390-tools (<< 1.8.3-2~), console-setup (<< 1.72), systemd-sysv (<< 186), lvm2 (<< 2.02.111-2.1~), initscripts (<< 2.88dsf-59.3~), upstart, e2fsprogs (<< 1.42.13)
+Breaks: cryptsetup (<< 2:1.6.6-4~), elilo (<< 3.12-3.1~), lilo (<< 22.8-8.2~), s390-tools (<< 1.8.3-2~), console-setup (<< 1.72), systemd-sysv (<< 186), lvm2 (<< 2.02.111-2.1~), initscripts (<< 2.88dsf-59.3~), e2fsprogs (<< 1.42.13)
 Description: generic modular initramfs generator (automation)
  This package builds a bootable initramfs for Linux kernel packages.  The
  initramfs is loaded along with the kernel and is responsible for
@@ -25,7 +28,7 @@ Package: initramfs-tools-core
 Architecture: all
 Multi-Arch: foreign
 Recommends: ${busybox:Recommends}
-Depends: klibc-utils (>= 2.0.4-8~), cpio, kmod | module-init-tools, udev, ${misc:Depends}
+Depends: initramfs-tools-bin (= ${binary:Version}), klibc-utils (>= 2.0.4-8~), cpio, kmod | module-init-tools, udev, ${misc:Depends}
 Suggests: bash-completion
 Breaks: initramfs-tools (<< 0.121~)
 Replaces: initramfs-tools (<< 0.121~)
@@ -34,3 +37,10 @@ Description: generic modular initramfs generator (core tools)
  create a bootable initramfs for a Linux kernel.  The initramfs should
  be loaded along with the kernel and is then responsible for mounting
  the root filesystem and starting the main init system.
+
+Package: initramfs-tools-bin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: binaries used by initramfs-tools
+ This package contains binaries used inside the initramfs images generated
+ by initramfs-tools.

@@ -50,6 +50,13 @@ add_modules_from_file()
 	done
 }
 
+# Is this module available?
+have_module()
+{
+	modprobe --set-version="${version}" --ignore-install \
+		--show-depends "${1}" >/dev/null 2>&1
+}
+
 # Add dependent modules + eventual firmware
 manual_add_modules()
 {
@@ -493,17 +500,19 @@ auto_add_modules()
 	local modules=
 
 	if [ "$#" -eq 0 ] ; then
-		set -- base net ide scsi block ata i2o dasd ieee1394 firewire mmc usb_storage
+		set -- base net ide scsi block ata i2o dasd ieee1394 firewire mmc usb_storage virtual nx
 	fi
 
 	for arg in "$@" ; do
 		case "$arg" in
 		base)
 			modules="$modules btrfs ext2 ext3 ext4 ext4dev "
-			modules="$modules isofs jfs reiserfs udf xfs"
+			modules="$modules isofs jfs reiserfs squashfs udf xfs"
 			modules="$modules nfs nfsv2 nfsv3 nfsv4"
 			modules="$modules af_packet atkbd i8042 psmouse"
 			modules="$modules virtio_pci virtio_mmio"
+			# nls not automatically pulled in as ubuntu has built-in vfat
+			modules="$modules vfat nls_cp437 nls_iso8859-1"
 
 			# Include most USB host and dual-role drivers
 			copy_modules_dir kernel/drivers/usb/host \
@@ -590,6 +599,15 @@ auto_add_modules()
 		;;
 		usb_storage)
 			copy_modules_dir kernel/drivers/usb/storage
+		;;
+		virtual)
+			# Hyper-V
+			modules="$modules hv_vmbus hv_utils hv_netvsc hv_mouse hv_storvsc hyperv-keyboard"
+		;;
+		nx)
+			# PowerPC NX Crypto Coprocessor
+			modules="$modules nx-compress nx-compress-crypto nx-compress-platform"
+			modules="$modules nx-compress-pseries nx-compress-powernv 842-decompress"
 		;;
 		esac
 	done
@@ -728,6 +746,11 @@ call_scripts()
 	set -e
 	for cs_x in ${runlist}; do
 		[ -f ${initdir}/${cs_x} ] || continue
+		if [ x"$call_scripts_optional" = "xoptional" ]; then
+			option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${initdir}/${cs_x}")
+			[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+		fi
+
 		# mkinitramfs verbose output
 		if [ "${verbose}" = "y" ]; then
 			echo "Calling hook ${cs_x}"
@@ -755,4 +778,10 @@ run_scripts()
 
 	runlist=$(get_prereq_pairs | tsort)
 	call_scripts $scriptdir
+}
+
+run_scripts_optional()
+{
+	call_scripts_optional=y
+	run_scripts "$@"
 }
