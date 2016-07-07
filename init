@@ -12,6 +12,8 @@ export PATH=/sbin:/usr/sbin:/bin:/usr/bin
 mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid sysfs /sys
 mount -t proc -o nodev,noexec,nosuid proc /proc
+# Some things don't work properly without /etc/mtab.
+ln -sf /proc/mounts /etc/mtab
 
 case " $(cat /proc/cmdline) " in
 *\ quiet\ *)
@@ -61,7 +63,13 @@ export drop_caps=
 export fastboot=n
 export forcefsck=n
 export fsckfix=
+export recovery=
 
+
+# mdadm needs hostname to be set. This has to be done before the udev rules are called!
+if [ -f "/etc/hostname" ]; then
+        /bin/hostname -F /etc/hostname >/dev/null 2>&1
+fi
 
 # Bring in the main config
 . /conf/initramfs.conf
@@ -96,8 +104,26 @@ for x in $(cat /proc/cmdline); do
 			;;
 		esac
 		;;
+	resumedelay=*)
+		RESUMEDELAY="${x#resumedelay=}"
+		;;
+	loop=*)
+		LOOP="${x#loop=}"
+		;;
+	loopflags=*)
+		LOOPFLAGS="-o ${x#loopflags=}"
+		;;
+	loopfstype=*)
+		LOOPFSTYPE="${x#loopfstype=}"
+		;;
+	cryptopts=*)
+		cryptopts="${x#cryptopts=}"
+		;;
 	nfsroot=*)
 		NFSROOT="${x#nfsroot=}"
+		;;
+	netboot=*)
+		NETBOOT="${x#netboot=}"
 		;;
 	ip=*)
 		IP="${x#ip=}"
@@ -169,6 +195,9 @@ for x in $(cat /proc/cmdline); do
 	BOOTIF=*)
 		BOOTIF=${x#BOOTIF=}
 		;;
+	hwaddr=*)
+		BOOTIF=${x#hwaddr=}
+		;;
 	fastboot|fsck.mode=skip)
 		fastboot=y
 		;;
@@ -180,6 +209,9 @@ for x in $(cat /proc/cmdline); do
 		;;
 	fsck.repair=no)
 		fsckfix=n
+		;;
+	recovery)
+		recovery=y
 		;;
 	esac
 done
@@ -197,6 +229,10 @@ else
 fi
 
 maybe_break top
+
+# export BOOT variable value for compcache,
+# so we know if we run from casper
+export BOOT
 
 # Don't do log messages here to avoid confusing graphical boots
 run_scripts /scripts/init-top
@@ -303,6 +339,6 @@ mount -n -o move /sys ${rootmnt}/sys
 mount -n -o move /proc ${rootmnt}/proc
 
 # Chain to real filesystem
-exec run-init ${drop_caps} ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
+exec run-init ${drop_caps} ${rootmnt} ${init} "$@" ${recovery:+--startup-event=recovery} <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 echo "Something went badly wrong in the initramfs."
 panic "Please file a bug on initramfs-tools."

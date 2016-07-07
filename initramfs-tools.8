@@ -42,6 +42,19 @@ The default is 180 seconds.
 set the file system mount option string.
 
 .TP
+\fB\fI loop= "<path to image>"
+path within the original root file system to loop-mount and use as the real
+root file system.
+
+.TP
+\fB\fI loopfstype
+set the loop file system type, if applicable.
+
+.TP
+\fB\fI loopflags
+set the loop file system mount option string, if applicable.
+
+.TP
 \fB\fI nfsroot
 can be either "auto" to try to get the relevant information from DHCP or a
 string of the form NFSSERVER:NFSPATH or NFSSERVER:NFSPATH:NFSOPTS.
@@ -303,7 +316,7 @@ allows arch specific hook additions.
 \fB\fI verbose
 corresponds to the verbosity of the update-initramfs run.
 .TP
-\fB\fI BUSYBOX, KEYMAP, MODULES
+\fB\fI BUSYBOX, MODULES
 are as described in \fIinitramfs.conf\fR(5).
 .TP
 \fB\fI BUSYBOXDIR
@@ -410,6 +423,20 @@ user to investigate the situation.
 .PP
 .B Example:
 panic "Frobnication failed"
+.fi
+.RE
+.RE
+
+.TP
+\fB\fI
+add_mountroot_fail_hook
+Registers the script as able to provide possible further information, in the
+event that the root device cannot be found. See the example script in the
+initramfs-tools examples directory for more information.
+.RS
+.PP
+.B Example:
+add_mountroot_fail_hook
 .RE
 
 .SS Subdirectories
