@@ -1,3 +1,10 @@
+initramfs-tools (0.125ubuntu2) yakkety; urgency=medium
+
+  * Make busybox-initramfs a real runtime dependency, fixing
+    kernel install failures with cryptsetup
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 29 Jul 2016 11:09:50 +0200
+
 initramfs-tools (0.125ubuntu1) yakkety; urgency=medium
 
   * Merge with debian 0.125 (LP: #1599915).  Remaining delta:
