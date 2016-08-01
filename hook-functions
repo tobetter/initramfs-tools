@@ -429,6 +429,7 @@ auto_add_modules()
 	case "${1:-}" in
 	base)
 		for x in ehci-hcd ohci-hcd ohci-pci uhci-hcd usbhid xhci xhci-hcd hid-apple \
+		ehci-msm ehci-orion ehci-pci xhci-pci \
 		hid-cherry hid-logitech hid-logitech-dj hid-microsoft \
 		hid-a4tech hid-belkin hid-bright hid-chicony \
 		hid-cypress hid-dell hid-ezkey hid-gyration \
@@ -436,6 +437,7 @@ auto_add_modules()
 		hid-sunplus hid-tmff hid-zpff hid-generic \
 		btrfs ext2 ext3 ext4 ext4dev isofs jfs nfs nfsv3 nfsv4 nfs_acl \
 		reiserfs udf xfs vfat nls_cp437 nls_iso8859-1 \
+		virtio_mmio \
 		af_packet atkbd i8042 virtio_pci psmouse; do
 			manual_add_modules "${x}"
 		done
@@ -462,6 +464,7 @@ auto_add_modules()
 	;;
 	block)
 		copy_modules_dir kernel/drivers/block
+		copy_modules_dir kernel/drivers/nvme
 	;;
 	ubi)
 		for x in deflate zlib lzo ubi ubifs; do
