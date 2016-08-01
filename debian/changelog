@@ -1,3 +1,13 @@
+initramfs-tools (0.103ubuntu4.4) trusty; urgency=low
+
+  * Backport Xenial driver lists (LP: #1608622):
+   - add nvme drivers to block.
+   - add ehci-* drivers to base.
+   - add xhci-* drivers to base.
+   - add virtio-* drivers to base.
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Mon, 01 Aug 2016 19:22:50 +0100
+
 initramfs-tools (0.103ubuntu4.3) trusty; urgency=medium
 
   [ Dimitri John Ledkov ]
