@@ -1,3 +1,14 @@
+initramfs-tools (0.125ubuntu3) yakkety; urgency=medium
+
+  * init: Revert Debian commit ab91306. Interpreting "rootdelay" as a static
+    sleep is complete nonsense. (LP: #1615751)
+  * scripts/local: Let rootdelay determine the wait-for-root timeout instead
+    of the shell polling loop that comes after it, as we should never hit the
+    latter in Ubuntu (where we require udev everywhere). Thanks to Scott Moser
+    for this patch!
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 26 Aug 2016 12:54:37 +0200
+
 initramfs-tools (0.125ubuntu2) yakkety; urgency=medium
 
   * Make busybox-initramfs a real runtime dependency, fixing

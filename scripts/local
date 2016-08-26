@@ -49,9 +49,24 @@ local_device_setup()
 
 	# If wait-for-root understands this prefix, then use it to wait for
 	# the device rather than settling the whole of udev.
+
+	# Timeout is max(30, rootdelay) seconds (approximately)
+	local slumber=30
+	case $DPKG_ARCH in
+		powerpc|ppc64|ppc64el)
+			slumber=180
+			;;
+		*)
+			slumber=30
+			;;
+	esac
+	if [ ${ROOTDELAY:-0} -gt $slumber ]; then
+		slumber=$ROOTDELAY
+	fi
+
 	case "$dev_id" in
 	UUID=*|LABEL=*|/dev/*)
-		FSTYPE=$( wait-for-root "$dev_id" 10 )
+		FSTYPE=$( wait-for-root "$dev_id" $slumber )
 		;;
 	*)
 		wait_for_udev 10
@@ -78,22 +93,12 @@ local_device_setup()
 	# to allow for asynchronous device discovery (e.g. USB).  We
 	# also need to keep invoking the local-block scripts in case
 	# there are devices stacked on top of those.
+	#
+	# in ubuntu, we should never actually enter this loop as wait-for-root
+	# above should waited until the device appeared.
 	if ! real_dev=$(resolve_device "${dev_id}") ||
 	   ! get_fstype "${real_dev}" >/dev/null; then
 		log_begin_msg "Waiting for ${name} file system"
-
-		# Timeout is max(30, rootdelay) seconds (approximately)
-		case $DPKG_ARCH in
-			powerpc|ppc64|ppc64el)
-				slumber=180
-				;;
-			*)
-				slumber=30
-				;;
-		esac
-		if [ ${ROOTDELAY:-0} -gt $slumber ]; then
-			slumber=$ROOTDELAY
-		fi
 
 		while true; do
 			sleep 1
