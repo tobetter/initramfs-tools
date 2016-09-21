@@ -276,11 +276,18 @@ configure_networking()
 		none|off)
 			# Do nothing
 			;;
-		""|on|any)
+		""|::::*|on|any|dhcp)
+			# if IP contains something other than BOOTIF; use that
+			# interface to bring up the network.
+			if ! echo "${IP}" | grep -qc 'BOOTIF'; then
+				DEVICE="${IP#*:*:*:*:*:*}";
+			fi
+
 			# Bring up device
-			ipconfig -t ${ROUNDTTT} "${DEVICE}"
+			dhclient -4 -1 -v "${DEVICE}"
+			dhclient -6 -1 -v "${DEVICE}"
 			;;
-		dhcp|bootp|rarp|both)
+		bootp|rarp|both)
 			ipconfig -t ${ROUNDTTT} -c ${IP} -d "${DEVICE}"
 			;;
 		*)

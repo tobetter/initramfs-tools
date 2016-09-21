@@ -1,3 +1,14 @@
+initramfs-tools (0.125ubuntu4) yakkety; urgency=medium
+
+  * scripts/functions: by default, when setting up networking, use dhclient if
+    we're asked to do DHCP explicitly, or if we otherwise are expected to do
+    things automatically. This way we can bring up both IPv4 and IPv6, as
+    klibc doesn't support IPv6. (LP: #1621507)
+  * debian/control: Breaks isc-dhcp-client << 4.3.3-5ubuntu14, since we're
+    calling the dhclient binary in scripts/functions now.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Wed, 21 Sep 2016 14:01:57 -0400
+
 initramfs-tools (0.125ubuntu3) yakkety; urgency=medium
 
   * init: Revert Debian commit ab91306. Interpreting "rootdelay" as a static
