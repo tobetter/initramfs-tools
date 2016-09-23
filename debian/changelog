@@ -1,3 +1,15 @@
+initramfs-tools (0.122ubuntu8.2) xenial; urgency=medium
+
+  [ Mathieu Trudel-Lapierre ]
+  * scripts/functions: update configure_networking to use dhclient.
+    (LP: #1621507)
+
+  [ LaMont Jones ]
+  * Depend/Breaks isc-dhcp-client as needed to make sure that it has
+    initramfs support
+
+ -- LaMont Jones <lamont@ubuntu.com>  Fri, 23 Sep 2016 16:01:48 -0600
+
 initramfs-tools (0.122ubuntu8.1) xenial; urgency=medium
 
   * hook-functions: include ehci-msm in auto_add_modules_list
