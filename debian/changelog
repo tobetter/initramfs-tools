@@ -1,3 +1,12 @@
+initramfs-tools (0.125ubuntu5) yakkety; urgency=medium
+
+  * scripts/functions: make sure we can try to start all available and suitable
+    interfaces if ip= isn't set when setting up the network, and exit as soon
+    as we get an IP address. This retains the old behavior from ipconfig when
+    ip= is unset, for really simple remote-root scenarios. (LP: #1628306)
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Tue, 27 Sep 2016 18:25:50 -0400
+
 initramfs-tools (0.125ubuntu4) yakkety; urgency=medium
 
   * scripts/functions: by default, when setting up networking, use dhclient if
