@@ -1,3 +1,13 @@
+initramfs-tools (0.122ubuntu8.4) xenial; urgency=medium
+
+  * Fix case where ip=dhcp and ip=eth0 and other ip= instances exists on
+    the kernel command line (LP: #1631474)
+  * Also fixed an error discovered by the shellcheck static code analyzer
+    where "$DEVICES" would be processed as a single device where-as removing
+    the quotes allows the list to be correctly processed by the for loop.
+
+ -- Dave Chiluk <chiluk@ubuntu.com>  Fri, 07 Oct 2016 16:21:50 -0500
+
 initramfs-tools (0.122ubuntu8.3) xenial; urgency=medium
 
   * scripts/functions: make sure we can try to start all available and suitable
