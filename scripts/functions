@@ -305,10 +305,11 @@ configure_networking()
 			# Do nothing
 			;;
 		""|::::*|on|any|dhcp)
-			# if IP contains something other than BOOTIF; use that
+			# if IP is of the form ::::*, and does not contain bootif use that
 			# interface to bring up the network.
-			if ! echo "${IP}" | grep -qc 'BOOTIF'; then
-				DEVICE="${IP#*:*:*:*:*:*}";
+			if echo "${IP}"| grep -vi bootif | grep -qe ".*:.*:.*:.*:.*:.*" ;  then
+				DEVICE="${IP#*:*:*:*:*:}";
+				DEVICE="${DEVICE%%:*}";
 			fi
 
 			# if we don't have a device specified, try to bring up
@@ -318,7 +319,7 @@ configure_networking()
 			fi
 
 			# Bring up device
-			for dev in "${DEVICE}"; do
+			for dev in ${DEVICE} ; do
 				dhclient -4 -1 -v "${dev}"
 				dhclient -6 -1 -v "${dev}"
 
