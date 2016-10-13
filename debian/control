@@ -14,7 +14,7 @@ X-Debian-Vcs-Git: https://anonscm.debian.org/git/kernel/initramfs-tools.git
 Package: initramfs-tools
 Architecture: all
 Multi-Arch: foreign
-Depends: initramfs-tools-core (= ${binary:Version}), linux-base, ${misc:Depends}, isc-dhcp-client (>= 4.3.3-5ubuntu12.3)
+Depends: initramfs-tools-core (= ${binary:Version}), linux-base, ${misc:Depends}
 Suggests: bash-completion
 Provides: linux-initramfs-tool
 Conflicts: linux-initramfs-tool, usplash (<< 0.5.50)
