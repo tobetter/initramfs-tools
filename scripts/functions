@@ -276,14 +276,12 @@ configure_networking()
 				current_mac=$(cat "$device/address")
 				if [ "$bootif_mac" = "$current_mac" ]; then
 					DEVICE=${device##*/}
+					DEVICE6=${device##*/}
 					break
 				fi
 			fi
 		done
 	fi
-
-	# networking already configured thus bail out
-	[ -n "${DEVICE}" ] && [ -e /run/net-"${DEVICE}".conf ] && return 0
 
 	wait_for_udev 10
 
@@ -297,18 +295,38 @@ configure_networking()
 		# Ip-Config tries to create this file and when it succeds
 		# creating the file, ipconfig is not run again.
 		for x in /run/net-"${DEVICE}".conf /run/net-*.conf ; do
-			[ -e "$x" ] && break 2
+			if [ -e "$x" ]; then
+				if grep -q reason "$x"; then
+					grep -q BOUND "$x" && IP=done
+				else
+					IP=done
+				fi
+			fi
 		done
 
+		for x in /run/net6-"${DEVICE}".conf /run/net6-*.conf ; do
+			[ -e "$x" ] && grep -q BOUND6 "$x" && IP6=done
+		done
+
+		# if we've reached a point where both IP and IP6 are "done",
+		# then we're finished with network configuration.
+		if [ "$IP" = done ] && [ "$IP6" = done ]; then
+			break
+		fi
+
+		sleep $(( $ROUNDTTT - 2 ))
+
 		case ${IP} in
-		none|off)
+		none|done|off)
 			# Do nothing
+			IP=done
 			;;
-		""|::::*|on|any|dhcp)
-			# if IP contains something other than BOOTIF; use that
+		""|::::*|on|any)
+			# if IP is of the form ::::*, and does not contain bootif use that
 			# interface to bring up the network.
-			if ! echo "${IP}" | grep -qc 'BOOTIF'; then
-				DEVICE="${IP#*:*:*:*:*:*}";
+			if echo "${IP}"| grep -vi bootif | grep -qe ".*:.*:.*:.*:.*:.*" ;  then
+				DEVICE="${IP#*:*:*:*:*:}";
+				DEVICE="${DEVICE%%:*}";
 			fi
 
 			# if we don't have a device specified, try to bring up
@@ -318,15 +336,8 @@ configure_networking()
 			fi
 
 			# Bring up device
-			for dev in "${DEVICE}"; do
+			for dev in ${DEVICE} ; do
 				dhclient -4 -1 -v "${dev}"
-				dhclient -6 -1 -v "${dev}"
-
-				# If we reach BOUND or BOUND6, break out -- we
-				# got an interface configured.
-				if grep -qc BOUND /run/net-${dev}.conf; then
-					break
-				fi
 			done
 
 			# At this point we should have configured an interface
@@ -334,7 +345,7 @@ configure_networking()
 			# last device we reached to source the results later.
 			DEVICE=$dev
 			;;
-		bootp|rarp|both)
+		dhcp|bootp|rarp|both)
 			ipconfig -t ${ROUNDTTT} -c ${IP} -d "${DEVICE}"
 			;;
 		*)
@@ -353,8 +364,40 @@ configure_networking()
 			fi
 			;;
 		esac
+
+		case ${IP6} in
+		""|none|done|off)
+			# Do nothing
+			IP6=done
+			;;
+		*)
+			# check the content of IP6, if we have something other
+			# than a device name there and BOOTIF isn't set, clear
+			# DEVICE6 and we'll try all available devices.
+			if echo "${IP6}" | grep -v '^\(on\|dhcp\|any\)$'; then
+				DEVICE6="$IP6"
+			fi
+
+			# if we don't have a device specified, try to bring up
+			# any eligible device.
+			if [ -z "${DEVICE6}" ]; then
+				DEVICE6=$(all_netbootable_devices)
+			fi
+
+			# Bring up device
+			for dev in ${DEVICE6} ; do
+				dhclient -6 -1 -v "${dev}"
+			done
+
+			# At this point we should have configured an interface
+			# properly, or none were suitable. Keep track of the
+			# last device we reached to source the results later.
+			DEVICE6=$dev
+			;;
+		esac
 	done
 
+	# IPv4/ipconfig only...
 	# source ipconfig output
 	if [ -n "${DEVICE}" ]; then
 		# source specific bootdevice
