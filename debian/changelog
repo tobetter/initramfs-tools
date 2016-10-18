@@ -1,3 +1,10 @@
+initramfs-tools (0.125ubuntu6.1) yakkety; urgency=medium
+
+  * scripts/functions: Revert configure_networking changes to the state at
+    0.125ubuntu3. (LP: #1631474)
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Tue, 18 Oct 2016 13:45:14 -0400
+
 initramfs-tools (0.125ubuntu6) yakkety; urgency=medium
 
   * Fix case where ip=dhcp and ip=:::::eth0 and other ip= instances exists on
