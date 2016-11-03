@@ -1,3 +1,14 @@
+initramfs-tools (0.125ubuntu8) zesty; urgency=medium
+
+  [ LaMont Jones ]
+  * Only source ipv4 config in configure_networking() if it exists.
+
+  [ Mathieu Trudel-Lapierre ]
+  * init: hey, we also need to actually will in IP6 with what someone passes
+    at the command-line in ip6=.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Thu, 03 Nov 2016 16:03:25 -0600
+
 initramfs-tools (0.125ubuntu7) zesty; urgency=medium
 
   * scripts/functions: for configure_networking:

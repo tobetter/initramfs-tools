@@ -398,15 +398,16 @@ configure_networking()
 	done
 
 	# IPv4/ipconfig only...
-	# source ipconfig output
-	if [ -n "${DEVICE}" ]; then
-		# source specific bootdevice
-		. /run/net-${DEVICE}.conf
-	else
-		# source any interface...
-		# ipconfig should have quit after first response
-		. /run/net-*.conf
-	fi
+	# source ipconfig output for either $DEVICE or the first one.
+	# If the user is booting with only IPv6, then DEVICE may be set,
+	# but no IPv4 conf files exist.
+	for conf in /run/net-${DEVICE}.conf /run/net-*.conf; do
+		if [ -e "${conf}" ]; then
+			# source specific bootdevice
+			. ${conf}
+			break
+		fi
+	done
 }
 
 # Wait for queued kernel/udev events
