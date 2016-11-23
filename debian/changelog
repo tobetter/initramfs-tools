@@ -1,3 +1,26 @@
+initramfs-tools (0.125ubuntu6.2) yakkety; urgency=medium
+
+  [ Mathieu Trudel-Lapierre ]
+  * scripts/functions: for configure_networking:
+    - split out IPv6 options in its own cmdline parameter: ip6= ; always use
+      dhclient in this case if the value set is anything other than 'off' or
+      'none'. Furthermore, parse anything other than 'on', 'dhcp' or 'any' as
+      the name of an interface. (LP: #1621507)
+    - rework the stop conditions so that we properly handle the ROUNDTTT loop,
+      timing out after a short period of time and trying again after a short
+      sleep.
+    - add a 'done' parameter for both ip= and ip6= so that we can properly
+      exit the ROUNDTTT loop once we know that either there is no work to do,
+      or that we've achieved what we wanted (that is, to bring up IPv4, IPv6,
+      or possibly both).
+    - return ip=dhcp to the ipconfig use case; if set, then ipconfig will be
+      run using any interface available, or the BOOTIF if it was set.
+
+  [ LaMont Jones ]
+  * Only source ipv4 config in configure_networking() if it exists.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Wed, 23 Nov 2016 15:45:47 -0500
+
 initramfs-tools (0.125ubuntu6.1) yakkety; urgency=medium
 
   * scripts/functions: Revert configure_networking changes to the state at
