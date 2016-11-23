@@ -43,6 +43,7 @@ export ROOTDELAY=
 export ROOTFLAGS=
 export ROOTFSTYPE=
 export IP=
+export IP6=
 export BOOT=
 export BOOTIF=
 export UBIMTD=
@@ -124,6 +125,9 @@ for x in $(cat /proc/cmdline); do
 		;;
 	ip=*)
 		IP="${x#ip=}"
+		;;
+	ip6=*)
+		IP6="${x#ip6=}"
 		;;
 	boot=*)
 		BOOT=${x#boot=}
@@ -315,6 +319,7 @@ unset ROOTFSTYPE
 unset ROOTDELAY
 unset ROOT
 unset IP
+unset IP6
 unset BOOT
 unset BOOTIF
 unset UBIMTD
