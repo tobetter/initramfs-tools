@@ -302,7 +302,10 @@ configure_networking()
 		done
 
 		for x in /run/net6-"${DEVICE}".conf /run/net6-*.conf ; do
-			[ -e "$x" ] && grep -q BOUND6 "$x" && IP6=done
+			if [ -e "$x" ]; then
+				IP6=done
+				break
+			fi
 		done
 
 		# if we've reached a point where both IP and IP6 are "done",
