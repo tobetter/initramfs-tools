@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu4.5) trusty; urgency=medium
+
+  [ Timo Aaltonen ]
+  * hooks/framebuffer: Copy kernel/ubuntu/i915 backport driver too.
+    (LP: #1500751)
+
+ -- Brian Murray <brian@ubuntu.com>  Wed, 07 Dec 2016 01:27:28 -0800
+
 initramfs-tools (0.103ubuntu4.4) trusty; urgency=low
 
   * Backport Xenial driver lists (LP: #1608622):
