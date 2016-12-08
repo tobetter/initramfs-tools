@@ -1,3 +1,10 @@
+initramfs-tools (0.122ubuntu8.7) xenial; urgency=medium
+
+  * scripts/functions: clean up configure_networking and the function
+    all_netbootable_interfaces to not have side-effects. (LP: #1621507)
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Thu, 08 Dec 2016 18:01:45 +0100
+
 initramfs-tools (0.122ubuntu8.6) xenial; urgency=medium
 
   [ Mathieu Trudel-Lapierre ]

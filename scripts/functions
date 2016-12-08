@@ -196,14 +196,17 @@ get_fstype ()
 
 all_netbootable_devices()
 {
+	local NETBOOTABLE
+	NETBOOTABLE=""
+
 	for device in /sys/class/net/* ; do
-		if [ ! -e $device/flags ]; then
+		if [ ! -e "$device/flags" ]; then
 			continue
 		fi
 
-		loop=$(($(cat $device/flags) & 0x8 && 1 || 0))
-		bc=$(($(cat $device/flags) & 0x2 && 1 || 0))
-		ptp=$(($(cat $device/flags) & 0x10 && 1 || 0))
+		loop=$(($(cat "$device/flags") & 0x8 && 1 || 0))
+		bc=$(($(cat "$device/flags") & 0x2 && 1 || 0))
+		ptp=$(($(cat "$device/flags") & 0x10 && 1 || 0))
 
 		# Skip any device that is a loopback
 		if [ $loop = 1 ]; then
@@ -216,10 +219,10 @@ all_netbootable_devices()
 			continue
 		fi
 
-		DEVICE="$DEVICE $(basename $device)"
+		NETBOOTABLE="$NETBOOTABLE $(basename $device)"
 	done
 
-	echo $DEVICE
+	echo "$NETBOOTABLE"
 }
 
 configure_networking()
@@ -280,7 +283,10 @@ configure_networking()
 		done
 
 		for x in /run/net6-"${DEVICE}".conf /run/net6-*.conf ; do
-			[ -e "$x" ] && grep -q BOUND6 "$x" && IP6=done
+			if [ -e "$x" ]; then
+				IP6=done
+				break
+			fi
 		done
 
 		# if we've reached a point where both IP and IP6 are "done",
@@ -330,7 +336,7 @@ configure_networking()
 			# check the content of IP6, if we have something other
 			# than a device name there and BOOTIF isn't set, clear
 			# DEVICE6 and we'll try all available devices.
-			if echo "${IP6}" | grep -v '^\(on\|dhcp\|any\)$'; then
+			if echo "${IP6}" | grep -qv '^\(on\|dhcp\|any\)$'; then
 				DEVICE6="$IP6"
 			fi
 
@@ -344,8 +350,6 @@ configure_networking()
 			for dev in ${DEVICE6} ; do
 				dhclient -6 -1 -v "${dev}"
 			done
-
-			DEVICE6=$dev
 			;;
 		esac
 	done
