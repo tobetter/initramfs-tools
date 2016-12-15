@@ -73,11 +73,6 @@ manual_add_modules()
 
 		copy_file module "${kmod}" || continue
 
-		# Add detached signature if present
-		if [ -f "${kmod}.sig" ]; then
-			copy_file module "${kmod}.sig"
-		fi
-
 		# Add required firmware
 		for firmware in $(modinfo -k "${version}" -F firmware "${kmod}"); do
 			if [ -e "${DESTDIR}/lib/firmware/${firmware}" ] \
@@ -154,7 +149,7 @@ copy_file() {
 		# Copy the link target if it doesn't already exist
 		src="${link_target}"
 		target="${link_target}"
-		[ -e "${DESTDIR}/${target}" ] && return 1
+		[ -e "${DESTDIR}/${target}" ] && return 0
 		mkdir -p "${DESTDIR}/${target%/*}"
 	fi
 
@@ -540,6 +535,8 @@ auto_add_modules()
 			copy_modules_dir kernel/drivers/bus
 			copy_modules_dir kernel/drivers/clk
 			copy_modules_dir kernel/drivers/gpio
+			copy_modules_dir kernel/drivers/i2c/busses
+			copy_modules_dir kernel/drivers/i2c/muxes
 			copy_modules_dir kernel/drivers/phy
 			copy_modules_dir kernel/drivers/pinctrl
 			copy_modules_dir kernel/drivers/regulator

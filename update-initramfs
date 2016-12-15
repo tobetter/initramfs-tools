@@ -56,19 +56,6 @@ EOF
 	exit 1
 }
 
-# chroot check
-chrooted()
-{
-	# borrowed from udev's postinst
-	if [ "$(stat -c %d/%i /)" = "$(stat -Lc %d/%i /proc/1/root 2>/dev/null)" ]; then
-		# the devicenumber/inode pair of / is the same as that of
-		# /sbin/init's root, so we're *not* in a chroot and hence
-		# return false.
-		return 1
-	fi
-return 0
-}
-
 mild_panic()
 {
 	if [ -n "${1:-}" ]; then
@@ -213,7 +200,7 @@ delete_sha1()
 ro_boot_check()
 {
 	# check irrelevant inside of a chroot
-	if [ ! -r /proc/mounts ] || chrooted; then
+	if [ ! -r /proc/mounts ] || ischroot; then
 		return 0
 	fi
 
