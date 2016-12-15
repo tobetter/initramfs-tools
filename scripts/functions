@@ -296,16 +296,16 @@ configure_networking()
 		# creating the file, ipconfig is not run again.
 		for x in /run/net-"${DEVICE}".conf /run/net-*.conf ; do
 			if [ -e "$x" ]; then
-				if grep -q reason "$x"; then
-					grep -q BOUND "$x" && IP=done
-				else
-					IP=done
-				fi
+				IP=done
+				break
 			fi
 		done
 
 		for x in /run/net6-"${DEVICE}".conf /run/net6-*.conf ; do
-			[ -e "$x" ] && grep -q BOUND6 "$x" && IP6=done
+			if [ -e "$x" ]; then
+				IP6=done
+				break
+			fi
 		done
 
 		# if we've reached a point where both IP and IP6 are "done",
@@ -314,36 +314,14 @@ configure_networking()
 			break
 		fi
 
-		sleep $(( $ROUNDTTT - 2 ))
-
 		case ${IP} in
 		none|done|off)
 			# Do nothing
 			IP=done
 			;;
-		""|::::*|on|any)
-			# if IP is of the form ::::*, and does not contain bootif use that
-			# interface to bring up the network.
-			if echo "${IP}"| grep -vi bootif | grep -qe ".*:.*:.*:.*:.*:.*" ;  then
-				DEVICE="${IP#*:*:*:*:*:}";
-				DEVICE="${DEVICE%%:*}";
-			fi
-
-			# if we don't have a device specified, try to bring up
-			# any eligible device.
-			if [ -z "${DEVICE}" ]; then
-				DEVICE=$(all_netbootable_devices)
-			fi
-
+		""|on|any)
 			# Bring up device
-			for dev in ${DEVICE} ; do
-				dhclient -4 -1 -v "${dev}"
-			done
-
-			# At this point we should have configured an interface
-			# properly, or none were suitable. Keep track of the
-			# last device we reached to source the results later.
-			DEVICE=$dev
+			ipconfig -t ${ROUNDTTT} "${DEVICE}"
 			;;
 		dhcp|bootp|rarp|both)
 			ipconfig -t ${ROUNDTTT} -c ${IP} -d "${DEVICE}"
@@ -371,6 +349,9 @@ configure_networking()
 			IP6=done
 			;;
 		*)
+			# if this is not the first loop, sleep to provide the backoff.
+			[ "$(($ROUNDTTT-2))" = "0" ] || sleep $ROUNDTTT
+
 			# check the content of IP6, if we have something other
 			# than a device name there and BOOTIF isn't set, clear
 			# DEVICE6 and we'll try all available devices.
@@ -389,15 +370,11 @@ configure_networking()
 				dhclient -6 -1 -v "${dev}"
 			done
 
-			# At this point we should have configured an interface
-			# properly, or none were suitable. Keep track of the
-			# last device we reached to source the results later.
 			DEVICE6=$dev
 			;;
 		esac
 	done
 
-	# IPv4/ipconfig only...
 	# source ipconfig output for either $DEVICE or the first one.
 	# If the user is booting with only IPv6, then DEVICE may be set,
 	# but no IPv4 conf files exist.

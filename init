@@ -319,6 +319,7 @@ unset ROOTFSTYPE
 unset ROOTDELAY
 unset ROOT
 unset IP
+unset IP6
 unset BOOT
 unset BOOTIF
 unset UBIMTD
