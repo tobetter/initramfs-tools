@@ -28,17 +28,6 @@ if [ ! -r /proc/swaps ]; then
 	exit 0
 fi
 
-# This is borrowed from udev's postinst
-chrooted() {
-	if [ "$(stat -c %d/%i /)" = "$(stat -Lc %d/%i /proc/1/root 2>/dev/null)" ]; then
-		# the devicenumber/inode pair of / is the same as that of
-		# /sbin/init's root, so we're *not* in a chroot and hence
-		# return false.
-		return 1
-	fi
-	return 0
-}
-
 # Try to autodetect the RESUME partition, using biggest swap?
 RESUME=$(grep ^/dev/ /proc/swaps | sort -rk3 | head -n 1 | cut -d " " -f 1)
 if [ -n "$RESUME" ]; then
@@ -49,6 +38,6 @@ if [ -n "$RESUME" ]; then
 fi
 
 # Write detected resume to intramfs conf.d/resume if not in a chroot
-if [ -n "${RESUME}" ] && ! chrooted; then
+if [ -n "${RESUME}" ] && ! ischroot; then
 	echo "RESUME=${RESUME}" > ${DESTDIR}/conf/conf.d/resume
 fi

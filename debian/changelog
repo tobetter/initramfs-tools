@@ -1,3 +1,44 @@
+initramfs-tools (0.126) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * [0b2266e] bash-completion: Fix installation of update-initramfs completion
+    script.  Thanks to Stephan Suerken <absurd@debian.org>.  (Closes: #824385)
+  * [7d875ad] Revert "hook-functions: Add detached module signatures if present"
+  * [b0a5f26] update-initramfs, hooks/resume: Use ischroot command instead of
+    our own function
+  * [385e3fc] hook-functions: Make copy_file return 0 on creating a link to an
+    existing file (Closes: #847325)
+  * [82f4bcf] Fix initramfs.conf move to ensure default values are upgraded.
+    Thanks to Andreas Beckmann <anbe@debian.org> (Closes: #822671, #825929)
+  * [d9f77c1] Remove obsolete bash-completion file on upgrade.
+    Thanks to Andreas Beckmann <anbe@debian.org>
+  * [4a10868] Remove code that prunes 'broken' symlinks and sometimes /etc/mtab
+    (Closes: #845581)
+  * [dc2323f] auto_add_modules: Add all I2C bus and mux drivers when
+    MODULES=most (Closes: #825687)
+  * [811f408] maintainer-notes.html: Update 'git buildpackage' commands to use
+    gbp too
+  * [cd33566] maintainer-notes.html: Fix post-clean option to gbp buildpackage
+  * [f54d7f0] Use debhelper compatibility level 9
+  * [5221375] debian/control: Update Standards-Version to 3.9.8; no changes
+    needed
+  * [c48108d] Revert "initramfs-tools: Install script to be invoked by
+    linux-signed postinst"
+  * [12744eb] unmkinitramfs: Rewrite command syntax
+  * [c7f241f] unmkinitramfs: Unpack early and main cpio archives in separate
+    directories
+  * [b804348] initramfs-tools: Remove obsolete linux-signed postinst script on
+    upgrade
+
+  [ Michael Prokop ]
+  * [30dfbbd] mkinitramfs: consider *.conf files only, also from
+    /lib/modprobe.d/ + don't complain about empty dirs (Closes: #829280)
+
+  [ Kevin Locke ]
+  * [f1f18a4] Create unmkinitramfs command
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Thu, 15 Dec 2016 22:43:05 +0000
+
 initramfs-tools (0.125) unstable; urgency=medium
 
   * [74597dd] update-initramfs: Remove $USETRIGGERS variable and condition

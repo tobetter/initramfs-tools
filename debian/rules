@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh --with bash-completion $@
+	dh $@ --with bash-completion
 
 # On Debian we can use either busybox or busybox-static, but on Ubuntu
 # and derivatives only busybox-initramfs will work.

@@ -3,8 +3,8 @@ Section: utils
 Priority: optional
 Uploaders: maximilian attems <maks@debian.org>, Michael Prokop <mika@debian.org>, Adam Conrad <adconrad@0c3.net>, Ben Hutchings <ben@decadent.org.uk>
 Maintainer: Debian kernel team <debian-kernel@lists.debian.org>
-Build-Depends: debhelper (>= 7.0), bash-completion
-Standards-Version: 3.9.6
+Build-Depends: debhelper (>= 9), bash-completion
+Standards-Version: 3.9.8
 Vcs-Browser: https://anonscm.debian.org/cgit/kernel/initramfs-tools.git
 Vcs-Git: https://anonscm.debian.org/git/kernel/initramfs-tools.git
 

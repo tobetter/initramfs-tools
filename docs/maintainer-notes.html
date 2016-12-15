@@ -217,7 +217,7 @@ any stale remote branches locally by executing:
 
 <li>Build package:
 <pre>
-<b>% git buildpackage --git-ignore-new --git-debian-branch=&quot;$(git branch | awk -F\*\&nbsp;&nbsp;'/^* / { print $2}' )&quot; -tc</b>
+<b>% gbp buildpackage --git-ignore-new --git-debian-branch=&quot;$(git branch | awk -F\*\&nbsp;&nbsp;'/^* / { print $2}' )&quot; --post-clean</b>
 </pre>
 </li>
 
@@ -239,7 +239,7 @@ any stale remote branches locally by executing:
 
 <li>Build package:
 <pre>
-<b>% git buildpackage --git-debian-branch=&quot;$(git branch | awk -F\*\&nbsp;&nbsp;'/^* / { print $2}' )&quot; -tc [-us -uc]</b>
+<b>% gbp buildpackage --git-debian-branch=&quot;$(git branch | awk -F\*\&nbsp;&nbsp;'/^* / { print $2}' )&quot; --post-clean [-us -uc]</b>
 </pre>
 </li>
 
