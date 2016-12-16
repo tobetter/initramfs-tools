@@ -1,3 +1,11 @@
+initramfs-tools (0.103ubuntu4.6) trusty; urgency=medium
+
+  [ Andy Whitcroft ]
+  * hook-functions: firmware -- copy symlink components into initramfs
+    (LP: #1496163)
+
+ -- Philipp Kern <pkern@ubuntu.com>  Fri, 16 Dec 2016 09:02:52 -0800
+
 initramfs-tools (0.103ubuntu4.5) trusty; urgency=medium
 
   [ Timo Aaltonen ]

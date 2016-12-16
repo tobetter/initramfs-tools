@@ -115,7 +115,7 @@ manual_add_modules()
 			if ! [ -d "$target_dir" ]; then
 				mkdir -p "$target_dir"
 			fi
-			cp -a "$firmware" "$target_dir"
+			cp -aL "$firmware" "$target_dir"
 			if [ "${verbose}" = "y" ]; then
 				echo "Adding firmware ${firmware}"
 			fi
