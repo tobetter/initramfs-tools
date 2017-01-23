@@ -24,7 +24,10 @@ xcpio()
 		lzop -c -d "$archive"
 	# Ignoring other data, which may be garbage at the end of the file
 	fi | (
-		test -z "$dir" || { mkdir -p -- "$dir" && cd -- "$dir"; }
+		if [ -n "$dir" ]; then
+			mkdir -p -- "$dir"
+			cd -- "$dir"
+		fi
 		cpio "$@"
 	)
 }
@@ -72,7 +75,10 @@ splitinitramfs()
 	if [ $offset -ne 0 ]; then
 		# uncompressed archive
 		(
-			test -z "$dir" || { mkdir -p -- "$dir/early" && cd -- "$dir/early"; }
+			if [ -n "$dir" ]; then
+				mkdir -p -- "$dir/early"
+				cd -- "$dir/early"
+			fi
 			cpio -i "$@"
 		) < "$initramfs"
 
@@ -81,7 +87,7 @@ splitinitramfs()
 		trap "rm -f '$subarchive'" EXIT
 		dd < "$initramfs" bs="$offset" skip=1 2> /dev/null \
 			> $subarchive
-		xcpio "$subarchive" "$dir/main" -i "$@"
+		xcpio "$subarchive" "${dir:+$dir/main}" -i "$@"
 	else
 		xcpio "$initramfs" "$dir" -i "$@"
 	fi
