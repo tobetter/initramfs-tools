@@ -1,3 +1,12 @@
+initramfs-tools (0.127) unstable; urgency=medium
+
+  * [251adae] unmkinitramfs: Don't attempt to create /main directory when
+    listing (Closes: #848423)
+  * [3714d5b] unmkinitramfs: Change mkdir/cd/cpio command sequences to exit on
+    failure
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Mon, 23 Jan 2017 03:42:36 +0000
+
 initramfs-tools (0.126) unstable; urgency=medium
 
   [ Ben Hutchings ]
