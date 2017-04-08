@@ -9,6 +9,7 @@ BUSYBOX_PACKAGES := $(shell if dpkg-vendor --derives-from ubuntu; then echo busy
 BUSYBOX_MIN_VERSION := 1:1.22.0-17~
 
 override_dh_gencontrol:
+	echo >> debian/initramfs-tools-core.substvars "busybox:Breaks=$(wordlist 2,100,$(BUSYBOX_PACKAGES:%=, % (<< $(BUSYBOX_MIN_VERSION))))"
 	echo >> debian/initramfs-tools-core.substvars "busybox:Recommends=$(wordlist 2,100,$(BUSYBOX_PACKAGES:%=| % (>= $(BUSYBOX_MIN_VERSION))))"
 	dh_gencontrol
 
