@@ -27,7 +27,7 @@ Multi-Arch: foreign
 Recommends: ${busybox:Recommends}
 Depends: klibc-utils (>= 2.0.4-8~), cpio, kmod | module-init-tools, udev, ${misc:Depends}
 Suggests: bash-completion
-Breaks: initramfs-tools (<< 0.121~)
+Breaks: initramfs-tools (<< 0.121~), ${busybox:Breaks}
 Replaces: initramfs-tools (<< 0.121~)
 Description: generic modular initramfs generator (core tools)
  This package contains the mkinitramfs program that can be used to

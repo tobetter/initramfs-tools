@@ -8,6 +8,14 @@ local_top()
 		[ "$quiet" != "y" ] && log_end_msg
 	fi
 	local_top_used=yes
+
+	# Start time for measuring elapsed time in local_device_setup
+	if [ -z "${local_top_time}" ]; then
+		local_top_time="$(cat /proc/uptime)"
+		local_top_time="${local_top_time%%[. ]*}"
+		local_top_time=$((local_top_time + 1)) # round up
+		export local_top_time
+	fi
 }
 
 local_block()
@@ -36,16 +44,21 @@ local_bottom()
 	fi
 	local_premount_used=no
 	local_top_used=no
+	unset local_top_time
 }
 
 # $1=device ID to mount
 # $2=optionname (for root and etc)
+# $3=panic if device is missing (true or false, default: true)
 # Sets $DEV to the resolved device node
 local_device_setup()
 {
 	local dev_id="$1"
 	local name="$2"
+	local may_panic="${3:-true}"
 	local real_dev
+	local time_elapsed
+	local count
 
 	wait_for_udev 10
 
@@ -71,7 +84,7 @@ local_device_setup()
 	# there are devices stacked on top of those.
 	if ! real_dev=$(resolve_device "${dev_id}") ||
 	   ! get_fstype "${real_dev}" >/dev/null; then
-		log_begin_msg "Waiting for ${name} file system"
+		log_begin_msg "Waiting for ${name}"
 
 		# Timeout is max(30, rootdelay) seconds (approximately)
 		slumber=30
@@ -81,15 +94,38 @@ local_device_setup()
 
 		while true; do
 			sleep 1
+			time_elapsed="$(cat /proc/uptime)"
+			time_elapsed="${time_elapsed%%[. ]*}"
+			time_elapsed=$((time_elapsed - local_top_time))
+
 			local_block "${dev_id}"
+
+			# If mdadm's local-block script counts the
+			# number of times it is run, make sure to
+			# run it the expected number of times.
+			while true; do
+				if [ -f /run/count.mdadm.initrd ]; then
+					count="$(cat /run/count.mdadm.initrd)"
+				elif [ -n "${count}" ]; then
+					# mdadm script deleted it; put it back
+					count=$((count + 1))
+					echo "${count}" >/run/count.mdadm.initrd
+				else
+					break
+				fi
+				if [ ${count} -ge ${time_elapsed} ]; then
+					break;
+				fi
+				/scripts/local-block/mdadm "${dev_id}"
+			done
+
 			if real_dev=$(resolve_device "${dev_id}") &&
 			   get_fstype "${real_dev}" >/dev/null; then
 				wait_for_udev 10
 				log_end_msg 0
 				break
 			fi
-			slumber=$(( ${slumber} - 1 ))
-			if [ ${slumber} -eq 0 ]; then
+			if [ ${time_elapsed} -ge ${slumber} ]; then
 				log_end_msg 1 || true
 				break
 			fi
@@ -99,6 +135,10 @@ local_device_setup()
 	# We've given up, but we'll let the user fix matters if they can
 	while ! real_dev=$(resolve_device "${dev_id}") ||
 	      ! get_fstype "${real_dev}" >/dev/null; do
+		if ! $may_panic; then
+			echo "Gave up waiting for ${name}"
+			return 1
+		fi
 		echo "Gave up waiting for ${name} device.  Common problems:"
 		echo " - Boot args (cat /proc/cmdline)"
 		echo "   - Check rootdelay= (did the system wait long enough?)"
@@ -115,7 +155,7 @@ local_device_setup()
 local_mount_root()
 {
 	local_top
-	local_device_setup "${ROOT}" root
+	local_device_setup "${ROOT}" "root file system"
 	ROOT="${DEV}"
 
 	# Get the root filesystem type if not set
@@ -151,7 +191,7 @@ local_mount_fs()
 {
 	read_fstab_entry "$1"
 
-	local_device_setup "$MNT_FSNAME" "$1"
+	local_device_setup "$MNT_FSNAME" "$1 file system"
 	MNT_FSNAME="${DEV}"
 
 	local_premount
