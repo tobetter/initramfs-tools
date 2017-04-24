@@ -1,3 +1,24 @@
+initramfs-tools (0.129) unstable; urgency=medium
+
+  * Some systems that do not support suspend-to-disk (hibernation) will
+    require a configuration change to explicitly disable this.
+
+    From version 0.128, the boot code waits for a suspend/resume device
+    to appear, rather than checking just once.  If the configured or
+    automatically selected resume device is not available at boot time,
+    this results in a roughly 30 second delay.
+
+    You should set the RESUME variable in
+    /etc/initramfs-tools/conf.d/resume or
+    /etc/initramfs-tools/initramfs.conf to one of:
+
+    - auto - select the resume device automatically
+    - none - disable use of a resume device
+    - UUID=<uuid> - use a specific resume device (by UUID)
+    - /dev/<name> - use a specific resume device (by kernel name)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Thu, 20 Apr 2017 23:21:32 +0100
+
 initramfs-tools (0.121~rc1) unstable; urgency=medium
 
   * If initramfs-tools is configured to use busybox but it is not

@@ -1,3 +1,22 @@
+initramfs-tools (0.129) unstable; urgency=medium
+
+  * [71cfb7f] hooks/resume: Use correct sort options to select the biggest swap
+    partition
+  * [7da8194] initramfs.conf(5): Clean up split between general and NFS
+    variables
+  * [d857e91] Support setting of RESUME in initramfs.conf or anywhere in conf.d/
+  * [786e4aa] initramfs.conf(5): Document the RESUME variable
+  * [7106c3e] hooks/resume: Check for chroot earlier
+  * [433e1ca] Allow disabling resume from disk at build time by setting
+    RESUME=none
+  * [8108a17] Support requesting automatic selection of resume device with
+    RESUME=auto
+  * [aaaa6b5] hooks/resume: Report when we might be doing something surprising
+  * [995b556] NEWS: Add entry explaining the need for RESUME=none on some
+    systems (Closes: #860403)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Mon, 24 Apr 2017 01:06:21 +0100
+
 initramfs-tools (0.128) unstable; urgency=medium
 
   * [cd352e8] debian/control: Add Breaks against older versions of busybox

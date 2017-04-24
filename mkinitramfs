@@ -205,6 +205,7 @@ export verbose
 export KEYMAP
 export MODULES
 export BUSYBOX
+export RESUME
 
 # Private, used by 'catenate_cpiogz'.
 export __TMPCPIOGZ
