@@ -189,8 +189,8 @@ if [ -z "${BOOT}" ]; then
 	BOOT=local
 fi
 
-if [ -n "${noresume}" ]; then
-	export noresume
+if [ -n "${noresume}" ] || [ "$RESUME" = none ]; then
+	export noresume=y
 	unset resume
 else
 	resume=${RESUME:-}
