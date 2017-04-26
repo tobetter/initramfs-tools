@@ -15,10 +15,16 @@ prereqs)
 	;;
 esac
 
-# First check if a location is set and is a valid swap partition
+. /usr/share/initramfs-tools/scripts/functions
+
+# First check if a location is set and is a valid swap partition.
+# If so, the config file will be copied in and there is nothing to do.
 if [ -n "$RESUME" ] && [ "$RESUME" != auto ]; then
-	if [ "$RESUME" = none ] || blkid -p -n swap $RESUME >/dev/null 2>&1; then
-		# As mkinitramfs copies the config file nothing to do.
+	if [ "$RESUME" = none ]; then
+		exit 0
+	fi
+	if resume_dev_node="$(resolve_device "$RESUME")" && \
+	   blkid -p -n swap "$resume_dev_node" >/dev/null 2>&1; then
 		exit 0
 	fi
 
