@@ -447,6 +447,8 @@ auto_add_modules()
 		copy_modules_dir kernel/drivers/net \
 			appletalk arcnet bonding can hamradio irda pcmcia \
 			tokenring usb wan wimax wireless
+		# Ubuntu backported bnxt driver
+		copy_modules_dir kernel/ubuntu/bnxt
 	;;
 	ide)
 		copy_modules_dir kernel/drivers/ide
