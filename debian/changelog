@@ -1,3 +1,9 @@
+initramfs-tools (0.125ubuntu10) artful; urgency=low
+
+  * hook-functions: include backported bnxt driver. (LP: #1712491)
+
+ -- Andy Whitcroft <apw@ubuntu.com>  Wed, 30 Aug 2017 11:28:51 +0100
+
 initramfs-tools (0.125ubuntu9) zesty; urgency=medium
 
   [ Mathieu Trudel-Lapierre ]
