@@ -564,6 +564,8 @@ auto_add_modules()
 				macvtap.ko pcmcia sb1000.ko team tokenring \
 				tun.ko usb veth.ko wan wimax wireless \
 				xen-netback.ko
+			# Ubuntu backported bnxt driver
+			copy_modules_dir kernel/ubuntu/bnxt
 		;;
 		ide)
 			copy_modules_dir kernel/drivers/ide
