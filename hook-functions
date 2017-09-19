@@ -310,7 +310,8 @@ dep_add_modules()
 		fi
 		# luks or lvm on cciss or ida
 		if [ "${block#cciss}" != "${block}" ] \
-		|| [ "${block#ida}" != "${block}" ]; then
+		|| [ "${block#ida}" != "${block}" ] \
+		|| [ "${block#nvme}" != "${block}" ]; then
 			block="${block%p*}"
 		else
 			block=${block%%[0-9]*}
