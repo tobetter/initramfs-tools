@@ -37,6 +37,9 @@ endif
 
 override_dh_auto_build:
 	make -C src $(CROSS)
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	./tests/run-tests
+endif
 
 override_dh_auto_clean:
 	make -C src clean

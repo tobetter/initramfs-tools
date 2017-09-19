@@ -1,3 +1,10 @@
+initramfs-tools (0.125ubuntu11) artful; urgency=medium
+
+  * hook-functions, mkinitramfs, scripts/functions: support usage of dns
+    after configure_networking. (LP: #1714308)
+
+ -- Scott Moser <smoser@ubuntu.com>  Tue, 19 Sep 2017 12:54:18 -0400
+
 initramfs-tools (0.125ubuntu10) artful; urgency=low
 
   * hook-functions: include backported bnxt driver. (LP: #1712491)

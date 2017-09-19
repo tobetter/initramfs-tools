@@ -787,3 +787,33 @@ run_scripts_optional()
 	call_scripts_optional=y
 	run_scripts "$@"
 }
+
+add_dns() {
+	local destdir="$1" nsswitch="" lib="" libdir="" f="" d=""
+	# find the multiarch lib dir (for example /lib/x86_64-linux-gnu)
+	# by finding a directory with libc.so.6.
+	for d in /lib/* /lib; do
+		for f in "$d"/libc.so.?; do [ -f "$f" ] && break; done
+		[ -f "$f" ] && libdir="$d" && break
+	done
+	if [ -z "$libdir" ]; then
+		echo "WARNING: no libdir found for adding dns." 1>&2
+		return
+	fi
+	nsswitch="$destdir/etc/nsswitch.conf"
+	if ! grep -qs "^hosts:" "$nsswitch"; then
+		echo "hosts: files dns" >> "$nsswitch"
+	fi
+	local found=""
+	for lib in libnss_files libnss_dns libresolv; do
+		found=""
+		for f in "$libdir/$lib.so".?; do
+			[ -e "$f" ] || continue
+			[ "$verbose" = "y" ] && echo "dns: $lib: $f"
+			copy_file library "$f"
+			found="$f"
+		done
+		[ -n "$found" ] || echo "WARNING: no $libdir/$lib.? file" 1>&2
+	done
+	return 0
+}
