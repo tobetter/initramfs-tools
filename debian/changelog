@@ -1,3 +1,10 @@
+initramfs-tools (0.103ubuntu4.8) trusty; urgency=medium
+
+  * hook-functions: handle lvm-on-nvme case.
+    (LP: #1718055)
+
+ -- Dan Streetman <dan.streetman@canonical.com>  Tue, 19 Sep 2017 11:03:43 -0400
+
 initramfs-tools (0.103ubuntu4.7) trusty; urgency=medium
 
   * hook-functions: copy xhci-plat-hcd also.
