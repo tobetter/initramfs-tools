@@ -350,6 +350,10 @@ if [ ! -e "${DESTDIR}/bin/sh" ]; then
 	copy_exec /bin/sh "${DESTDIR}/bin/"
 fi
 
+case "${MODULES}" in
+	netboot|most) add_dns "${DESTDIR}/";;
+esac
+
 # Remove any looping or broken symbolic links, since they break cpio.
 [ "${verbose}" = y ] && xargs_verbose="-t"
 (cd "${DESTDIR}" && find . -type l -printf '%p %Y\n' | sed -n 's/ [LN]$//p' \
