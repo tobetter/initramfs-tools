@@ -1,3 +1,9 @@
+initramfs-tools (0.125ubuntu12) artful; urgency=medium
+
+  * hook-functions: include vmd driver. (LP: #1703339)
+
+ -- Seth Forshee <seth.forshee@canonical.com>  Fri, 13 Oct 2017 14:09:26 -0500
+
 initramfs-tools (0.125ubuntu11) artful; urgency=medium
 
   * hook-functions, mkinitramfs, scripts/functions: support usage of dns
