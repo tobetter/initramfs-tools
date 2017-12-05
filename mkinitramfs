@@ -163,10 +163,26 @@ if [ ! -e "${MODULESDIR}/modules.dep" ]; then
 	depmod ${version}
 fi
 
+# Prepare to clean up temporary files on exit
+DESTDIR=
+__TMPCPIOGZ=
+__TMPEARLYCPIO=
+clean_on_exit() {
+	if [ "${keep}" = "y" ]; then
+		echo "Working files in ${DESTDIR:-<not yet created>}, early initramfs in ${__TMPEARLYCPIO:-<not yet created>} and overlay in ${__TMPCPIOGZ:-<not yet created>}"
+	else
+		for path in "${DESTDIR}" "${__TMPCPIOGZ}" "${__TMPEARLYCPIO}"; do
+			test -z "${path}" || rm -rf "${path}"
+		done
+	fi
+}
+trap clean_on_exit EXIT
+trap "exit 1" INT TERM	# makes the EXIT trap effective even when killed
+
+# Create temporary directory and files for initramfs contents
 [ -n "${TMPDIR}" ] && [ ! -w "${TMPDIR}" ] && unset TMPDIR
 DESTDIR="$(mktemp -d ${TMPDIR:-/var/tmp}/mkinitramfs_XXXXXX)" || exit 1
 chmod 755 "${DESTDIR}"
-
 __TMPCPIOGZ="$(mktemp ${TMPDIR:-/var/tmp}/mkinitramfs-OL_XXXXXX)" || exit 1
 __TMPEARLYCPIO="$(mktemp ${TMPDIR:-/var/tmp}/mkinitramfs-FW_XXXXXX)" || exit 1
 
@@ -385,14 +401,6 @@ fi
 
 if [ -s "${__TMPCPIOGZ}" ]; then
 	cat "${__TMPCPIOGZ}" >>"${outfile}" || exit 1
-fi
-
-if [ "${keep}" = "y" ]; then
-	echo "Working files in ${DESTDIR}, early initramfs in ${__TMPEARLYCPIO} and overlay in ${__TMPCPIOGZ}"
-else
-	rm -rf "${DESTDIR}"
-	rm -rf "${__TMPCPIOGZ}"
-	rm -rf "${__TMPEARLYCPIO}"
 fi
 
 exit 0
