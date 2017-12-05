@@ -1,3 +1,10 @@
+initramfs-tools (0.122ubuntu8.10) xenial; urgency=medium
+
+  * mkinitramfs: Delete or report temporary files in /var/tmp/ on failure.
+    (LP: #1713004)
+
+ -- Brian Murray <brian@ubuntu.com>  Tue, 05 Dec 2017 11:17:43 -0800
+
 initramfs-tools (0.122ubuntu8.9) xenial; urgency=low
 
   * hook-functions: include backported bnxt driver. (LP: #1712491)
