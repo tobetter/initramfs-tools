@@ -1,3 +1,11 @@
+initramfs-tools (0.122ubuntu8.11) xenial; urgency=medium
+
+  [ Oliver Grawert ]
+  * make fixrtc catch "n/a" string and fall back to a sane value for the date
+    command instead (LP: #1623125)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Wed, 20 Dec 2017 09:38:07 +0100
+
 initramfs-tools (0.122ubuntu8.10) xenial; urgency=medium
 
   * mkinitramfs: Delete or report temporary files in /var/tmp/ on failure.
