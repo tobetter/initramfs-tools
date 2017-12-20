@@ -1,3 +1,11 @@
+initramfs-tools (0.125ubuntu13) bionic; urgency=medium
+
+  [ Oliver Grawert ]
+  * make fixrtc catch "n/a" string and fall back to a sane value for the date
+    command instead (LP: #1623125)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Wed, 20 Dec 2017 09:44:43 +0100
+
 initramfs-tools (0.125ubuntu12) artful; urgency=medium
 
   * hook-functions: include vmd driver. (LP: #1703339)
