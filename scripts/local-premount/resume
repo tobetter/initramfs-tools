@@ -22,13 +22,19 @@ fi
 . /scripts/functions
 . /scripts/local
 
-if ! local_device_setup ${resume} "suspend/resume device" false; then
-	exit 0
-fi
+SWAPTYPE=$(wait-for-root "${resume}" ${RESUMEDELAY:-5})
 
-# hardcode path, uswsusp ships an resume binary too
-if [ -n "${resume_offset}" ]; then
-	/bin/resume ${DEV} ${resume_offset}
-else
-	/bin/resume ${DEV}
-fi
+case "${SWAPTYPE}" in
+    swsuspend|s1suspend|s2suspend|ulsuspend|tuxonice)
+	if [ -x /bin/plymouth ] && plymouth --ping; then
+		plymouth message --text="Resuming from $resume"
+	fi
+
+	# hardcode path, uswsusp ships an resume binary too
+	if [ -n "${resume_offset}" ]; then
+		/bin/resume ${DEV} ${resume_offset}
+	else
+		/bin/resume ${DEV}
+	fi
+	;;
+esac
