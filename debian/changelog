@@ -1,3 +1,9 @@
+initramfs-tools (0.130ubuntu2) bionic; urgency=medium
+
+  * Include mlx4 and mlx5 InfiniBand modules (Closes: #871595, LP: #1719302)
+
+ -- Benjamin Drung <bdrung@ubuntu.com>  Sat, 27 Jan 2018 12:51:45 +0100
+
 initramfs-tools (0.130ubuntu1) bionic; urgency=medium
 
   * Merge from Debian unstable. Remaining delta:
