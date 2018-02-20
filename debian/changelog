@@ -1,3 +1,9 @@
+initramfs-tools (0.130ubuntu3) bionic; urgency=medium
+
+  * Fix resuming a hibernate session from a swapfile (LP: #1644975)
+
+ -- Mario Limonciello <mario.limonciello@dell.com>  Tue, 20 Feb 2018 15:34:46 -0600
+
 initramfs-tools (0.130ubuntu2) bionic; urgency=medium
 
   * Include mlx4 and mlx5 InfiniBand modules (Closes: #871595, LP: #1719302)
