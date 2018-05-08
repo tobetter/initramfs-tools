@@ -1,3 +1,15 @@
+initramfs-tools (0.130ubuntu4) cosmic; urgency=medium
+
+  [ Scott Moser ]
+  * scripts/functions: write netplan config files to /run/netplan for
+    network devices configured with configure_networking. (LP: #1713803)
+
+  [ Mathieu Trudel-Lapierre ]
+  * scripts/functions: add 'critical: true' parameter; requires netplan
+    0.37. (LP: #1713803)
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Tue, 08 May 2018 17:15:53 -0400
+
 initramfs-tools (0.130ubuntu3) bionic; urgency=medium
 
   * Fix resuming a hibernate session from a swapfile (LP: #1644975)
