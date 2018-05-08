@@ -1,0 +1,7 @@
+eth1:
+  dhcp4: true
+  dhcp-identifier: mac
+  critical: true
+  nameservers:
+    addresses: ["192.168.122.1"]
+    search: ["foo.com"]
