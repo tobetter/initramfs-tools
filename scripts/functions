@@ -494,30 +494,34 @@ _render_netplan() {
 	local name="$1" mac="$2" dhcp4="$3" dhcp6="$4" addrs="$5" \
 		gateway4="$6" gateway6="$7" ns_addrs="$8" ns_search="$9"
 	local n found=""
-	echo "$name:"
+	echo "network:"
+	echo "  version: 2"
+	echo "  renderer: networkd"
+	echo "  ethernets:"
+	echo "    $name:"
 	if [ -n "$mac" ]; then
-		echo "  match:"
-		echo "    macaddress: \"$mac\""
-		echo "  set-name: $name"
+		echo "      match:"
+		echo "        macaddress: \"$mac\""
+		echo "      set-name: $name"
 	fi
 	if [ -n "$dhcp4" ]; then
-		echo "  dhcp4: $dhcp4"
-		echo "  dhcp-identifier: mac"
+		echo "      dhcp4: $dhcp4"
+		echo "      dhcp-identifier: mac"
 	fi
-	[ -n "$dhcp6" ] && echo "  dhcp6: $dhcp6"
-	( [ -n "$dhcp4" ] || [ -n "$dhcp6" ] ) && echo "  critical: true"
+	[ -n "$dhcp6" ] && echo "      dhcp6: $dhcp6"
+	( [ -n "$dhcp4" ] || [ -n "$dhcp6" ] ) && echo "      critical: true"
 	if [ -n "$addrs" ]; then
-		echo "  addresses:"
+		echo "      addresses:"
 		found=","
 		for n in $addrs; do
 			# remove dups
 			[ "${found#*,$n,}" = "${found}" ] || continue
 			found="${found}$n,"
-			echo "    - \"$n\""
+			echo "        - \"$n\""
 		done
 	fi
-	[ -n "$gateway4" ] && echo "  gateway4: \"$gateway4\""
-	[ -n "$gateway6" ] && echo "  gateway6: \"$gateway6\""
+	[ -n "$gateway4" ] && echo "      gateway4: \"$gateway4\""
+	[ -n "$gateway6" ] && echo "      gateway6: \"$gateway6\""
 
 	if [ -n "$ns_addrs" ]; then
 		local alist="[" slist=""
@@ -537,9 +541,9 @@ _render_netplan() {
 			done
 			slist="${slist%, }]"
 		fi
-		echo "  nameservers:"
-		echo "    addresses: $alist"
-		[ -n "$slist" ] && echo "    search: $slist"
+		echo "      nameservers:"
+		echo "        addresses: $alist"
+		[ -n "$slist" ] && echo "        search: $slist"
 	fi
 }
 

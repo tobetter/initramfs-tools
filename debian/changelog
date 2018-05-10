@@ -1,3 +1,9 @@
+initramfs-tools (0.130ubuntu6) cosmic; urgency=medium
+
+  * Fix formatting for the generated netplan config: headers were missing.
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Thu, 10 May 2018 12:12:03 -0400
+
 initramfs-tools (0.130ubuntu5) cosmic; urgency=medium
 
   * debian/rules: skip tests on non-x86 architectures, where they then to be
