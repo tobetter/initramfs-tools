@@ -1,3 +1,18 @@
+initramfs-tools (0.122ubuntu8.12) xenial; urgency=medium
+
+  [ Scott Moser ]
+  * scripts/functions: write netplan config files to /run/netplan for
+    network devices configured with configure_networking. (LP: #1769682)
+
+  [ Mathieu Trudel-Lapierre ]
+  * scripts/functions: add 'critical: true' parameter; requires netplan
+    0.32~16.04.5. (LP: #1769682)
+  * debian/rules: skip tests on non-x86 architectures, where they then to be
+    false negatives (extra macaddress matching makes the tests fail to match
+    expected values).
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Wed, 16 May 2018 16:10:19 -0400
+
 initramfs-tools (0.122ubuntu8.11) xenial; urgency=medium
 
   [ Oliver Grawert ]
