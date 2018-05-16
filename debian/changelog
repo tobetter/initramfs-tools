@@ -1,3 +1,9 @@
+initramfs-tools (0.103ubuntu4.11) trusty; urgency=medium
+
+  * hook-functions: handle md arrays with nvme disk members. (LP: #1771557)
+
+ -- Guilherme G. Piccoli <gpiccoli@canonical.com>  Wed, 16 May 2018 09:47:01 -0300
+
 initramfs-tools (0.103ubuntu4.10) trusty; urgency=medium
 
   * mkinitramfs: Delete or report temporary files in /var/tmp/ on failure.
