@@ -1,3 +1,10 @@
+initramfs-tools (0.130ubuntu7) cosmic; urgency=medium
+
+  * hooks/resume: don't generate RESUME config pointing to randomly-crypted
+    swap devices.  LP: #1771962.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Fri, 08 Jun 2018 21:22:04 -0700
+
 initramfs-tools (0.130ubuntu6) cosmic; urgency=medium
 
   * Fix formatting for the generated netplan config: headers were missing.
