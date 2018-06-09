@@ -1,0 +1,20 @@
+--- hooks/resume
++++ hooks/resume
+@@ -45,8 +45,16 @@ if ischroot || [ ! -r /proc/swaps ]; then
+ else
+ 	# Try to autodetect the RESUME partition, using biggest swap?
+ 	resume_auto=$(grep ^/dev/ /proc/swaps | sort -rnk3 | head -n 1 | cut -d " " -f 1)
++	dm_name="$(dmsetup info -c --noheadings -o name "$resume_auto" 2>/dev/null)"
++	if [ -e /etc/crypttab ]; then
++		while read cryptdev srcdev keyfile junk; do
++			if [ "$cryptdev" = "$dm_name" ] && [ "$keyfile" = /dev/urandom ]; then
++				resume_auto=
++			fi
++		done < /etc/crypttab
++	fi
+ 	if [ -n "$resume_auto" ]; then
+-		if dm_name="$(dmsetup info -c --noheadings -o name "$resume_auto" 2>/dev/null)"; then
++		if [ -n "$dm_name" ]; then
+ 			resume_auto_canon="/dev/mapper/$dm_name"
+ 		elif UUID=$(blkid -s UUID -o value "$resume_auto"); then
+ 			resume_auto_canon="UUID=$UUID"
