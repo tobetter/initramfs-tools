@@ -52,6 +52,18 @@ run_resolvconf() {
    pass_on_nodiff "$tname" "$expected" "$found"
 }
 
+run_netinfo_to_netplan() {
+   local bname="$1" testdir="$2" results_d="$3"
+   local tname="$bname-netinfo-to-netplan"
+   shift 3
+   local found_d="$results_d/netplan"
+   local expected_d="$testdir/netplan"
+   [ -d "$expected_d" ] || return $RET_SKIP
+
+   _run_in_functions "$tname" netinfo_to_netplan "$found_d" "$@" || return
+   pass_on_nodiff "$tname" "$expected_d" "$found_d"
+}
+
 record() {
    local ret="$1"
    case "$ret" in
@@ -71,6 +83,9 @@ for testdir in "${data_dir}"/*; do
       done
    )
    run_resolvconf "$dname" "$testdir" "$results_d" $confs
+   record $?
+
+   run_netinfo_to_netplan "$dname" "$testdir" "$results_d" $confs
    record $?
 
    rm -Rf "${results_d}"
