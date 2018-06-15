@@ -1,3 +1,11 @@
+initramfs-tools (0.130ubuntu9) cosmic; urgency=medium
+
+  * hooks/resume: cherry-pick patch from upstream git to fix
+    auto-configuration of resume devices that are on LVM; always refer to
+    them by name, never by UUID.  LP: #1768230.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 14 Jun 2018 22:23:46 -0700
+
 initramfs-tools (0.130ubuntu8) cosmic; urgency=medium
 
   * hooks/resume: minor improvements to the hook based on Debian feedback.
