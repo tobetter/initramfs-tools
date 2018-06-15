@@ -1,3 +1,9 @@
+initramfs-tools (0.130ubuntu10) cosmic; urgency=medium
+
+  * Avoid redundant call to dmsetup.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 14 Jun 2018 22:26:51 -0700
+
 initramfs-tools (0.130ubuntu9) cosmic; urgency=medium
 
   * hooks/resume: cherry-pick patch from upstream git to fix
