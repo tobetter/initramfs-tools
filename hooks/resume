@@ -56,7 +56,7 @@ else
 		done < /etc/crypttab
 	fi
 	if [ -n "$resume_auto" ]; then
-		if dm_name="$(dmsetup info -c --noheadings -o name "$resume_auto" 2>/dev/null)"; then
+		if [ -n "$dm_name" ]; then
 			resume_auto_canon="/dev/mapper/$dm_name"
 		elif UUID=$(blkid -s UUID -o value "$resume_auto"); then
 			resume_auto_canon="UUID=$UUID"
