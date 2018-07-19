@@ -1,4 +1,4 @@
-.TH MKINITRAMFS 8  "2010/04/07" "Linux" "mkinitramfs manual"
+.TH MKINITRAMFS 8  "2018/07/18" "initramfs\-tools" "System Administration"
 
 .SH NAME
 mkinitramfs \- low-level tool for generating an initramfs image
@@ -82,16 +82,6 @@ Set the verbose mode output.
 Set the kernel version of the initramfs image
 (defaults to the running kernel).
 
-.TP
-\fB\-\-supported-host-version=\fIhversion
-This option queries if mkinitramfs can create ramdisks on a running kernel of version
-.IR hversion .
-
-.TP
-\fB\-\-supported-target-version=\fItversion
-This option queries if mkinitramfs can create ramdisks for kernel version
-.IR tversion .
-
 .SH ENVIRONMENT
 .B mkinitramfs
 honours the
@@ -104,6 +94,12 @@ filesystem which allows the execution of files stored there, i.e.
 should not be mounted with the
 .B noexec
 mount option.
+
+If
+.B SOURCE_DATE_EPOCH
+is set,
+.B mkinitramfs
+attempts to generate a reproducible initramfs image.
 
 .SH FILES
 .TP
@@ -153,7 +149,7 @@ Jeff Bailey <jbailey@raspberryginger.com> and numerous others.
 .SH SEE ALSO
 .BR
 .IR initramfs.conf (5),
-.IR initramfs-tools (8),
+.IR initramfs-tools (7),
 .IR update-initramfs (8),
 .IR lsinitramfs (8),
 .IR unmkinitramfs (8).

@@ -109,8 +109,8 @@ manual_add_modules()
 }
 
 # $1 = file type (for logging)
-# $2 = file to copy to ramdisk
-# $3 (optional) Name for the file on the ramdisk
+# $2 = file to copy to initramfs
+# $3 (optional) Name for the file on the initramfs
 # Location of the image dir is assumed to be $DESTDIR
 # If the target exists, we leave it and return 1.
 # On any other error, we return >1.
@@ -158,8 +158,8 @@ copy_file() {
 	cp -pP "${src}" "${DESTDIR}/${target}" || return $(($? + 1))
 }
 
-# $1 = executable to copy to ramdisk, with library dependencies
-# $2 (optional) Name for the file on the ramdisk
+# $1 = executable to copy to initramfs, with library dependencies
+# $2 (optional) Name for the file on the initramfs
 # Location of the image dir is assumed to be $DESTDIR
 # We never overwrite the target if it exists.
 copy_exec() {
@@ -381,7 +381,7 @@ dep_add_modules_mount()
 		|| ! [ -b "$dev_node" ]; then
 		echo "mkinitramfs: failed to determine device for $dir" >&2
 		echo "mkinitramfs: workaround is MODULES=most, check:" >&2
-		echo "grep -r MODULES /etc/initramfs-tools/" >&2
+		echo "grep -r MODULES ${CONFDIR}" >&2
 		echo "" >&2
 		echo "Error please report bug on initramfs-tools" >&2
 		echo "Include the output of 'mount' and 'cat /proc/mounts'" >&2
@@ -513,6 +513,10 @@ auto_add_modules()
 			copy_modules_dir kernel/drivers/usb/renesas_usbhs
 			# and any extcon drivers for USB
 			modules="$modules extcon-usb-gpio"
+			# Add the axp20x_usb_power power supply driver,
+			# required to initialize the USB host controllers
+			# on a number of armhf systems
+			modules="$modules axp20x_usb_power"
 
 			# Include all HID drivers unless we're sure they
 			# don't support keyboards.  hid-*ff covers various
@@ -537,6 +541,7 @@ auto_add_modules()
 			copy_modules_dir kernel/drivers/gpio
 			copy_modules_dir kernel/drivers/i2c/busses
 			copy_modules_dir kernel/drivers/i2c/muxes
+			copy_modules_dir kernel/drivers/mfd
 			copy_modules_dir kernel/drivers/phy
 			copy_modules_dir kernel/drivers/pinctrl
 			copy_modules_dir kernel/drivers/regulator
@@ -569,6 +574,7 @@ auto_add_modules()
 		block)
 			copy_modules_dir kernel/drivers/block
 			copy_modules_dir kernel/drivers/nvme
+			modules="$modules vmd"
 		;;
 		ubi)
 			modules="$modules deflate zlib lzo ubi ubifs"
@@ -594,23 +600,46 @@ auto_add_modules()
 	manual_add_modules $modules
 }
 
-# 'depmod' only looks at symbol dependencies; there is no way for
-# modules to declare explicit dependencies through module information,
-# so dependencies on e.g. crypto providers are hidden.  Until this is
-# fixed, we need to handle those hidden dependencies.
+# 'depmod' only looks at symbol dependencies and the 'softdep' module
+# information field; there is no way for modules to declare weaker
+# dependencies (modules that *might* be needed at run-time) through
+# module information, Until this is fixed, we need to handle those
+# hidden dependencies.
 hidden_dep_add_modules()
 {
-	local modules=
-	for dep in "lib/libcrc32c crc32c" \
-			"fs/ubifs/ubifs deflate zlib lzo" \
-			"fs/btrfs/btrfs crc32c"; do
-		set -- $dep
-		if [ -f "${DESTDIR}/lib/modules/${version}/kernel/$1.ko" ]; then
-			shift
-			modules="$modules $@"
-		fi
-	done
-	manual_add_modules $modules
+	manual_add_modules $(
+		{
+			cat "${DESTDIR}/lib/modules/${version}/modules.builtin"
+			find "${DESTDIR}/lib/modules/${version}/kernel" -name '*.ko'
+		} |
+		while read module; do
+			module="${module##*/}"
+			module="${module%.ko}"
+			case "$module" in
+			libcrc32c)
+				echo crc32c
+				;;
+			ubifs)
+				echo deflate zlib lzo
+				;;
+			btrfs)
+				echo crc32c
+				;;
+			mlx4_core)
+				echo mlx4_ib
+				;;
+			mlx5_core)
+				echo mlx5_ib
+				;;
+			i8042)
+				echo psmouse
+				;;
+			nvme)
+				echo vmd
+				;;
+			esac
+		done
+		)
 }
 
 # mkinitramfs help message

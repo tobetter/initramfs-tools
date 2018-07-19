@@ -13,15 +13,21 @@ mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid sysfs /sys
 mount -t proc -o nodev,noexec,nosuid proc /proc
 
-case " $(cat /proc/cmdline) " in
-*\ quiet\ *)
-	quiet=y
-	;;
-*)
+for x in $(cat /proc/cmdline); do
+	case $x in
+	initramfs.clear)
+		clear
+		;;
+	quiet)
+		quiet=y
+		;;
+	esac
+done
+
+if [ "$quiet" != "y" ]; then
 	quiet=n
 	echo "Loading, please wait..."
-	;;
-esac
+fi
 export quiet
 
 # Note that this only becomes /dev on the real filesystem if udev's scripts
@@ -29,8 +35,6 @@ export quiet
 mount -t devtmpfs -o nosuid,mode=0755 udev /dev
 mkdir /dev/pts
 mount -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts || true
-mount -t tmpfs -o "noexec,nosuid,size=10%,mode=0755" tmpfs /run
-mkdir -m 0755 /run/initramfs
 
 # Export the dpkg architecture
 export DPKG_ARCH=
@@ -45,6 +49,7 @@ export ROOTDELAY=
 export ROOTFLAGS=
 export ROOTFSTYPE=
 export IP=
+export DEVICE=
 export BOOT=
 export BOOTIF=
 export UBIMTD=
@@ -66,7 +71,7 @@ export fsckfix=
 # Bring in the main config
 . /conf/initramfs.conf
 for conf in conf/conf.d/*; do
-	[ -f ${conf} ] && . ${conf}
+	[ -f "${conf}" ] && . "${conf}"
 done
 . /scripts/functions
 
@@ -81,7 +86,7 @@ for x in $(cat /proc/cmdline); do
 		if [ -z "${BOOT}" ] && [ "$ROOT" = "/dev/nfs" ]; then
 			BOOT=nfs
 		fi
-                ;;
+		;;
 	rootflags=*)
 		ROOTFLAGS="-o ${x#rootflags=}"
 		;;
@@ -99,6 +104,9 @@ for x in $(cat /proc/cmdline); do
 	nfsroot=*)
 		NFSROOT="${x#nfsroot=}"
 		;;
+	initramfs.runsize=*)
+		RUNSIZE="${x#initramfs.runsize=}"
+		;;
 	ip=*)
 		IP="${x#ip=}"
 		;;
@@ -111,7 +119,7 @@ for x in $(cat /proc/cmdline); do
 	resume=*)
 		RESUME="${x#resume=}"
 		case $RESUME in
-	        UUID=*)
+		UUID=*)
 			RESUME="/dev/disk/by-uuid/${RESUME#UUID=}"
 		esac
 		;;
@@ -142,9 +150,9 @@ for x in $(cat /proc/cmdline); do
 		debug=y
 		quiet=n
 		if [ -n "${netconsole}" ]; then
-			exec >/dev/kmsg 2>&1
+			log_output=/dev/kmsg
 		else
-			exec >/run/initramfs/initramfs.debug 2>&1
+			log_output=/run/initramfs/initramfs.debug
 		fi
 		set -x
 		;;
@@ -164,7 +172,7 @@ for x in $(cat /proc/cmdline); do
 		;;
 	netconsole=*)
 		netconsole=${x#netconsole=}
-		[ "x$debug" = "xy" ] && exec >/dev/kmsg 2>&1
+		[ "x$debug" = "xy" ] && log_output=/dev/kmsg
 		;;
 	BOOTIF=*)
 		BOOTIF=${x#BOOTIF=}
@@ -196,6 +204,14 @@ else
 	resume=${RESUME:-}
 fi
 
+mount -t tmpfs -o "noexec,nosuid,size=${RUNSIZE:-10%},mode=0755" tmpfs /run
+mkdir -m 0755 /run/initramfs
+
+if [ -n "$log_output" ]; then
+	exec >$log_output 2>&1
+	unset log_output
+fi
+
 maybe_break top
 
 # Don't do log messages here to avoid confusing graphical boots
@@ -223,7 +239,7 @@ log_begin_msg "Mounting root file system"
 . /scripts/local
 . /scripts/nfs
 . /scripts/${BOOT}
-parse_numeric ${ROOT}
+parse_numeric "${ROOT}"
 maybe_break mountroot
 mount_top
 mount_premount
@@ -285,6 +301,7 @@ unset ROOT
 unset IP
 unset BOOT
 unset BOOTIF
+unset DEVICE
 unset UBIMTD
 unset blacklist
 unset break
@@ -303,6 +320,6 @@ mount -n -o move /sys ${rootmnt}/sys
 mount -n -o move /proc ${rootmnt}/proc
 
 # Chain to real filesystem
-exec run-init ${drop_caps} ${rootmnt} ${init} "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
+exec run-init ${drop_caps} "${rootmnt}" "${init}" "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
 echo "Something went badly wrong in the initramfs."
 panic "Please file a bug on initramfs-tools."

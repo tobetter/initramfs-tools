@@ -59,9 +59,9 @@ get_fsck_type_fstab () {
 		# therefore never used at boot time
 		if [ "${MNT_DIR}" = "/" ] || [ "${MNT_TYPE}" = "auto" ]; then
 			MNT_FSNAME="$(resolve_device "${MNT_FSNAME}")"
-			alias fstype="/usr/lib/klibc/bin/fstype"
+			fstype() { "/usr/lib/klibc/bin/fstype" "$@"; }
 			get_fstype "${MNT_FSNAME}"
-			unalias fstype
+			unset -f fstype
 		else
 			echo "${MNT_TYPE}"
 		fi
