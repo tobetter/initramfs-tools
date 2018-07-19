@@ -151,6 +151,8 @@ if dpkg --compare-versions "${version}" lt "2.6.38" 2>/dev/null; then
 		echo "linux-2.6 likely misses ${COMPRESS} support, using gzip"
 fi
 
+[ "${compress}" = gzip ] && [ -n "${SOURCE_DATE_EPOCH}" ] && compress="gzip -n"
+[ "${compress}" = lz4 ] && compress="lz4 -9 -l"
 [ "${compress}" = lzop ] && compress="lzop -9"
 [ "${compress}" = xz ] && compress="xz --check=crc32"
 
@@ -336,6 +338,10 @@ if ! ldconfig -r "$DESTDIR" ; then
 	[ $(id -u) != "0" ] \
 	&& echo "ldconfig might need uid=0 (root) for chroot()" >&2
 fi
+# The auxiliary cache is not reproducible and is always invalid at boot
+# (see #845034)
+rm -f "${DESTDIR}"/var/cache/ldconfig/aux-cache
+rmdir --ignore-fail-on-non-empty "${DESTDIR}"/var/cache/ldconfig
 
 # Apply DSDT to initramfs
 if [ -e "${CONFDIR}/DSDT.aml" ]; then
@@ -372,8 +378,18 @@ fi
 # preserve permissions if root builds the image, see #633582
 [ "$(id -ru)" != 0 ] && cpio_owner_root="-R 0:0"
 
+# if SOURCE_DATE_EPOCH is set, try and create a reproducible image
+if [ -n "${SOURCE_DATE_EPOCH}" ]; then
+	# ensure that no timestamps are newer than $SOURCE_DATE_EPOCH
+	find "${DESTDIR}" -newermt "@${SOURCE_DATE_EPOCH}" -print0 | \
+		xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+
+	# --reproducible requires cpio >= 2.12
+	cpio_reproducible="--reproducible"
+fi
+
 # work around lack of "set -o pipefail" for the following pipe:
-# cd "${DESTDIR}" && find . | cpio --quiet $cpio_owner_root -o -H newc | gzip >>"${outfile}" || exit 1
+# cd "${DESTDIR}" && find . | LC_ALL=C sort | cpio --quiet $cpio_owner_root $cpio_reproducible -o -H newc | gzip >>"${outfile}" || exit 1
 exec 3>&1
 eval `
 	# http://cfaj.freeshell.org/shell/cus-faq-2.html
@@ -382,7 +398,9 @@ eval `
 	{
 		find . 4>&-; echo "ec1=$?;" >&4
 	} | {
-		cpio --quiet $cpio_owner_root -o -H newc 4>&-; echo "ec2=$?;" >&4
+		LC_ALL=C sort
+	} | {
+		cpio --quiet $cpio_owner_root $cpio_reproducible -o -H newc 4>&-; echo "ec2=$?;" >&4
 	} | ${compress} >>"${outfile}"
 	echo "ec3=$?;" >&4
 `
