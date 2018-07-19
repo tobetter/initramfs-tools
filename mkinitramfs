@@ -204,9 +204,9 @@ export CONFDIR
 export DESTDIR
 export DPKG_ARCH
 export verbose
-export KEYMAP
 export MODULES
 export BUSYBOX
+export COMPCACHE_SIZE
 export RESUME
 
 # Private, used by 'catenate_cpiogz'.
@@ -264,6 +264,9 @@ cp -p /usr/share/initramfs-tools/init ${DESTDIR}/init
 # add existant boot scripts
 for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
 	-regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "/usr/share/initramfs-tools/scripts/${b}")
+	[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "/usr/share/initramfs-tools/scripts/${b}" \
@@ -272,6 +275,8 @@ done
 # Prune dot-files/directories and limit depth to exclude VCS files
 for b in $(cd "${CONFDIR}/scripts" && find . -maxdepth 2 -name '.?*' -prune -o \
 	-regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f -print); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${CONFDIR}/scripts/${b}")
+	[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "${CONFDIR}/scripts/${b}" "${DESTDIR}/scripts/$(dirname "${b}")/"
@@ -302,6 +307,9 @@ fi
 touch "${DESTDIR}/etc/fstab"
 ln -s /proc/mounts "${DESTDIR}/etc/mtab"
 
+# install wait-for-root binary.
+copy_exec /usr/lib/initramfs-tools/bin/wait-for-root /sbin
+
 # module-init-tools
 copy_exec /sbin/modprobe /sbin
 copy_exec /sbin/rmmod /sbin
@@ -317,8 +325,8 @@ if [ "$DPKG_ARCH" = arm ] || [ "$DPKG_ARCH" = armeb ]; then
 	cp -a /lib/libgcc_s.so.1 "${DESTDIR}/lib/"
 fi
 
-run_scripts /usr/share/initramfs-tools/hooks
-run_scripts "${CONFDIR}"/hooks
+run_scripts_optional /usr/share/initramfs-tools/hooks
+run_scripts_optional "${CONFDIR}"/hooks
 
 # Avoid double sleep when using older udev scripts
 sed -i 's/^\s*sleep \$ROOTDELAY$/:/' "${DESTDIR}/scripts/init-top/udev"
@@ -352,6 +360,15 @@ fi
 if [ ! -e "${DESTDIR}/bin/sh" ]; then
 	copy_exec /bin/sh "${DESTDIR}/bin/"
 fi
+
+case "${MODULES}" in
+	netboot|most) add_dns "${DESTDIR}/";;
+esac
+
+# Remove any looping or broken symbolic links, since they break cpio.
+[ "${verbose}" = y ] && xargs_verbose="-t"
+(cd "${DESTDIR}" && find . -type l -printf '%p %Y\n' | sed -n 's/ [LN]$//p' \
+	| xargs ${xargs_verbose:-} -rL1 rm -f)
 
 # dirty hack for armhf's double-linker situation; if we have one of
 # the two known eglibc linkers, nuke both and re-create sanity
