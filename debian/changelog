@@ -1,3 +1,10 @@
+initramfs-tools (0.131ubuntu2) cosmic; urgency=medium
+
+  * Fix permissions on /usr/share/initramfs-tools/init, which were mangled
+    by merge-o-matic.  LP: #1782854.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Fri, 20 Jul 2018 22:54:00 -0400
+
 initramfs-tools (0.131ubuntu1) cosmic; urgency=low
 
   * Merge from Debian unstable.  Remaining changes:
