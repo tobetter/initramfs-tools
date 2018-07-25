@@ -566,10 +566,6 @@ auto_add_modules()
 				macvtap.ko pcmcia sb1000.ko team tokenring \
 				tun.ko usb veth.ko wan wimax wireless \
 				xen-netback.ko
-			# Include modules that can be request_module'd from
-			# their network drivers (e.g. from mlx4_core)
-			copy_modules_dir kernel/drivers/infiniband/hw/mlx4
-			copy_modules_dir kernel/drivers/infiniband/hw/mlx5
 		;;
 		ide)
 			copy_modules_dir kernel/drivers/ide
