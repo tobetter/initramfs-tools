@@ -180,6 +180,26 @@ get_fstype ()
 	return ${RET}
 }
 
+_handle_device_vs_ip()
+{
+	# If the ip= parameter is present and is a colon-separated list,
+	# then:
+	# - If it specifies a device, use that in preference to any
+	#   device name we already have
+	# - Otherwise, substitute in any device name we already have
+	local IFS=:
+	set -f
+	set -- ${IP}
+	set +f
+	if [ -n "$6" ]; then
+		DEVICE="$6"
+	elif [ $# -ge 2 ] && [ -n "${DEVICE}" ]; then
+		IP="$1:$2:$3:$4:$5:${DEVICE}"
+		shift 6 || shift $#
+		IP="${IP}:$*"
+	fi
+}
+
 configure_networking()
 {
 	if [ -n "${BOOTIF}" ]; then
@@ -218,6 +238,8 @@ configure_networking()
 		done
 	fi
 
+	_handle_device_vs_ip
+
 	# networking already configured thus bail out
 	[ -n "${DEVICE}" ] && [ -e /run/net-"${DEVICE}".conf ] && return 0
 
@@ -249,18 +271,6 @@ configure_networking()
 			;;
 		*)
 			ipconfig -t ${ROUNDTTT} -d $IP
-
-			# grab device entry from ip option
-			NEW_DEVICE=${IP#*:*:*:*:*:*}
-			if [ "${NEW_DEVICE}" != "${IP}" ]; then
-				NEW_DEVICE=${NEW_DEVICE%%:*}
-			else
-				# wrong parse, possibly only a partial string
-				NEW_DEVICE=
-			fi
-			if [ -n "${NEW_DEVICE}" ]; then
-				DEVICE="${NEW_DEVICE}"
-			fi
 			;;
 		esac
 	done

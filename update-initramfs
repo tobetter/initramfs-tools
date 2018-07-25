@@ -47,7 +47,6 @@ Options:
  -c		Create a new initramfs
  -u		Update an existing initramfs
  -d		Remove an existing initramfs
- -t		Take over a custom initramfs with this one
  -b directory	Set alternate boot directory
  -v		Be verbose
  -h		This message
@@ -77,12 +76,6 @@ verbose()
 	if [ "${verbose}" = 1 ]; then
 		printf "${*}\n"
 	fi
-}
-
-version_exists()
-{
-	[ -e "${STATEDIR}/${1}" ] && [ -e "${initramfs}" ]
-	return $?
 }
 
 set_initramfs()
@@ -179,12 +172,6 @@ run_bootloader()
 	fi
 }
 
-compare_sha1()
-{
-	sha1sum "${initramfs}" | diff "${STATEDIR}/${version}" - >/dev/null 2>&1
-	return $?
-}
-
 # Note that this must overwrite so that updates work.
 set_sha1()
 {
@@ -215,8 +202,13 @@ ro_boot_check()
 
 get_sorted_versions()
 {
-	version_list="$(ls -1 "${STATEDIR}" | linux-version sort --reverse)"
-
+	version_list="$(
+		linux-version list |
+		while read version; do
+		      test -e "${BOOTDIR}/initrd.img-$version" && echo "$version"
+		done |
+		linux-version sort --reverse
+		)"
 	verbose "Available versions: ${version_list}"
 }
 
@@ -264,16 +256,6 @@ create()
 
 	set_initramfs
 
-	if [ "${takeover}" = 0 ]; then
-		if version_exists "${version}"; then
-			panic "Cannot create version ${version}: already exists"
-		fi
-
-		if [ -e "${initramfs}" ]; then
-			panic "${initramfs} already exists, cannot create."
-		fi
-	fi
-
 	generate_initramfs
 
 	run_bootloader
@@ -307,8 +289,6 @@ update()
 
 	ro_boot_check
 
-	altered_check
-
 	backup_initramfs
 
 	generate_initramfs
@@ -326,18 +306,6 @@ delete()
 
 	set_initramfs
 
-	if [ "${takeover}" = 0 ]; then
-		if [ ! -e "${initramfs}" ]; then
-			panic "Cannot delete ${initramfs}, doesn't exist."
-		fi
-
-		if ! version_exists "${version}"; then
-			panic "Cannot delete version ${version}: Not created by this utility."
-		fi
-	fi
-
-	altered_check
-
 	echo "update-initramfs: Deleting ${initramfs}"
 
 	delete_sha1
@@ -345,25 +313,9 @@ delete()
 	rm -f "${initramfs}" "${initramfs}.bak"
 }
 
-# Check for update mode on existing and modified initramfs
-altered_check()
-{
-	# No check on takeover
-	[ "${takeover}" = 1 ] && return 0
-	if [ ! -e "${initramfs}" ]; then
-		mild_panic "${initramfs} does not exist. Cannot update."
-	fi
-	if ! compare_sha1; then
-		echo "update-initramfs: ${initramfs} has been altered." >&2
-		mild_panic "update-initramfs: Cannot update. Override with -t option."
-	fi
-}
-
 # Defaults
 verbose=0
 yes=0
-# We default to takeover=1 in Ubuntu, but not Debian
-takeover=0
 
 ##
 
@@ -388,7 +340,7 @@ while getopts "k:cudyvtb:h?" flag; do
 		yes="1"
 		;;
 	t)
-		takeover="1"
+		# accepted for compatibility, but ignored
 		;;
 	b)
 		BOOTDIR="${OPTARG}"
@@ -427,9 +379,6 @@ if [ "${version}" = "all" ] \
 	OPTS="-b ${BOOTDIR}"
 	if [ "${verbose}" = "1" ]; then
 		OPTS="${OPTS} -v"
-	fi
-	if [ "${takeover}" = "1" ]; then
-		OPTS="${OPTS} -t"
 	fi
 	if [ "${yes}" = "1" ]; then
 		OPTS="${OPTS} -y"

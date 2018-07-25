@@ -39,23 +39,34 @@ report_auto()
 	test "$RESUME" = auto || echo >&2 "I: $*"
 }
 
-# We need to be able to read the listed swap partitions
-if ischroot || [ ! -r /proc/swaps ]; then
-	resume_auto=
-else
-	# Try to autodetect the RESUME partition, using biggest swap?
-	resume_auto=$(grep ^/dev/ /proc/swaps | sort -rnk3 | head -n 1 | cut -d " " -f 1)
-	if [ -n "$resume_auto" ]; then
+# Try to autodetect the RESUME partition, using biggest swap device that
+# is not ephemeral.  We need to be able to read the listed swap partitions.
+resume_auto=
+if ! ischroot && [ -r /proc/swaps ]; then
+	for resume_auto in $(grep ^/dev/ /proc/swaps | sort -rnk3 | cut -d " " -f 1); do
+		ephemeral=false
 		dm_name="$(dmsetup info -c --noheadings -o name "$resume_auto" 2>/dev/null)"
-	fi
-	if [ -n "$dm_name" ] && [ -e /etc/crypttab ]; then
-		while read cryptdev srcdev keyfile junk; do
-			if [ "$cryptdev" = "$dm_name" ] && [ "$keyfile" = /dev/urandom ]; then
-				resume_auto=
-			fi
-		done < /etc/crypttab
-	fi
-	if [ -n "$resume_auto" ]; then
+
+		# dm-crypt is ephemeral if the key file is /dev/urandom
+		if [ -n "$dm_name" ] && [ -e /etc/crypttab ]; then
+			while read cryptdev srcdev keyfile junk; do
+				if [ "$cryptdev" = "$dm_name" ] && [ "$keyfile" = /dev/urandom ]; then
+					ephemeral=true
+				fi
+			done < /etc/crypttab
+		fi
+
+		# zram is ephemeral
+		case "$resume_auto" in
+		/dev/zram*)
+			ephemeral=true
+			;;
+		esac
+
+		$ephemeral || break
+	done
+
+	if [ -n "$resume_auto" ] && ! $ephemeral; then
 		if [ -n "$dm_name" ]; then
 			resume_auto_canon="/dev/mapper/$dm_name"
 		elif UUID=$(blkid -s UUID -o value "$resume_auto"); then
