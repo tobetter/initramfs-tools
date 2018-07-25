@@ -215,7 +215,13 @@ export __TMPCPIOGZ
 # Private, used by 'prepend_earlyinitramfs'.
 export __TMPEARLYCPIO
 
-for d in bin conf/conf.d etc lib/modules run sbin scripts ${MODULESDIR}; do
+# Create usr-merged filesystem layout, to avoid duplicates if the host
+# filesystem is usr-merged.
+for d in /bin /lib* /sbin; do
+	mkdir -p "${DESTDIR}/usr${d}"
+	ln -s "usr${d}" "${DESTDIR}${d}"
+done
+for d in conf/conf.d etc run scripts ${MODULESDIR}; do
 	mkdir -p "${DESTDIR}/${d}"
 done
 
@@ -340,8 +346,10 @@ if ! ldconfig -r "$DESTDIR" ; then
 fi
 # The auxiliary cache is not reproducible and is always invalid at boot
 # (see #845034)
-rm -f "${DESTDIR}"/var/cache/ldconfig/aux-cache
-rmdir --ignore-fail-on-non-empty "${DESTDIR}"/var/cache/ldconfig
+if [ -d "${DESTDIR}"/var/cache/ldconfig ]; then
+	rm -f "${DESTDIR}"/var/cache/ldconfig/aux-cache
+	rmdir --ignore-fail-on-non-empty "${DESTDIR}"/var/cache/ldconfig
+fi
 
 # Apply DSDT to initramfs
 if [ -e "${CONFDIR}/DSDT.aml" ]; then

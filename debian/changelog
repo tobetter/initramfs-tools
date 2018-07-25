@@ -1,3 +1,25 @@
+initramfs-tools (0.132) unstable; urgency=medium
+
+  * [4e1f80e] mkinitramfs: Don't try to remove nonexistent /var/cache/ldconfig
+    (Closes: #904065)
+  * [d0212d3] hook-functions: Quote exclusions in copy_modules_dir
+  * [8c806b4] hook-functions: Add support for compressed module files
+    (Closes: #891560)
+  * [71f5d61] mkinitramfs: Create usr-merged filesystem layout
+    (Closes: #874523)
+  * [4c0d86c] hooks/resume: Loop over all swap devices when selecting
+    automatically
+  * [312393b] hooks/resume: Reject zram swap devices when selecting
+    automatically (Closes: #861228)
+  * [c0ae42b] update-initramfs: Always take over other initramfs images
+    (Closes: #765750, #804295)
+  * [f39625a] update-initramfs: Make "-k all" take over other initramfs images
+  * [f273172] scripts/functions: Fix parsing of device name from ip parameter
+  * [abae896] scripts/functions: Merge information from BOOTIF/DEVICE and ip
+    parameters (Closes: #721088)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Thu, 26 Jul 2018 01:18:39 +0800
+
 initramfs-tools (0.131) unstable; urgency=medium
 
   [ Ben Hutchings ]
