@@ -1,3 +1,10 @@
+initramfs-tools (0.131ubuntu4) cosmic; urgency=medium
+
+  * Add some autopkgests for the network configuration processing.
+    (LP: #1786130)
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Wed, 08 Aug 2018 12:33:21 +1200
+
 initramfs-tools (0.131ubuntu3) cosmic; urgency=medium
 
   * Drop including mlx4 and mlx5 InfiniBand modules. Version 0.131 uses
