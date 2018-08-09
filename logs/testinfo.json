@@ -1,7 +1,0 @@
-{
-  "virt_server": "autopkgtest-virt-qemu /home/mwhudson/images/autopkgtest-cosmic-amd64.img",
-  "kernel_version": "Linux 4.17.0-6-generic #7-Ubuntu SMP Tue Jul 24 23:07:00 UTC 2018",
-  "nproc": "1",
-  "cpu_model": "Common KVM processor",
-  "cpu_flags": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc nopl xtopology cpuid pni vmx cx16 x2apic hypervisor lahf_lm cpuid_fault pti tpr_shadow vnmi flexpriority ept vpid"
-}

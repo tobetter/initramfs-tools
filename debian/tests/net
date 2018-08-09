@@ -14,6 +14,13 @@ set -ux
 # dnsmasq on it so we test ipv6 and can control which ips which nics
 # get and so on -- but this is still better than nothing.
 
+# Also the current qemu command lines only work on intel. That should
+# be fixed too :)
+
+arch=$(dpkg --print-architecture)
+[ $arch = amd64 ] || [ $arch = i386 ] || exit 0
+
+
 ./debian/tests/prep-image image.img
 ret=$?
 if [ $ret -eq 100 ]; then
