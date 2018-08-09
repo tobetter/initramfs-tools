@@ -31,9 +31,10 @@ mkinitramfs -o myinitrd
 
 nicslot=5
 nicname=ens$nicslot
+kernel=$(echo /boot/vmlinu*-"$(uname -r)")
 
 run () {
-    ./debian/tests/run-image kernel=/boot/vmlinu[xz]-"$(uname -r)" initrd=myinitrd \
+    ./debian/tests/run-image kernel=$kernel initrd=myinitrd \
                              image=image.img cmdline="$basecmdline ${1-}" \
                              output=result nicslot=$nicslot
 }

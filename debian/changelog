@@ -1,3 +1,9 @@
+initramfs-tools (0.131ubuntu7) cosmic; urgency=medium
+
+  * d/tests: Fix kernel location again. 
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 09 Aug 2018 15:01:19 +1200
+
 initramfs-tools (0.131ubuntu6) cosmic; urgency=medium
 
   * d/tests: Use virtio for nic as it is supported everywhere, find kernel on
