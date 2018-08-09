@@ -26,6 +26,10 @@ ppc64*)
         qemu="qemu-system-ppc64"
         archopts=( -machine "pseries,usb=off" )
         ;;
+aarch64)
+        qemu="qemu-system-aarch64"
+        archopts=( -machine "virt" )
+        ;;
 *)
         qemu=qemu-system-$(uname -m)
 esac
@@ -36,7 +40,7 @@ timeout --foreground 10m \
         -append "$CMDLINE" \
         -drive file="$IMAGE",format=raw \
         -nographic -monitor none \
-        -netdev user,id=net0 -device e1000,netdev=net0,bus=pci.0,addr="$NICSLOT"
+        -netdev user,id=net0 -device virtio-net-pci,netdev=net0,bus=pci.0,addr="$NICSLOT"
 
 dev=$(losetup -Pf --show "$IMAGE")
 mount "${dev}p1" mnt
