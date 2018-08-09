@@ -1,6 +1,13 @@
+initramfs-tools (0.131ubuntu6) cosmic; urgency=medium
+
+  * d/tests: Use virtio for nic as it is supported everywhere, find kernel on
+    ppc64el, explicitly depend on curl, pass -machine virt on arm64.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 09 Aug 2018 12:05:33 +1200
+
 initramfs-tools (0.131ubuntu5) cosmic; urgency=medium
 
-  * d/tests/control: depend on qemu-system, not just qemu-system-x86. 
+  * d/tests/control: depend on qemu-system, not just qemu-system-x86.
 
  -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 09 Aug 2018 11:16:12 +1200
 
