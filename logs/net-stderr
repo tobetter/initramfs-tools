@@ -1,0 +1,218 @@
++ ./debian/tests/prep-image image.img
++ IMAGE=image.img
+++ lsb_release -sc
++ series=cosmic
+++ dpkg --print-architecture
++ url=http://cloud-images.ubuntu.com/cosmic/current/cosmic-server-cloudimg-amd64-root.tar.xz
+++ basename http://cloud-images.ubuntu.com/cosmic/current/cosmic-server-cloudimg-amd64-root.tar.xz
++ filename=cosmic-server-cloudimg-amd64-root.tar.xz
++ mkdir -p images
++ '[' '!' -f images/cosmic-server-cloudimg-amd64-root.tar.xz ']'
+++ curl --silent --write-out '%{http_code}\n' --output images/cosmic-server-cloudimg-amd64-root.tar.xz http://cloud-images.ubuntu.com/cosmic/current/cosmic-server-cloudimg-amd64-root.tar.xz
++ status=200
++ '[' 200 = 404 ']'
++ rm -f image.img image.img-uuid
++ truncate -s 1G image.img
++ parted --script --align optimal image.img -- mklabel gpt mkpart primary ext4 1MiB -2048s
+++ losetup -Pf --show image.img
++ dev=/dev/loop0
++ mke2fs -q /dev/loop0p1
++ head -n1
++ blkid --output=value /dev/loop0p1
++ mkdir -p mnt
++ mount /dev/loop0p1 mnt
++ tar '--xattrs-include=*' -C mnt -xf images/cosmic-server-cloudimg-amd64-root.tar.xz
++ rm -f mnt/sbin/init
++ cat
++ chmod u+x mnt/sbin/init
++ umount mnt
++ losetup -d /dev/loop0
++ ret=0
++ '[' 0 -eq 100 ']'
++ '[' 0 -ne 0 ']'
++ set -e
+++ cat image.img-uuid
++ basecmdline='root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0'
++ mkinitramfs -o myinitrd
+cryptsetup: WARNING: The initramfs image may not contain cryptsetup binaries 
+    nor crypto modules. If that's on purpose, you may want to uninstall the 
+    'cryptsetup-initramfs' package in order to disable the cryptsetup initramfs 
+    integration and avoid this warning.
+rmdir: failed to remove '/var/tmp/mkinitramfs_mTdRMI/var/cache/ldconfig': No such file or directory
++ nicslot=5
++ nicname=ens5
++++ uname -r
+++ echo /boot/vmlinuz-4.17.0-6-generic
++ kernel=/boot/vmlinuz-4.17.0-6-generic
++ run ''
++ ./debian/tests/run-image kernel=/boot/vmlinuz-4.17.0-6-generic initrd=myinitrd image=image.img 'cmdline=root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ' output=result nicslot=5
++ NICSLOT=3
++ '[' 6 -gt 0 ']'
++ case $1 in
++ KERNEL=/boot/vmlinuz-4.17.0-6-generic
++ shift
++ '[' 5 -gt 0 ']'
++ case $1 in
++ INITRD=myinitrd
++ shift
++ '[' 4 -gt 0 ']'
++ case $1 in
++ IMAGE=image.img
++ shift
++ '[' 3 -gt 0 ']'
++ case $1 in
++ CMDLINE='root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 '
++ shift
++ '[' 2 -gt 0 ']'
++ case $1 in
++ OUTPUT=result
++ shift
++ '[' 1 -gt 0 ']'
++ case $1 in
++ NICSLOT=5
++ shift
++ '[' 0 -gt 0 ']'
++ archopts=()
++ case $(uname -m) in
+++ uname -m
+++ uname -m
++ qemu=qemu-system-x86_64
++ timeout --foreground 10m qemu-system-x86_64 -m 512m -kernel /boot/vmlinuz-4.17.0-6-generic -initrd myinitrd -append 'root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ' -drive file=image.img,format=raw -nographic -monitor none -netdev user,id=net0 -device virtio-net-pci,netdev=net0,bus=pci.0,addr=5
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+++ losetup -Pf --show image.img
++ dev=/dev/loop0
++ mount /dev/loop0p1 mnt
++ rm -rf result
++ cp -aT mnt/result result
++ umount mnt
++ losetup -d /dev/loop0
++ ./debian/tests/check-results result has_no_ipv4_addr ens5
++ run ip=dhcp
++ ./debian/tests/run-image kernel=/boot/vmlinuz-4.17.0-6-generic initrd=myinitrd image=image.img 'cmdline=root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=dhcp' output=result nicslot=5
++ NICSLOT=3
++ '[' 6 -gt 0 ']'
++ case $1 in
++ KERNEL=/boot/vmlinuz-4.17.0-6-generic
++ shift
++ '[' 5 -gt 0 ']'
++ case $1 in
++ INITRD=myinitrd
++ shift
++ '[' 4 -gt 0 ']'
++ case $1 in
++ IMAGE=image.img
++ shift
++ '[' 3 -gt 0 ']'
++ case $1 in
++ CMDLINE='root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=dhcp'
++ shift
++ '[' 2 -gt 0 ']'
++ case $1 in
++ OUTPUT=result
++ shift
++ '[' 1 -gt 0 ']'
++ case $1 in
++ NICSLOT=5
++ shift
++ '[' 0 -gt 0 ']'
++ archopts=()
++ case $(uname -m) in
+++ uname -m
+++ uname -m
++ qemu=qemu-system-x86_64
++ timeout --foreground 10m qemu-system-x86_64 -m 512m -kernel /boot/vmlinuz-4.17.0-6-generic -initrd myinitrd -append 'root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=dhcp' -drive file=image.img,format=raw -nographic -monitor none -netdev user,id=net0 -device virtio-net-pci,netdev=net0,bus=pci.0,addr=5
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+++ losetup -Pf --show image.img
++ dev=/dev/loop0
++ mount /dev/loop0p1 mnt
++ rm -rf result
++ cp -aT mnt/result result
++ umount mnt
++ losetup -d /dev/loop0
++ ./debian/tests/check-results result has_an_ipv4_addr ens5
++ run ip=:::::ens5:dhcp
++ ./debian/tests/run-image kernel=/boot/vmlinuz-4.17.0-6-generic initrd=myinitrd image=image.img 'cmdline=root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=:::::ens5:dhcp' output=result nicslot=5
++ NICSLOT=3
++ '[' 6 -gt 0 ']'
++ case $1 in
++ KERNEL=/boot/vmlinuz-4.17.0-6-generic
++ shift
++ '[' 5 -gt 0 ']'
++ case $1 in
++ INITRD=myinitrd
++ shift
++ '[' 4 -gt 0 ']'
++ case $1 in
++ IMAGE=image.img
++ shift
++ '[' 3 -gt 0 ']'
++ case $1 in
++ CMDLINE='root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=:::::ens5:dhcp'
++ shift
++ '[' 2 -gt 0 ']'
++ case $1 in
++ OUTPUT=result
++ shift
++ '[' 1 -gt 0 ']'
++ case $1 in
++ NICSLOT=5
++ shift
++ '[' 0 -gt 0 ']'
++ archopts=()
++ case $(uname -m) in
+++ uname -m
+++ uname -m
++ qemu=qemu-system-x86_64
++ timeout --foreground 10m qemu-system-x86_64 -m 512m -kernel /boot/vmlinuz-4.17.0-6-generic -initrd myinitrd -append 'root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=:::::ens5:dhcp' -drive file=image.img,format=raw -nographic -monitor none -netdev user,id=net0 -device virtio-net-pci,netdev=net0,bus=pci.0,addr=5
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+++ losetup -Pf --show image.img
++ dev=/dev/loop0
++ mount /dev/loop0p1 mnt
++ rm -rf result
++ cp -aT mnt/result result
++ umount mnt
++ losetup -d /dev/loop0
++ ./debian/tests/check-results result has_an_ipv4_addr ens5
++ run ip=10.0.2.100::10.0.2.2:255.0.0.0::ens5:
++ ./debian/tests/run-image kernel=/boot/vmlinuz-4.17.0-6-generic initrd=myinitrd image=image.img 'cmdline=root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=10.0.2.100::10.0.2.2:255.0.0.0::ens5:' output=result nicslot=5
++ NICSLOT=3
++ '[' 6 -gt 0 ']'
++ case $1 in
++ KERNEL=/boot/vmlinuz-4.17.0-6-generic
++ shift
++ '[' 5 -gt 0 ']'
++ case $1 in
++ INITRD=myinitrd
++ shift
++ '[' 4 -gt 0 ']'
++ case $1 in
++ IMAGE=image.img
++ shift
++ '[' 3 -gt 0 ']'
++ case $1 in
++ CMDLINE='root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=10.0.2.100::10.0.2.2:255.0.0.0::ens5:'
++ shift
++ '[' 2 -gt 0 ']'
++ case $1 in
++ OUTPUT=result
++ shift
++ '[' 1 -gt 0 ']'
++ case $1 in
++ NICSLOT=5
++ shift
++ '[' 0 -gt 0 ']'
++ archopts=()
++ case $(uname -m) in
+++ uname -m
+++ uname -m
++ qemu=qemu-system-x86_64
++ timeout --foreground 10m qemu-system-x86_64 -m 512m -kernel /boot/vmlinuz-4.17.0-6-generic -initrd myinitrd -append 'root=UUID=c03fb9e9-14ad-41fc-8080-699be324f633 rw console=ttyS0 ip=10.0.2.100::10.0.2.2:255.0.0.0::ens5:' -drive file=image.img,format=raw -nographic -monitor none -netdev user,id=net0 -device virtio-net-pci,netdev=net0,bus=pci.0,addr=5
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+++ losetup -Pf --show image.img
++ dev=/dev/loop0
++ mount /dev/loop0p1 mnt
++ rm -rf result
++ cp -aT mnt/result result
++ umount mnt
++ losetup -d /dev/loop0
++ ./debian/tests/check-results result has_ipv4_addr ens5 10.0.2.100
