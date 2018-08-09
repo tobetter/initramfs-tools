@@ -1,6 +1,12 @@
+initramfs-tools (0.131ubuntu8) cosmic; urgency=medium
+
+  * d/tests: only run on amd64 and i386 for now.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 09 Aug 2018 16:12:44 +1200
+
 initramfs-tools (0.131ubuntu7) cosmic; urgency=medium
 
-  * d/tests: Fix kernel location again. 
+  * d/tests: Fix kernel location again.
 
  -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 09 Aug 2018 15:01:19 +1200
 
