@@ -1,3 +1,11 @@
+initramfs-tools (0.131ubuntu9) cosmic; urgency=medium
+
+  [ John Gallagher ]
+  * Work out the kernel modules required to support ZFS filesystems and add
+    them as necessary. (LP: #1661629)
+
+ -- Mathieu Trudel-Lapierre <cyphermox@ubuntu.com>  Mon, 20 Aug 2018 10:52:20 -0400
+
 initramfs-tools (0.131ubuntu8) cosmic; urgency=medium
 
   * d/tests: only run on amd64 and i386 for now.

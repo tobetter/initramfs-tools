@@ -357,6 +357,21 @@ dep_add_modules_mount()
 		return
 	fi
 
+	if [ "${FSTYPE}" = "zfs" ]; then
+		manual_add_modules "${FSTYPE}"
+ 
+		# ZFS uses the name of a filesystem instead of a device. Find
+		# the devices that make up the pool containing the specified
+		# filesystem, and add the appropriate driver for each device.
+		local poolname="${dev_node%%/*}"
+		zpool list -vPL "$poolname" | while read dev ignored; do
+			# Ignore non-leaf vdevs by skipping anything that doesn't
+			# look like an absolute path
+			echo "$dev" | grep -q '^/' && block_dev_mod_add "$dev"
+		done
+		return
+	fi
+
 	if [ "$dir" = / ] && [ "${dev_node}" = "/dev/root" ] ; then
 		if [ -b "${dev_node}" ]; then
 			# Match it to the canonical device name by UUID
