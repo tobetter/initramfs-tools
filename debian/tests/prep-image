@@ -46,6 +46,7 @@ for file in /run/net-*.conf /run/net6-*.conf; do
 done
 ip -json addr > /result/addr.json
 ip -json link > /result/link.json
+ps aux | tee /result/ps.txt
 sync
 exec /lib/systemd/systemd-shutdown poweroff
 EOF

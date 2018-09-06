@@ -57,6 +57,12 @@ with open(os.path.join(result_dir, 'link.json')) as fp:
 with open(os.path.join(result_dir, 'addr.json')) as fp:
     addrs = json.load(fp)
 
+with open(os.path.join(result_dir, 'ps.txt'), encoding='utf-8', errors='replace') as fp:
+    ps_output = fp.read()
+
+if 'dhclient' in ps_output:
+    error("dhclient appears to be running")
+
 i = 2
 while i < len(sys.argv):
     a = sys.argv[i]
