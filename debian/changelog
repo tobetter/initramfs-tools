@@ -1,3 +1,19 @@
+initramfs-tools (0.131ubuntu10) cosmic; urgency=medium
+
+  * Tidy up configure_networking a bit:
+    - Just let dhclient scan the interfaces if none is specified for IPv6.
+    - Do not handle ip=rarp specially (ipconfig hasn't supported it for some
+      time)
+    - Call dhclient in simple cases for IPv4 (this makes some small observable
+      changes -- for example ip=bootp will now make a DHCP request too -- but
+      nothing that seems important).
+    - Do not let dhclient processes hang around past the pivot and have them
+      respect the shorter timeouts ipconfig was given.
+  * debian/tests/control: add some dependencies that happened to already be
+    installed on the test runners used so far.
+
+ -- Michael Hudson-Doyle <mwhudson@debian.org>  Thu, 06 Sep 2018 14:23:52 +1200
+
 initramfs-tools (0.131ubuntu9) cosmic; urgency=medium
 
   [ John Gallagher ]

@@ -216,32 +216,24 @@ get_fstype ()
 	return ${RET}
 }
 
-all_netbootable_devices()
-{
-	for device in /sys/class/net/* ; do
-		if [ ! -e $device/flags ]; then
-			continue
-		fi
+run_dhclient() {
+        local timeout conffile pidfile pid
 
-		loop=$(($(cat $device/flags) & 0x8 && 1 || 0))
-		bc=$(($(cat $device/flags) & 0x2 && 1 || 0))
-		ptp=$(($(cat $device/flags) & 0x10 && 1 || 0))
+	timeout=$1
+	shift
 
-		# Skip any device that is a loopback
-		if [ $loop = 1 ]; then
-			continue
-		fi
+        conffile="/etc/dhcp/dhclient.conf.$timeout"
+        pidfile="/tmp/dhclient.pid.$timeout"
+	cp /etc/dhcp/dhclient.conf $conffile
+	echo "timeout $timeout;" >> $conffile
 
-		# Skip any device that isn't a broadcast
-		# or point-to-point.
-		if [ $bc = 0 ] && [ $ptp = 0 ]; then
-			continue
-		fi
+        rm -f $pidfile
+	dhclient -v -1 -cf $conffile -pf $pidfile "$@"
 
-		DEVICE="$DEVICE $(basename $device)"
-	done
-
-	echo $DEVICE
+        # We do not want the dhclient persisting past the initramfs so
+	# just kill it here (the pid file will only be written if
+	# dhclient daemonized, i.e. found an address).
+	[ -f $pidfile ] && read pid < $pidfile && [ -n "$pid" ] && kill $pid
 }
 
 configure_networking()
@@ -319,12 +311,9 @@ configure_networking()
 			# Do nothing
 			IP=done
 			;;
-		""|on|any)
-			# Bring up device
-			ipconfig -t ${ROUNDTTT} "${DEVICE}"
-			;;
-		dhcp|bootp|rarp|both)
-			ipconfig -t ${ROUNDTTT} -c ${IP} -d "${DEVICE}"
+		""|on|any|dhcp|bootp|both)
+			run_dhclient $ROUNDTTT -4 ${DEVICE:+"${DEVICE}"}
+
 			;;
 		*)
 			ipconfig -t ${ROUNDTTT} -d $IP
@@ -349,28 +338,17 @@ configure_networking()
 			IP6=done
 			;;
 		*)
-			# if this is not the first loop, sleep to provide the backoff.
-			[ "$(($ROUNDTTT-2))" = "0" ] || sleep $ROUNDTTT
+			# check the content of IP6 and if it is not on/dhcp/any use it as
+			# a device name. Otherwise all devices will be tried (unless
+			# BOOTIF was set, see above).
+			case "${IP6}" in
+			on|dhcp|any)
+				;;
+			*)
+				DEVICE6="$IP6" ;;
+			esac
 
-			# check the content of IP6, if we have something other
-			# than a device name there and BOOTIF isn't set, clear
-			# DEVICE6 and we'll try all available devices.
-			if echo "${IP6}" | grep -v '^\(on\|dhcp\|any\)$'; then
-				DEVICE6="$IP6"
-			fi
-
-			# if we don't have a device specified, try to bring up
-			# any eligible device.
-			if [ -z "${DEVICE6}" ]; then
-				DEVICE6=$(all_netbootable_devices)
-			fi
-
-			# Bring up device
-			for dev in ${DEVICE6} ; do
-				dhclient -6 -1 -v "${dev}"
-			done
-
-			DEVICE6=$dev
+			run_dhclient $ROUNDTTT -6 ${DEVICE6:+"${DEVICE6}"}
 			;;
 		esac
 	done
