@@ -1,3 +1,15 @@
+initramfs-tools (0.122ubuntu8.13) xenial; urgency=medium
+
+  [ Colin Watson ]
+  * [b4804dd] Only sync the filesystem containing the initramfs
+    (Closes: #882380) (LP: #1667512)
+
+  [ Tiago Stürmer Daitx ]
+  * debian/initramfs-tools.postinst: remove orphaned old-dkms initrd files
+    in /boot. (LP: #1791959)
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Tue, 18 Sep 2018 09:18:47 +0000
+
 initramfs-tools (0.122ubuntu8.12) xenial; urgency=medium
 
   [ Scott Moser ]

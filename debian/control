@@ -28,7 +28,7 @@ Package: initramfs-tools-core
 Architecture: all
 Multi-Arch: foreign
 Recommends: busybox (>= 1:1.01-3) | busybox-initramfs | busybox-static
-Depends: initramfs-tools-bin (= ${binary:Version}), busybox-initramfs (>= 1:1.13.3-1ubuntu5), klibc-utils (>= 2.0.4-7~), cpio, kmod | module-init-tools, udev, ${misc:Depends}, klibc-utils (>= 2.0.4-1.2~) | busybox (>= 1:1.01-3) | busybox-initramfs | busybox-static
+Depends: initramfs-tools-bin (= ${binary:Version}), busybox-initramfs (>= 1:1.13.3-1ubuntu5), klibc-utils (>= 2.0.4-7~), cpio, kmod | module-init-tools, udev, ${misc:Depends}, klibc-utils (>= 2.0.4-1.2~) | busybox (>= 1:1.01-3) | busybox-initramfs | busybox-static, coreutils (>= 8.24)
 Suggests: bash-completion
 Breaks: initramfs-tools (<< 0.121~)
 Replaces: initramfs-tools (<< 0.121~)
