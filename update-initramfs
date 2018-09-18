@@ -173,7 +173,7 @@ generate_initramfs()
 		mv -f "${initramfs}.new" "${initramfs}"
 		set_sha1
 		# Guard against an unclean shutdown
-		sync
+		sync -f "${initramfs}"
 	else
 		mkinitramfs_return="$?"
 		remove_initramfs_bak
