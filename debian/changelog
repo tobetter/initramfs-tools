@@ -1,3 +1,10 @@
+initramfs-tools (0.130ubuntu3.5) bionic; urgency=medium
+
+  * debian/initramfs-tools.postinst: fix version comparison and
+    so it will run for any version earlier than 0.130ubuntu3.5.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 27 Sep 2018 16:21:37 +0000
+
 initramfs-tools (0.130ubuntu3.4) bionic; urgency=medium
 
   [ Colin Watson ]
