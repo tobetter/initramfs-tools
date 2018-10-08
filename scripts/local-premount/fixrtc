@@ -90,7 +90,12 @@ if [ -n "$BROKEN_CLOCK" -a -n "$ROOTDEV" ]; then
         # Trim whitespace for busybox
         CREATEDATE=`echo ${CREATEDATESTR#*:}`
 
-        hwclock -s || true
+        # Hide stderr to avoid ugly message:
+        #  can't open '/dev/misc/rtc': No such file or directory
+        # on pi2 (and possible more PIs) where there is no /dev/rtc of
+        # any kind. We still need to keep this call because we use
+        # fixrtc on all armhf images.
+        hwclock -s 2>/dev/null || true
 
         # make sure we're also compatible with busybox, if available
         DATE="/bin/date -D%c"

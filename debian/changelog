@@ -1,3 +1,13 @@
+initramfs-tools (0.131ubuntu13) cosmic; urgency=medium
+
+  * scripts/local-premount/fixrtc:
+    - Hide stderr when running "hwclock -s" to avoid ugly message:
+        can't open '/dev/misc/rtc': No such file or directory
+      on pi2 (and possible more PIs) where there is no /dev/rtc of
+      any kind.
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Mon, 08 Oct 2018 11:38:36 +0200
+
 initramfs-tools (0.131ubuntu12) cosmic; urgency=medium
 
   * Do not include graphical drivers when FRAMEBUFFER is not set (LP: #1561643)
