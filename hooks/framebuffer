@@ -25,6 +25,7 @@ copy_modules_dir kernel/ubuntu/i915
 manual_add_modules fbcon
 manual_add_modules vesafb
 manual_add_modules vga16fb
+manual_add_modules vboxvideo
 
 for x in ${MODULESDIR}/initrd/*; do
 	x=${x##*/}
