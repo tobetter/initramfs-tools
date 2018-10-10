@@ -1,3 +1,10 @@
+initramfs-tools (0.131ubuntu14) cosmic; urgency=medium
+
+  * hooks/framebuffer: manual_add_modules vboxvideo to support graphical
+    boot in VirtualBox. LP: #1796822
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 10 Oct 2018 11:06:00 +0100
+
 initramfs-tools (0.131ubuntu13) cosmic; urgency=medium
 
   * scripts/local-premount/fixrtc:
