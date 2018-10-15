@@ -348,8 +348,10 @@ if ! ldconfig -r "$DESTDIR" ; then
 fi
 # The auxiliary cache is not reproducible and is always invalid at boot
 # (see #845034)
-rm -f "${DESTDIR}"/var/cache/ldconfig/aux-cache
-rmdir --ignore-fail-on-non-empty "${DESTDIR}"/var/cache/ldconfig
+if [ -d "${DESTDIR}"/var/cache/ldconfig ]; then
+	rm -f "${DESTDIR}"/var/cache/ldconfig/aux-cache
+	rmdir --ignore-fail-on-non-empty "${DESTDIR}"/var/cache/ldconfig
+fi
 
 # Apply DSDT to initramfs
 if [ -e "${CONFDIR}/DSDT.aml" ]; then
