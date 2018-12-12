@@ -63,6 +63,7 @@ export fastboot=n
 export forcefsck=n
 export fsckfix=
 export recovery=
+export NETWORK_SKIP_ENSLAVED=
 
 
 # mdadm needs hostname to be set. This has to be done before the udev rules are called!

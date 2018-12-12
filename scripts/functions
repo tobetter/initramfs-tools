@@ -238,7 +238,18 @@ all_netbootable_devices()
 			continue
 		fi
 
-		DEVICE="$DEVICE $(basename $device)"
+		if [ "${NETWORK_SKIP_ENSLAVED:-0}" = 0 ]; then
+			DEVICE="$DEVICE $(basename $device)"
+		else
+			# Skip enslaved device (has "master" link
+			# attribute on it)
+			dev="$(basename $device)"
+			ip -o link show "$dev" | grep -q -w master
+			if [ "$?" -eq 0 ]; then
+				continue
+			fi
+			DEVICE="$DEVICE $dev"
+		fi
 	done
 
 	echo $DEVICE
@@ -321,7 +332,16 @@ configure_networking()
 			;;
 		""|on|any)
 			# Bring up device
-			ipconfig -t ${ROUNDTTT} "${DEVICE}"
+			# if we don't have a DEVICE specified, try to bring up
+			# all eligible devices one at a time.
+			if [ "${NETWORK_SKIP_ENSLAVED:-0}" != 0 ] && [ -z "${DEVICE}" ]; then
+				DEVICES=$(all_netbootable_devices)
+				for dev in ${DEVICES} ; do
+					ipconfig -t ${ROUNDTTT} "${dev}"
+				done
+			else
+				ipconfig -t ${ROUNDTTT} "${DEVICE}"
+			fi
 			;;
 		dhcp|bootp|rarp|both)
 			ipconfig -t ${ROUNDTTT} -c ${IP} -d "${DEVICE}"

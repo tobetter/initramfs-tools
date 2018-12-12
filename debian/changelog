@@ -1,3 +1,16 @@
+initramfs-tools (0.130ubuntu3.6) bionic-security; urgency=medium
+
+  * scripts/functions: include a new option to skip enslaved network
+    devices. (LP: #1802591)
+      Include the new variable NETWORK_SKIP_ENSLAVED. When set to a
+      value different than "0", this variable will cause any enslaved
+      network devices to be skipped from the list of netbootable
+      devices. This variable can be set via the configuration files
+      under /etc/initramfs-tools/ or via any configuration file under
+      the initrd directory /conf/conf.d/ via a hook script.
+
+ -- Marcelo Henrique Cerri <marcelo.cerri@canonical.com>  Wed, 12 Dec 2018 20:58:27 -0200
+
 initramfs-tools (0.130ubuntu3.5) bionic; urgency=medium
 
   * debian/initramfs-tools.postinst: fix version comparison and
