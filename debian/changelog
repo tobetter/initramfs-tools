@@ -1,3 +1,16 @@
+initramfs-tools (0.130ubuntu3.7) bionic; urgency=medium
+
+  [ Steve Langasek ]
+  * hooks/resume: cherry-pick patch from upstream git to fix
+    auto-configuration of resume devices that are on LVM; always refer to
+    them by name, never by UUID.  LP: #1768230.
+
+  [ Thadeu Lima de Souza Cascardo ]
+  * Do not include graphical drivers when FRAMEBUFFER is not set.
+    (LP: #1561643)
+
+ -- Brian Murray <brian@ubuntu.com>  Thu, 17 Jan 2019 12:26:22 -0800
+
 initramfs-tools (0.130ubuntu3.6) bionic-security; urgency=medium
 
   * scripts/functions: include a new option to skip enslaved network

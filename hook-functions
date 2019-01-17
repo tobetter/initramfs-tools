@@ -765,7 +765,7 @@ call_scripts()
 	set -e
 	for cs_x in ${runlist}; do
 		[ -f ${initdir}/${cs_x} ] || continue
-		if [ x"$call_scripts_optional" = "xoptional" ]; then
+		if [ x"$call_scripts_optional" = "xy" ]; then
 			option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${initdir}/${cs_x}")
 			[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
 		fi

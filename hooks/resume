@@ -56,11 +56,17 @@ else
 		done < /etc/crypttab
 	fi
 	if [ -n "$resume_auto" ]; then
-		UUID=$(blkid -s UUID -o value "$resume_auto" || true)
+		if [ -n "$dm_name" ]; then
+			resume_auto_canon="/dev/mapper/$dm_name"
+		elif UUID=$(blkid -s UUID -o value "$resume_auto"); then
+			resume_auto_canon="UUID=$UUID"
+		else
+			resume_auto_canon=
+		fi
 		report_auto "The initramfs will attempt to resume from $resume_auto"
-		if [ -n "$UUID" ]; then
-			report_auto "(UUID=$UUID)"
-			resume_auto="UUID=$UUID"
+		if [ -n "$resume_auto_canon" ]; then
+			report_auto "($resume_auto_canon)"
+			resume_auto="$resume_auto_canon"
 		fi
 		report_auto "Set the RESUME variable to override this."
 	fi
