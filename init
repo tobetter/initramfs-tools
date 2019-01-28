@@ -54,6 +54,7 @@ export DEVICE=
 export BOOT=
 export BOOTIF=
 export UBIMTD=
+export NETWORK_SKIP_ENSLAVED=
 export break=
 export init=/sbin/init
 export readonly=y
