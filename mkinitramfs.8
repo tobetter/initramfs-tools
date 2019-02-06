@@ -5,25 +5,12 @@ mkinitramfs \- low-level tool for generating an initramfs image
 
 .SH SYNOPSIS
 .B mkinitramfs
-.RB [ \-c
-.IR compress ]
-.RB [ \-d
-.IR confdir ]
-.RB [ \-k ]
-.RB \-o
+.RI [ option ]...
+.B \-o
 .IR outfile
-.RB [ \-r
-.IR root ]
-.RB [ \-v ]
 .RI [ version ]
-
-.B mkinitramfs
-.RB [ \-\-supported-host-version=
-.IR hversion ]
-
-.B mkinitramfs
-.RB [ \-\-supported-target-version=
-.IR tversion ]
+.br
+.BR mkinitramfs " " -h
 
 .SH DESCRIPTION
 The
@@ -47,40 +34,44 @@ happens in this early userspace.
 
 .SH OPTIONS
 .TP
-\fB \-c \fI compress
+\fB\-c \fI compress
 Override the
 .B COMPRESS
 setting in
 .IR initramfs.conf .
 
 .TP
-\fB \-d \fI confdir
+\fB\-d \fI confdir
 Set an alternate configuration directory.
 
 .TP
-\fB \-k
+\fB\-k
 Keep the temporary directory used to make the image.
 
 .TP
-\fB \-o \fI outfile
+\fB\-o \fI outfile
 Write the image to
 .IR outfile .
 
 .TP
-\fB \-r \fI root
+\fB\-r \fI root
 Override the
 .B ROOT
 setting in
 .IR initramfs.conf .
 
 .TP
-\fB \-v
+\fB\-v
 Set the verbose mode output.
 
 .TP
-\fI version
+\fIversion
 Set the kernel version of the initramfs image
 (defaults to the running kernel).
+
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Display usage information and exit.
 
 .SH ENVIRONMENT
 .B mkinitramfs

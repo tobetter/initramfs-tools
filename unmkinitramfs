@@ -4,7 +4,22 @@ set -eu
 
 usage()
 {
-	echo "Usage: $(basename "$0") [-v] <initramfs file> <directory>"
+	cat << EOF
+
+Usage: unmkinitramfs [-v] initramfs-file directory
+
+Options:
+  -v   Display verbose messages about extraction
+
+See unmkinitramfs(8) for further details.
+
+EOF
+}
+
+usage_error()
+{
+	usage >&2
+	exit 2
 }
 
 # Extract a compressed cpio archive
@@ -14,8 +29,8 @@ xcpio()
 	dir="$2"
 	shift 2
 
-	if zcat -t "$archive" >/dev/null 2>&1 ; then
-		zcat "$archive"
+	if gzip -t "$archive" >/dev/null 2>&1 ; then
+		gzip -c -d "$archive"
 	elif xzcat -t "$archive" >/dev/null 2>&1 ; then
 		xzcat "$archive"
 	elif lz4cat -t "$archive" >/dev/null 2>&1 ; then
@@ -75,12 +90,12 @@ splitinitramfs()
 				break
 			fi
 			magic="$(readhex "$initramfs" $end 6)" || break
-			test $magic = 070701 || test $magic = 070702 || break
+			test "$magic" = 070701 || test "$magic" = 070702 || break
 			namesize=0x$(readhex "$initramfs" $((end + 94)) 8)
 			filesize=0x$(readhex "$initramfs" $((end + 54)) 8)
 			end=$(((end + 110)))
-			end=$(((end + $namesize + 3) & ~3))
-			end=$(((end + $filesize + 3) & ~3))
+			end=$(((end + namesize + 3) & ~3))
+			end=$(((end + filesize + 3) & ~3))
 		done
 		if [ $end -eq $start ]; then
 			break
@@ -106,10 +121,10 @@ splitinitramfs()
 
 	if [ $end -gt 0 ]; then
 		# Extract to main subdirectory
-		subarchive=$(mktemp ${TMPDIR:-/var/tmp}/unmkinitramfs_XXXXXX)
-		trap "rm -f '$subarchive'" EXIT
+		subarchive=$(mktemp "${TMPDIR:-/var/tmp}/unmkinitramfs_XXXXXX")
+		trap 'rm -f "$subarchive"' EXIT
 		dd < "$initramfs" skip=$end iflag=skip_bytes 2> /dev/null \
-			> $subarchive
+			> "$subarchive"
 		xcpio "$subarchive" "${dir:+$dir/main}" -i "$@"
 	else
 		# Don't use subdirectories (for backward compatibility)
@@ -117,9 +132,7 @@ splitinitramfs()
 	fi
 }
 
-OPTIONS=`getopt -o hv --long help,list,verbose -n "$0" -- "$@"`
-# Check for non-GNU getopt
-if [ $? != 0 ] ; then echo "W: non-GNU getopt" >&2 ; exit 1 ; fi
+OPTIONS=$(getopt -o hv --long help,list,verbose -n "$0" -- "$@") || usage_error
 
 cpio_opts="--preserve-modification-time --no-absolute-filenames --quiet"
 expected_args=2
@@ -152,8 +165,8 @@ while true; do
 done
 
 if [ $# -ne $expected_args ]; then
-	usage
-	exit 2
+	usage_error
 fi
 
+# shellcheck disable=SC2086
 splitinitramfs "$1" "${2:-}" $cpio_opts

@@ -44,7 +44,7 @@ add_modules_from_file()
 		return
 	fi
 
-	grep '^[^#]' ${1} | while read module args; do
+	grep '^[^#]' "${1}" | while read -r module args; do
 		[ -n "$module" ] || continue
 		force_load "${module}" "${args}"
 	done
@@ -64,9 +64,10 @@ manual_add_modules()
 	# module.ko' as we want.  However it also means that 'softdep'
 	# configuration lines and embedded softdep information is not
 	# processed.  So we run twice, with and without this option.
-	{ modprobe --all --set-version="${version}" --ignore-install --quiet --show-depends "$@";
+	# shellcheck disable=SC2034
+	{ modprobe --all --set-version="${version?}" --ignore-install --quiet --show-depends "$@";
 	  modprobe --all --set-version="${version}" --quiet --show-depends "$@"; } |
-	while read prefix kmod options ; do
+	while read -r prefix kmod options ; do
 		if [ "${prefix}" != "insmod" ]; then
 			continue
 		fi
@@ -123,6 +124,11 @@ copy_file() {
 
 	[ -f "${src}" ] || return 2
 
+	# Canonicalise usr-merged target directories
+	case "${target}" in
+	/bin/* | /lib* | /sbin/*) target="/usr${target}" ;;
+	esac
+
 	if [ -d "${DESTDIR}/${target}" ]; then
 		target="${target}/${src##*/}"
 	fi
@@ -130,7 +136,6 @@ copy_file() {
 	# check if already copied
 	[ -e "${DESTDIR}/${target}" ] && return 1
 
-	#FIXME: inst_dir
 	mkdir -p "${DESTDIR}/${target%/*}"
 
 	if [ -h "${src}" ]; then
@@ -138,8 +143,16 @@ copy_file() {
 		# just link directly to the ultimate target
 		link_target="$(readlink -f "${src}")" || return $(($? + 1))
 
+		# Update source for the copy
+		src="${link_target}"
+
+		# Canonicalise usr-merged target directories
+		case "${link_target}" in
+		/bin/* | /lib* | /sbin/*) link_target="/usr${link_target}" ;;
+		esac
+
 		if [ "${link_target}" != "${target}" ]; then
-			[ "${verbose}" = "y" ] && echo "Adding ${type}-link ${src}"
+			[ "${verbose?}" = "y" ] && echo "Adding ${type}-link ${src}"
 
 			# Create a relative link so it always points
 			# to the right place
@@ -147,7 +160,6 @@ copy_file() {
 		fi
 
 		# Copy the link target if it doesn't already exist
-		src="${link_target}"
 		target="${link_target}"
 		[ -e "${DESTDIR}/${target}" ] && return 0
 		mkdir -p "${DESTDIR}/${target%/*}"
@@ -224,9 +236,11 @@ copy_modules_dir()
 		first=false
 	done
 
+	# shellcheck disable=SC2044
 	for kmod in $(find "${MODULESDIR}/${dir}" "$@" -name '*.ko*' -printf '%f\n'); do
 		modules="$modules ${kmod%%.*}"
 	done
+	# shellcheck disable=SC2086
 	manual_add_modules $modules
 }
 
@@ -246,15 +260,15 @@ sys_walk_mod_add()
 		fi
 
 		# current driver module
-		driver_path="$(readlink -f ${device_path}/driver/module)"
+		driver_path="$(readlink -f "${device_path}/driver/module")"
 		if [ -e "$driver_path" ]; then
-			module="$(basename $(readlink -f $driver_path))"
+			module="$(basename "$(readlink -f "$driver_path")")"
 			if [ -n "${module}" ]; then
 				manual_add_modules "${module}"
 			fi
 		fi
 
-		device_path="$(dirname ${device_path})"
+		device_path="$(dirname "${device_path}")"
 	done
 }
 
@@ -273,11 +287,11 @@ block_dev_sys_walk_mod_add()
 	fi
 
 	# Iterate over component of a layered device
-	ls -1 "$disk_sys_path/slaves" | while read component; do
-		block_dev_sys_walk_mod_add "$disk_sys_path/slaves/$component"
+	find "$disk_sys_path/slaves" -mindepth 1 -maxdepth 1 | while read -r component; do
+		block_dev_sys_walk_mod_add "$component"
 	done
 
-	sys_walk_mod_add ${dev_sys_path}
+	sys_walk_mod_add "${dev_sys_path}"
 }
 
 block_dev_mod_add()
@@ -308,22 +322,22 @@ block_dev_mod_add()
 add_loaded_modules()
 {
 	local pattern="$1"
-	local module
-	local builtin=/lib/modules/$(uname -r)/modules.builtin
+	local module builtin
+	builtin="/lib/modules/$(uname -r)/modules.builtin"
 
 	for module in /sys/module/$pattern; do
 		if [ -d "$module" ]; then
-			manual_add_modules $(basename $module)
+			manual_add_modules "$(basename "$module")"
 		fi
 	done
-	if [ -f $builtin ]; then
-		while read module; do
+	if [ -f "$builtin" ]; then
+		while read -r module; do
 			case "$module" in
 			*/$pattern.ko)
-				manual_add_modules $(basename $module .ko)
+				manual_add_modules "$(basename "$module" .ko)"
 				;;
 			esac
-		done < $builtin
+		done < "$builtin"
 	fi
 }
 
@@ -341,9 +355,10 @@ dep_add_modules_mount()
 	fi
 
 	# find out block device + fstype
-	eval "$(while read dev mp fs opts rest ; do \
+	# shellcheck disable=SC2034
+	eval "$(while read -r dev mp fs opts rest ; do \
 		[ "$mp" = "$dir" ] && [ "$fs" != "rootfs" ] \
-		&& printf "dev_node=$dev\nFSTYPE=$fs"\
+		&& printf "dev_node=%s\\nFSTYPE=%s" "$dev" "$fs"\
 		&& break; done < /proc/mounts)"
 
 	# Only the root mountpoint has to exist; do nothing if any other
@@ -362,11 +377,12 @@ dep_add_modules_mount()
 	if [ "$dir" = / ] && [ "${dev_node}" = "/dev/root" ] ; then
 		if [ -b "${dev_node}" ]; then
 			# Match it to the canonical device name by UUID
-			dev_node="/dev/disk/by-uuid/"$(blkid -o value -s UUID ${dev_node}) 2>/dev/null
+			dev_node="/dev/disk/by-uuid/"$(blkid -o value -s UUID "${dev_node}") 2>/dev/null
 		else
 			# Does not exist in our namespace, so look at the
 			# kernel command line
 			dev_node=
+			# shellcheck disable=SC2013
 			for arg in $(cat /proc/cmdline); do
 				case "$arg" in
 				root=*)
@@ -386,7 +402,7 @@ dep_add_modules_mount()
 	fi
 
 	# recheck device
-	if [ -z "$dev_node" ] || ! dev_node="$(readlink -f ${dev_node})" \
+	if [ -z "$dev_node" ] || ! dev_node="$(readlink -f "${dev_node}")" \
 		|| ! [ -b "$dev_node" ]; then
 		echo "mkinitramfs: failed to determine device for $dir" >&2
 		echo "mkinitramfs: workaround is MODULES=most, check:" >&2
@@ -398,7 +414,7 @@ dep_add_modules_mount()
 	fi
 
 	# do not trust mount, check superblock
-	eval "$(/usr/lib/klibc/bin/fstype ${dev_node})"
+	eval "$(/usr/lib/klibc/bin/fstype "${dev_node}")"
 
 	# check that fstype fs recognition
 	if [ "${FSTYPE}" = "unknown" ]; then
@@ -412,7 +428,7 @@ dep_add_modules_mount()
 	fi
 
 	# Add filesystem
-	manual_add_modules ${FSTYPE}
+	manual_add_modules "${FSTYPE}"
 
 	block_dev_mod_add "$dev_node"
 }
@@ -434,7 +450,7 @@ dep_add_modules()
 
 	# sys walk some important device classes
 	for class in gpio phy regulator rtc; do
-		for device in /sys/class/$class/*; do
+		for device in "/sys/class/$class"/*; do
 			device="$(readlink -f "$device")" \
 				&& sys_walk_mod_add "$device"
 		done
@@ -487,6 +503,7 @@ dep_add_modules()
 		modules="$modules sunvnet sunvdc"
 	fi
 
+	# shellcheck disable=SC2086
 	manual_add_modules $modules
 }
 
@@ -606,6 +623,7 @@ auto_add_modules()
 		esac
 	done
 
+	# shellcheck disable=SC2086
 	manual_add_modules $modules
 }
 
@@ -616,12 +634,13 @@ auto_add_modules()
 # hidden dependencies.
 hidden_dep_add_modules()
 {
+	# shellcheck disable=SC2046
 	manual_add_modules $(
 		{
 			cat "${DESTDIR}/lib/modules/${version}/modules.builtin"
 			find "${DESTDIR}/lib/modules/${version}/kernel" -name '*.ko*'
 		} |
-		while read module; do
+		while read -r module; do
 			module="${module##*/}"
 			module="${module%%.*}"
 			case "$module" in
@@ -651,26 +670,6 @@ hidden_dep_add_modules()
 		)
 }
 
-# mkinitramfs help message
-usage()
-{
-	cat >&2 << EOF
-
-Usage: ${0} [OPTION]... -o outfile [version]
-
-Options:
-  -c compress	Override COMPRESS setting in initramfs.conf.
-  -d confdir	Specify an alternative configuration directory.
-  -k		Keep temporary directory used to make the image.
-  -o outfile	Write to outfile.
-  -r root	Override ROOT setting in initramfs.conf.
-
-See mkinitramfs(8) for further details.
-EOF
-	exit 1
-
-}
-
 # Find the source for a script file.  This is needed to work around
 # temporary directories mounted with the noexec option.  The source
 # will be on / or /usr which must be executable.
@@ -688,7 +687,7 @@ get_source()
 set_initlist()
 {
 	unset initlist
-	for si_x in ${initdir}/*; do
+	for si_x in "${initdir}"/*; do
 		# skip empty dirs without warning
 		[ "${si_x}" = "${initdir}/*" ] && return
 
@@ -702,7 +701,7 @@ set_initlist()
 		esac
 
 		# skip directories
-		if [ -d ${si_x} ]; then
+		if [ -d "${si_x}" ]; then
 			[ "${verbose}" = "y" ] \
 			&& echo "$si_x ignored: a directory" >&2
 			continue
@@ -711,14 +710,14 @@ set_initlist()
 		si_x="$(get_source "${si_x#${initdir}/}")"
 
 		# skip non executable scripts
-		if [ ! -x ${si_x} ]; then
+		if [ ! -x "${si_x}" ]; then
 			[ "${verbose}" = "y" ] \
 			&& echo "$si_x ignored: not executable" >&2
 			continue
 		fi
 
 		# skip bad syntax
-		if ! sh -n ${si_x} ; then
+		if ! sh -n "${si_x}" ; then
 			[ "${verbose}" = "y" ] \
 			&& echo "$si_x ignored: bad syntax" >&2
 			continue
@@ -732,11 +731,11 @@ get_prereq_pairs()
 {
 	set_initlist
 	for gp_x in ${initlist:-}; do
-		echo ${gp_x} ${gp_x}
-		gp_src="$(get_source $gp_x)"
+		echo "${gp_x} ${gp_x}"
+		gp_src="$(get_source "$gp_x")"
 		prereqs=$("${gp_src}" prereqs)
 		for prereq in ${prereqs}; do
-			echo ${prereq} ${gp_x}
+			echo "${prereq} ${gp_x}"
 		done
 	done
 }
@@ -747,14 +746,14 @@ cache_run_scripts()
 	DESTDIR=${1}
 	scriptdir=${2}
 	initdir=${DESTDIR}${scriptdir}
-	[ ! -d ${initdir} ] && return
+	[ ! -d "${initdir}" ] && return
 
-	> ${initdir}/ORDER
+	true > "${initdir}/ORDER"
 	runlist=$(get_prereq_pairs | tsort)
 	for crs_x in ${runlist}; do
-		[ -f ${initdir}/${crs_x} ] || continue
-		echo "${scriptdir}/${crs_x} \"\$@\"" >> ${initdir}/ORDER
-		echo "[ -e /conf/param.conf ] && . /conf/param.conf" >> ${initdir}/ORDER
+		[ -f "${initdir}/${crs_x}" ] || continue
+		echo "${scriptdir}/${crs_x} \"\$@\"" >> "${initdir}/ORDER"
+		echo "[ -e /conf/param.conf ] && . /conf/param.conf" >> "${initdir}/ORDER"
 	done
 }
 
@@ -762,15 +761,15 @@ call_scripts()
 {
 	set -e
 	for cs_x in ${runlist}; do
-		[ -f ${initdir}/${cs_x} ] || continue
+		[ -f "${initdir}/${cs_x}" ] || continue
 		# mkinitramfs verbose output
 		if [ "${verbose}" = "y" ]; then
 			echo "Calling hook ${cs_x}"
 		fi
-		${initdir}/${cs_x} && ec=$? || ec=$?
+		"${initdir}/${cs_x}" && ec=$? || ec=$?
 		# allow hooks to abort build:
 		if [ "$ec" -ne 0 ]; then
-			echo "E: ${initdir}/${cs_x} failed with return $ec."
+			echo "E: ${initdir}/${cs_x} failed with return $ec." >&2
 			# only errexit on mkinitramfs
 			[ -n "${version}" ] && exit $ec
 		fi
@@ -786,8 +785,8 @@ run_scripts()
 {
 	scriptdir=${2:-}
 	initdir=${1}
-	[ ! -d ${initdir} ] && return
+	[ ! -d "${initdir}" ] && return
 
 	runlist=$(get_prereq_pairs | tsort)
-	call_scripts $scriptdir
+	call_scripts "$scriptdir"
 }
