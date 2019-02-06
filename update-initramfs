@@ -23,8 +23,7 @@ linux-image-*)
 	;;
 ?*)
 	if	   [ $# = 1 ]						\
-		&& [ x"$1" = x-u ]					\
-		&& dpkg-trigger --check-supported 2>/dev/null
+		&& [ x"$1" = x-u ]
 	then
 		if dpkg-trigger --no-await update-initramfs; then
 			echo "update-initramfs: deferring update (trigger activated)"
@@ -36,11 +35,9 @@ esac
 
 usage()
 {
-	if [ -n "${1:-}" ]; then
-		printf "${*}\n\n" >&2
-	fi
-	cat >&2 << EOF
-Usage: ${0} [OPTION]...
+	cat << EOF
+
+Usage: update-initramfs {-c|-d|-u} [-k version] [-v] [-b directory]
 
 Options:
  -k version	Specify kernel version or 'all'
@@ -49,16 +46,25 @@ Options:
  -d		Remove an existing initramfs
  -b directory	Set alternate boot directory
  -v		Be verbose
- -h		This message
+
+See update-initramfs(8) for further details.
 
 EOF
-	exit 1
+}
+
+usage_error()
+{
+	if [ -n "${1:-}" ]; then
+		printf "%s\\n\\n" "${*}" >&2
+	fi
+	usage >&2
+	exit 2
 }
 
 mild_panic()
 {
 	if [ -n "${1:-}" ]; then
-		printf "${*}\n" >&2
+		printf "%s\\n" "${*}" >&2
 	fi
 	exit 0
 }
@@ -66,7 +72,7 @@ mild_panic()
 panic()
 {
 	if [ -n "${1:-}" ]; then
-		printf "${*}\n" >&2
+		printf "%s\\n" "${*}" >&2
 	fi
 	exit 1
 }
@@ -74,7 +80,7 @@ panic()
 verbose()
 {
 	if [ "${verbose}" = 1 ]; then
-		printf "${*}\n"
+		printf "%s\\n" "${*}"
 	fi
 }
 
@@ -120,7 +126,7 @@ backup_booted_initramfs()
 	boot_initramfs=
 	uptime_days=$(awk '{printf "%d", $1 / 3600 / 24}' /proc/uptime)
 	if [ -n "$uptime_days" ]; then
-		boot_initramfs=$(find "${initramfs}.bak" -mtime +${uptime_days})
+		boot_initramfs=$(find "${initramfs}.bak" -mtime "+${uptime_days}")
 	fi
 	if [ -n "${boot_initramfs}" ]; then
 		mv -f "${initramfs_bak}" "${initramfs}.bak"
@@ -147,6 +153,7 @@ generate_initramfs()
 	if [ "${verbose}" = 1 ]; then
 		OPTS="-v ${OPTS}"
 	fi
+	# shellcheck disable=SC2086
 	if mkinitramfs ${OPTS} "${initramfs}.new" "${version}"; then
 		mv -f "${initramfs}.new" "${initramfs}"
 		set_sha1
@@ -191,11 +198,12 @@ ro_boot_check()
 		return 0
 	fi
 
+	# shellcheck disable=SC1004
 	boot_opts=$(awk '/boot/{if ((match($4, /^ro/) || match($4, /,ro/)) \
 		&& $2 == "/boot") print "ro"}' /proc/mounts)
 	if [ -n "${boot_opts}" ]; then
-		echo "WARNING: /boot is ro mounted."
-		echo "update-initramfs: Not updating ${initramfs}"
+		echo "W: /boot is ro mounted." >&2
+		echo "W: update-initramfs: Not updating ${initramfs}" >&2
 		exit 0
 	fi
 }
@@ -204,7 +212,7 @@ get_sorted_versions()
 {
 	version_list="$(
 		linux-version list |
-		while read version; do
+		while read -r version; do
 		      test -e "${BOOTDIR}/initrd.img-$version" && echo "$version"
 		done |
 		linux-version sort --reverse
@@ -214,8 +222,8 @@ get_sorted_versions()
 
 set_current_version()
 {
-	if [ -f /boot/initrd.img-`uname -r` ]; then
-		version=`uname -r`
+	if [ -f "/boot/initrd.img-$(uname -r)" ]; then
+		version=$(uname -r)
 	fi
 }
 
@@ -244,6 +252,7 @@ set_highest_version()
 		version=
 		return
 	fi
+	# shellcheck disable=SC2086
 	set -- ${version_list}
 	version=${1}
 }
@@ -251,7 +260,7 @@ set_highest_version()
 create()
 {
 	if [ -z "${version}" ]; then
-		usage "Create mode requires a version argument"
+		usage_error "Create mode requires a version argument"
 	fi
 
 	set_initramfs
@@ -301,7 +310,7 @@ update()
 delete()
 {
 	if [ -z "${version}" ]; then
-		usage "Delete mode requires a version argument"
+		usage_error "Delete mode requires a version argument"
 	fi
 
 	set_initramfs
@@ -315,61 +324,70 @@ delete()
 
 # Defaults
 verbose=0
-yes=0
 
 ##
 
-while getopts "k:cudyvtb:h?" flag; do
-	case "${flag}" in
-	k)
-		version="${OPTARG}"
+OPTIONS=$(getopt -o "k:cudvtb:h?" --long help -n "$0" -- "$@") || usage_error
+
+eval set -- "$OPTIONS"
+
+while true; do
+	case "$1" in
+	-k)
+		version="$2"
+		shift 2
 		;;
-	c)
+	-c)
 		mode="c"
+		shift
 		;;
-	d)
+	-d)
 		mode="d"
+		shift
 		;;
-	u)
+	-u)
 		mode="u"
+		shift
 		;;
-	v)
+	-v)
 		verbose="1"
+		shift
 		;;
-	y)
-		yes="1"
-		;;
-	t)
+	-t)
 		# accepted for compatibility, but ignored
+		shift
 		;;
-	b)
-		BOOTDIR="${OPTARG}"
+	-b)
+		BOOTDIR="$2"
 		if [ ! -d "${BOOTDIR}" ]; then
-			echo "Error: ${BOOTDIR} is not a directory." >&2
+			echo "E: ${BOOTDIR} is not a directory." >&2
 			exit 1
 		fi
+		shift 2
 		;;
-	h|?)
+	-h|-\?|--help)
 		usage
+		exit 0
+		;;
+	--)
+		shift
+		break
 		;;
 	esac
 done
 
-shift $((${OPTIND} - 1))
-
 if [ $# -ne 0 ]; then
-	printf "Extra argument '%s'\n\n" "$1" >&2
-	usage
+	printf "Extra argument '%s'\\n\\n" "$1" >&2
+	usage_error
 fi
 
 # Validate arguments
 if [ -z "${mode}" ]; then
-	usage "You must specify at least one of -c, -u, or -d."
+	usage_error "You must specify at least one of -c, -u, or -d."
 fi
 
 if [ "${version}" = "all" ] \
-	|| ( [ "${update_initramfs}" = "all" ] && [ -z "${version}" ] ); then
-	: FIXME check for --yes, and if not ask are you sure
+	|| { [ "${update_initramfs}" = "all" ] && [ -z "${version}" ]; }; then
 	get_sorted_versions
 	if [ -z "${version_list}" ]; then
 		verbose "Nothing to do, exiting."
@@ -380,11 +398,9 @@ if [ "${version}" = "all" ] \
 	if [ "${verbose}" = "1" ]; then
 		OPTS="${OPTS} -v"
 	fi
-	if [ "${yes}" = "1" ]; then
-		OPTS="${OPTS} -y"
-	fi
 	for u_version in ${version_list}; do
 		verbose "Execute: ${0} -${mode} -k \"${u_version}\" ${OPTS}"
+		# shellcheck disable=SC2086
 		"${0}" -${mode} -k "${u_version}" ${OPTS}
 	done
 	exit 0

@@ -13,6 +13,7 @@ mkdir -p /var/lock
 mount -t sysfs -o nodev,noexec,nosuid sysfs /sys
 mount -t proc -o nodev,noexec,nosuid proc /proc
 
+# shellcheck disable=SC2013
 for x in $(cat /proc/cmdline); do
 	case $x in
 	initramfs.clear)
@@ -62,6 +63,7 @@ export panic=
 export blacklist=
 export resume=
 export resume_offset=
+export noresume=
 export drop_caps=
 export fastboot=n
 export forcefsck=n
@@ -76,6 +78,7 @@ done
 . /scripts/functions
 
 # Parse command line options
+# shellcheck disable=SC2013
 for x in $(cat /proc/cmdline); do
 	case $x in
 	init=*)
@@ -102,6 +105,7 @@ for x in $(cat /proc/cmdline); do
 		esac
 		;;
 	nfsroot=*)
+		# shellcheck disable=SC2034
 		NFSROOT="${x#nfsroot=}"
 		;;
 	initramfs.runsize=*)
@@ -198,8 +202,7 @@ if [ -z "${BOOT}" ]; then
 fi
 
 if [ -n "${noresume}" ] || [ "$RESUME" = none ]; then
-	export noresume=y
-	unset resume
+	noresume=y
 else
 	resume=${RESUME:-}
 fi
@@ -311,6 +314,7 @@ unset quiet
 unset readonly
 unset resume
 unset resume_offset
+unset noresume
 unset fastboot
 unset forcefsck
 unset fsckfix
@@ -320,6 +324,7 @@ mount -n -o move /sys ${rootmnt}/sys
 mount -n -o move /proc ${rootmnt}/proc
 
 # Chain to real filesystem
-exec run-init ${drop_caps} "${rootmnt}" "${init}" "$@" <${rootmnt}/dev/console >${rootmnt}/dev/console 2>&1
+# shellcheck disable=SC2086,SC2094
+exec run-init ${drop_caps} "${rootmnt}" "${init}" "$@" <"${rootmnt}/dev/console" >"${rootmnt}/dev/console" 2>&1
 echo "Something went badly wrong in the initramfs."
 panic "Please file a bug on initramfs-tools."

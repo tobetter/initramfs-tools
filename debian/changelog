@@ -1,3 +1,85 @@
+initramfs-tools (0.133) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * [942f1d2] unmkinitramfs, lsinitramfs: Avoid zcat compatibility issue by
+    running gzip (Closes: #903931)
+  * [94683ef] mkinitramfs: Remove check for kernel version < 2.6.38
+  * [40fb032] mkinitramfs; Stop setting both compress and COMPRESS variables
+  * [01af757] initramfs-tools: Change trigger declaration to "interest-await"
+  * [2bb6a9c] update-initramfs: Remove test for working dpkg-trigger
+  * [1f10559] kernel hooks: Remove use of update-initramfs -t option
+  * [1343b68] update-initramfs: Remove undocumented -y option
+  * [e0d4024] mkinitramfs: Warn if the compression command is not recognised
+  * [bafb9d4] init: Always export the resume and noresume variables, as
+    documented
+  * [f21fdae] debian/rules: Use a more conservative "find" for shellcheck
+    arguments
+  * [9c63564] Change get_fstype to be silent on failure
+  * [58df6d3] scripts/functions: Abort _checkfs_once early if fs type is
+    unknown
+  * [f8ceeb9] scripts/local: Explicitly check for missing root parameter and
+    mount failure. Thanks to "G.raud" <graud@gmx.com> (Closes: #848906)
+  * [a5ae8a1] scripts/{local,nfs}: Remove redundant modprobe of filesystem
+    modules
+  * [4807ede] hook-functions: Avoid symlinks that conflict with usr-merge in
+    copy_file
+  * [79f49b9] {hooks,scripts}/keymap: Use setupcon --setup-dir
+  * [839be1b] scripts/local: Handle rootfstype=auto the same as if type is
+    unspecified (Closes: #908967)
+  * [f086b72] mkinitramfs: Use default compression level for lzop
+    (Closes: #916935)
+  * [d343f5e] README: Summarise what initramfs-tools does and point to manual
+    pages
+  * [c5dd80a] initramfs-tools(7): Document how to update the initramfs from
+    another package (Closes: #893897)
+  * [2e5e389] scripts/functions: Revert change to _log_msg and make callers
+    format-safe
+  * [49139ca] scripts/local-premount/resume: Report when we are resuming.
+    Thanks to Mario Limonciello <mario.limonciello@dell.com>
+  * [28b9d1d] scripts/nfs: Use "sleep" instead of /bin/sleep (Closes: #677049)
+  * [db394d3] Print warnings and errors in initramfs generation consistently
+  * [d9cf2f2] hooks/fsck: If get_fstype fails, report which file system it
+    failed for (Closes: #766446)
+  * [1ae0994] mkinitramfs: Change EXTRA_CONF to include directory names
+  * [34f84b4] mkinitramfs: Don't add directories to EXTRA_CONF
+  * [db31e7e] mkinitramfs: Use pigz if available instead of gzip
+  * [e4a5589] initramfs-tools-core: Recommend pigz
+  * [b8d3d59] Remove descriptions of removed/deprecated options from man page
+    synopses
+  * [4d57f63] mkinitramfs(8), update-initramfs(8): Fix over-indentation of
+    options
+  * [66902db] update-initramfs(8): Fix formatting of mode options in the
+    synopsis
+  * [bb9d247] Move usage function for mkinitramfs out of hook-functions
+  * [2380cb8] update-initramfs: Use getopt instead of getopts
+  * [abca193] update-initramfs: Make -h option return 0 and write usage to
+    stdout
+  * [ccf07ee] update-initramfs: Support --help option
+  * [c800321] Make all commands return 2 in case of a usage error
+  * [fc81f7f] mkinitramfs: Support -h and --help options
+  * [94e05dd] unmkinitramfs(8): Abbreviate synopsis to avoid wrapping
+  * [00809d7] Make manual pages and usage messages more consistent
+  * [45f4d15] unmkinitramfs: Write usage on stderr in case of error
+  * [908bd7d] lsinitramfs, mkinitramfs, unmkinitramfs: Show usage if getopt
+    fails
+  * [1cc6e78] lsinitramfs: Check for empty list of arguments after parsing
+    options
+  * [fb3ea62] hooks/resume: Report in excruciating detail if the -v option is
+    used
+
+  [ Benjamin Drung ]
+  * [806c757] scripts/functions: Fix syntax error: unexpected "(" on panic
+  * [88b0c9b] mkinitramfs: Fix termination of gzip compression case
+  * [5438f31] scripts/functions: Drop render function
+  * [3c8b4c3] Remove trailing newline from debian/changelog
+  * [f277309] Fix (nearly) all issues found by shellcheck
+  * [2bab73b] Disable shellcheck for desired behaviour
+  * [3650731] Replace 'echo -n' by printf
+  * [9c0feb2] Run shellcheck on package build time
+  * [c9cb0a0] Add autopkgtest for shellcheck
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Wed, 06 Feb 2019 20:13:59 +0000
+
 initramfs-tools (0.132) unstable; urgency=medium
 
   * [4e1f80e] mkinitramfs: Don't try to remove nonexistent /var/cache/ldconfig
@@ -4493,4 +4575,3 @@ initramfs-tools (0.1) unstable; urgency=low
   * Initial Release.
 
  -- Jeff Bailey <jbailey@ubuntu.com>  Thu, 27 Jan 2005 15:23:52 -0500
-
