@@ -1,3 +1,9 @@
+initramfs-tools (0.131ubuntu17) disco; urgency=medium
+
+  * Fix PATH to include /usr/local. LP: #1814355
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Tue, 12 Feb 2019 13:16:06 +0000
+
 initramfs-tools (0.131ubuntu16) disco; urgency=medium
 
   * scripts/functions: include a new option to skip enslaved network
