@@ -7,7 +7,7 @@ import sys
 in_error = False
 
 def error(msg):
-    print(msg)
+    print("ERROR: " + msg)
     global in_error
     in_error = True
 

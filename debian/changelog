@@ -1,3 +1,10 @@
+initramfs-tools (0.131ubuntu18) disco; urgency=medium
+
+  * Explicitly record net autopkgtest dependency on isc-dhcp-client.
+  * Make errors in net autopkgtest a little more obvious.
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 14 Mar 2019 09:28:46 +1300
+
 initramfs-tools (0.131ubuntu17) disco; urgency=medium
 
   * Fix PATH to include /usr/local. LP: #1814355
