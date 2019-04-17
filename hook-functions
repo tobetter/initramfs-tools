@@ -256,6 +256,21 @@ sys_walk_mod_add()
 	done
 }
 
+nvme_dev_sys_walk_mod_add()
+{
+	local dev_sys_path component nvme_sys_path
+	dev_sys_path="$(readlink -f "$1")"
+	if ! echo "$dev_sys_path" | grep -q "nvme-subsys"; then
+		return
+	fi
+	for component in "$dev_sys_path"/nvme* ; do
+		if [ -L "$component" ] ; then
+			nvme_sys_path=$(readlink -f "$component")
+			sys_walk_mod_add "$nvme_sys_path"
+		fi
+	done
+}
+
 block_dev_sys_walk_mod_add()
 {
 	local dev_sys_path disk_sys_path component
@@ -274,6 +289,7 @@ block_dev_sys_walk_mod_add()
 	ls -1 "$disk_sys_path/slaves" | while read component; do
 		block_dev_sys_walk_mod_add "$disk_sys_path/slaves/$component"
 	done
+	nvme_dev_sys_walk_mod_add "$disk_sys_path/device"
 
 	sys_walk_mod_add ${dev_sys_path}
 }

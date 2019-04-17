@@ -1,3 +1,9 @@
+initramfs-tools (0.130ubuntu3.8) bionic; urgency=medium
+
+  * Add modules for nvme path components on multipath nvme. LP: #1778844
+
+ -- Thadeu Lima de Souza Cascardo <cascardo@canonical.com>  Tue, 16 Apr 2019 21:25:56 -0300
+
 initramfs-tools (0.130ubuntu3.7) bionic; urgency=medium
 
   [ Steve Langasek ]
