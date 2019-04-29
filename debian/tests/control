@@ -1,3 +1,14 @@
 # TODO: Check $(find /usr/share/initramfs-tools/hooks /usr/share/initramfs-tools/scripts -type f) once klibc, kmod, and systemd are fixed!
-Test-Command: shellcheck -e SC1090,SC1091 -s dash /usr/bin/lsinitramfs /usr/sbin/mkinitramfs /usr/bin/unmkinitramfs /usr/share/initramfs-tools/hook-functions /usr/share/initramfs-tools/init /etc/kernel/postinst.d/initramfs-tools /etc/kernel/postrm.d/initramfs-tools /usr/sbin/update-initramfs
+Test-Command: shellcheck -e SC1010,SC1090,SC1091,SC2015 -s dash /usr/bin/lsinitramfs /usr/sbin/mkinitramfs /usr/bin/unmkinitramfs /usr/share/initramfs-tools/hook-functions /usr/share/initramfs-tools/init /etc/kernel/postinst.d/initramfs-tools /etc/kernel/postrm.d/initramfs-tools /usr/sbin/update-initramfs
 Depends: @, shellcheck
+
+Tests: net
+Depends: curl,
+         initramfs-tools,
+         isc-dhcp-client,
+         linux-image-generic,
+         lsb-release,
+         parted,
+         python3,
+         qemu-system
+Restrictions: needs-root, allow-stderr
