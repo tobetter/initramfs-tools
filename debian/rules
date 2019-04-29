@@ -10,17 +10,33 @@ BUSYBOX_MIN_VERSION := 1:1.22.0-17~
 
 override_dh_gencontrol:
 	echo >> debian/initramfs-tools-core.substvars "busybox:Breaks=$(wordlist 2,100,$(BUSYBOX_PACKAGES:%=, % (<< $(BUSYBOX_MIN_VERSION))))"
-	echo >> debian/initramfs-tools-core.substvars "busybox:Recommends=$(wordlist 2,100,$(BUSYBOX_PACKAGES:%=| % (>= $(BUSYBOX_MIN_VERSION))))"
+	echo >> debian/initramfs-tools-core.substvars "busybox:Depends=$(wordlist 2,100,$(BUSYBOX_PACKAGES:%=| % (>= $(BUSYBOX_MIN_VERSION))))"
 	dh_gencontrol
 
 override_dh_install:
+	install -d debian/initramfs-tools-core/usr/sbin
 	sed -e 's,@BUSYBOX_PACKAGES@,$(wordlist 2,100,$(BUSYBOX_PACKAGES:%=or %)),' \
 	    -e 's/@BUSYBOX_MIN_VERSION@/$(BUSYBOX_MIN_VERSION)/' \
 		mkinitramfs > debian/initramfs-tools-core/usr/sbin/mkinitramfs
 	chmod 755 debian/initramfs-tools-core/usr/sbin/mkinitramfs
 	dh_install
 
+DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_GNU_TYPE  := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ifeq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
+CROSS :=
+else
+CROSS := CC=$(DEB_HOST_GNU_TYPE)-gcc PKG_CONFIG=$(DEB_HOST_GNU_TYPE)-pkg-config
+endif
+
+override_dh_auto_build:
+	make -C src $(CROSS)
+
+override_dh_auto_clean:
+	make -C src clean
+
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	shellcheck -e SC1090,SC1091 -s dash hook-functions $$(find hooks scripts -type f) $$({ find . -maxdepth 1 -type f -executable; find debian -maxdepth 1 -type f; find docs kernel -type f; } | xargs grep -l '^#!/bin/sh')
+	shellcheck -e SC1010,SC1090,SC1091,SC2015 -s dash hook-functions $$(find hooks scripts -type f) $$({ find . -maxdepth 1 -type f -executable; find debian -maxdepth 1 -type f; find docs kernel -type f; } | xargs grep -l '^#!/bin/sh')
+	./tests/run-tests
 endif
