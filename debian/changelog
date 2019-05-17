@@ -1,3 +1,11 @@
+initramfs-tools (0.133ubuntu2) eoan; urgency=medium
+
+  * Use set -a/+a around loading conf snippets, to autoexport hook
+    configuration variables. This thus allows packaged hooks to configure
+    each other.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 17 May 2019 09:51:24 +0200
+
 initramfs-tools (0.133ubuntu1) eoan; urgency=low
 
   * Merge from Debian unstable.  Remaining changes:
