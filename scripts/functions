@@ -312,6 +312,16 @@ configure_networking()
 
 	_handle_device_vs_ip
 
+	# activate non-autoconfigured s390x devices
+	for dev in $DEVICE $DEVICE6 $IP6; do
+		case ${dev} in
+		enc*)
+			zdev=${dev#enc}
+			chzdev -e "$zdev" || true
+			;;
+		esac
+	done
+
 	wait_for_udev 10
 
 	# support ip options see linux sources

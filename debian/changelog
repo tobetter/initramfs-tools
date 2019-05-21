@@ -1,3 +1,10 @@
+initramfs-tools (0.133ubuntu3) eoan; urgency=medium
+
+  * Auto activate qeth devices on s390x hosts, when using ip= ip6= command
+    lines.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 22 May 2019 00:46:49 +0100
+
 initramfs-tools (0.133ubuntu2) eoan; urgency=medium
 
   * Use set -a/+a around loading conf snippets, to autoexport hook
