@@ -1,3 +1,10 @@
+initramfs-tools (0.133ubuntu4) eoan; urgency=medium
+
+  * Switch default initramfs compression to lz4, faster than the current
+    default gzip. LP: #1831736
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 05 Jun 2019 13:23:29 +0100
+
 initramfs-tools (0.133ubuntu3) eoan; urgency=medium
 
   * Auto activate qeth devices on s390x hosts, when using ip= ip6= command
