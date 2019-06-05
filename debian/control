@@ -28,7 +28,7 @@ Description: generic modular initramfs generator (automation)
 Package: initramfs-tools-core
 Architecture: all
 Multi-Arch: foreign
-Depends: ${busybox:Depends}, initramfs-tools-bin (= ${binary:Version}), klibc-utils (>= 2.0.4-8~), cpio (>= 2.12), kmod, udev, coreutils (>= 8.24), e2fsprogs, ${misc:Depends}
+Depends: ${busybox:Depends}, initramfs-tools-bin (= ${binary:Version}), klibc-utils (>= 2.0.4-8~), cpio (>= 2.12), lz4, kmod, udev, coreutils (>= 8.24), e2fsprogs, ${misc:Depends}
 Suggests: bash-completion
 Breaks: initramfs-tools (<< 0.121~), ${busybox:Breaks}
 Replaces: initramfs-tools (<< 0.121~)
