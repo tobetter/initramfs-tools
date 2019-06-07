@@ -501,7 +501,7 @@ _declare_ip_info() {
 		dhcp|dhcp4|dhcp6)
 			echo "dhcp${version}=true"
 			;;
-		static)
+		none)
 			if [ -n "$address" ]; then
 				netprefix=$netmask
 				if [ "$version" = "4" ]; then
