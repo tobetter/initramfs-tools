@@ -1,3 +1,13 @@
+initramfs-tools (0.133ubuntu5) eoan; urgency=medium
+
+  * Correctly serialize previously absent static ip configuration
+    (declared as protocol 'none' by ipconfig) into runtime netplan
+    yaml. LP: #1832042
+  * Adjust testsuite sample file to match reality
+  * Set executable bit on resume script in local-premount
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Jun 2019 21:56:33 +0100
+
 initramfs-tools (0.133ubuntu4) eoan; urgency=medium
 
   * Switch default initramfs compression to lz4, faster than the current
