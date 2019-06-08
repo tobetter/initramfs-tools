@@ -1,3 +1,11 @@
+initramfs-tools (0.133ubuntu6) eoan; urgency=medium
+
+  * Revert lz4 by default, and switch to gzip, as lsinitramfs and
+    unmkinitramfs tools fails on lz4 compressed initrds. Regression bug
+    https://bugs.launchpad.net/ubuntu/+source/initramfs-tools/+bug/1832108
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Sat, 08 Jun 2019 23:03:00 +0100
+
 initramfs-tools (0.133ubuntu5) eoan; urgency=medium
 
   * Correctly serialize previously absent static ip configuration
