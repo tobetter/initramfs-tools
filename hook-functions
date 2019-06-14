@@ -619,6 +619,7 @@ auto_add_modules()
 				macvtap.ko pcmcia sb1000.ko team tokenring \
 				tun.ko usb veth.ko wan wimax wireless \
 				xen-netback.ko
+			modules="$modules 8021q"
 		;;
 		ide)
 			copy_modules_dir kernel/drivers/ide

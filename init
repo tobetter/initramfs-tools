@@ -55,6 +55,7 @@ export ROOTFLAGS=
 export ROOTFSTYPE=
 export IP=
 export IP6=
+export VLAN=
 export DEVICE=
 export BOOT=
 export BOOTIF=
@@ -147,6 +148,9 @@ for x in $(cat /proc/cmdline); do
 		;;
 	ip6=*)
 		IP6="${x#ip6=}"
+		;;
+	vlan=*)
+		VLAN="${x#vlan=}"
 		;;
 	boot=*)
 		BOOT=${x#boot=}
@@ -340,6 +344,7 @@ unset ROOTDELAY
 unset ROOT
 unset IP
 unset IP6
+unset VLAN
 unset BOOT
 unset BOOTIF
 unset DEVICE

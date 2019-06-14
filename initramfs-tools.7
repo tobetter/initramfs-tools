@@ -84,6 +84,12 @@ NFS server than the DHCP server. See Documentation/filesystems/nfsroot.txt
 in any recent Linux source for details. Optional parameter for NFS root.
 
 .TP
+\fB\fI vlan
+tells to create a VLAN tagged device. Allows one to configure one or
+multiple VLAN tagged devices using the "vlan=$name.$id:$parent"
+syntax. E.g. "vlan=eth0.1:eth0" Optional parameter for NFS root.
+
+.TP
 \fB\fI BOOTIF
 is a mac address in pxelinux format with leading "01-" and "-" as separations.
 pxelinux passes mac address of network card used to PXE boot on with this

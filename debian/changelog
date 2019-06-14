@@ -1,3 +1,10 @@
+initramfs-tools (0.133ubuntu9) eoan; urgency=medium
+
+  * Add support for creating VLANs via vlan=eth0.1:eth0 on kernel
+    commandline, and as VLAN= conf.d snippet. LP: #1382054
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 14 Jun 2019 14:46:05 +0100
+
 initramfs-tools (0.133ubuntu8) eoan; urgency=medium
 
   * Switch back to lz4 by default.
