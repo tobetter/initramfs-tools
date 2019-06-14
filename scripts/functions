@@ -312,14 +312,26 @@ configure_networking()
 
 	_handle_device_vs_ip
 
+	for v in $VLAN; do
+		VLAN_LINK="$VLAN_LINK ${v##*:}"
+	done
+
 	# activate non-autoconfigured s390x devices
-	for dev in $DEVICE $DEVICE6 $IP6; do
+	for dev in $DEVICE $DEVICE6 $IP6 $VLAN_LINK; do
 		case ${dev} in
 		enc*)
 			zdev=${dev#enc}
 			chzdev -e "$zdev" || true
 			;;
 		esac
+	done
+
+	for v in $VLAN; do
+		vlink=${v##*:}
+		vname=${v%:*}
+		vid=${vname#*.}
+		ip link set up dev "$vlink"
+		ip link add name "$vname" link "$vlink" type vlan id "$vid"
 	done
 
 	wait_for_udev 10
@@ -519,8 +531,12 @@ _declare_ip_info() {
 _render_netplan() {
 	# write a netplan stanza for the given device.
 	local name="$1" mac="$2" dhcp4="$3" dhcp6="$4" addrs="$5" \
-		gateway4="$6" gateway6="$7" ns_addrs="$8" ns_search="$9"
+		gateway4="$6" gateway6="$7" ns_addrs="$8" ns_search="$9" \
+		vlink="${10}" vname="${11}" vid="${12}"
 	local n found=""
+	if [ -n "$vlink" ]; then
+		name=$vlink
+	fi
 	echo "network:"
 	echo "  version: 2"
 	echo "  renderer: networkd"
@@ -530,6 +546,12 @@ _render_netplan() {
 		echo "      match:"
 		echo "        macaddress: \"$mac\""
 		echo "      set-name: $name"
+	fi
+	if [ -n "$vname" ]; then
+		echo "  vlans:"
+		echo "    $vname:"
+		echo "      id: $vid"
+		echo "      link: $name"
 	fi
 	if [ -n "$dhcp4" ]; then
 		echo "      dhcp4: $dhcp4"
@@ -618,6 +640,17 @@ netinfo_to_netplan() {
 		fi
 
 		{
+		for v in $VLAN; do
+			vlink=${v##*:}
+			vname=${v%:*}
+			vid=${vname#*.}
+			if [ "$name" = "$vname" ]; then
+				echo "vlink=$vlink"
+				echo "vname=$vname"
+				echo "vid=$vid"
+				break
+			fi
+		done
 		if [ -n "$DEVICE" ]; then
 			# shellcheck disable=SC2153
 			_declare_ip_info 4 "$PROTO" "$IPV4ADDR" "$IPV4NETMASK" "$IPV4GATEWAY"
@@ -637,9 +670,11 @@ netinfo_to_netplan() {
 	for name in $devices; do
 		local macaddress="" dhcp4="" dhcp6="" addresses=""
 		local gateway4="" gateway6="" ns_addresses="" ns_search=""
+		local vlink="" vname="" vid=""
 		. "$tmpd/$name"
 		_render_netplan "$name" "$macaddress" "$dhcp4" "$dhcp6" "$addresses" \
 			"$gateway4" "$gateway6" "$ns_addresses" "$ns_search" \
+			"$vlink" "$vname" "$vid" \
 			> "${out_d}/$name.yaml"
 	done
 	rm -Rf "$tmpd"
