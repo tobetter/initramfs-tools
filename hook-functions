@@ -124,14 +124,14 @@ copy_file() {
 
 	[ -f "${src}" ] || return 2
 
+	if [ -d "${DESTDIR}/${target}" ]; then
+		target="${target}/${src##*/}"
+	fi
+
 	# Canonicalise usr-merged target directories
 	case "${target}" in
 	/bin/* | /lib* | /sbin/*) target="/usr${target}" ;;
 	esac
-
-	if [ -d "${DESTDIR}/${target}" ]; then
-		target="${target}/${src##*/}"
-	fi
 
 	# check if already copied
 	[ -e "${DESTDIR}/${target}" ] && return 1
@@ -449,7 +449,7 @@ dep_add_modules()
 	fi
 
 	# sys walk some important device classes
-	for class in gpio phy regulator rtc; do
+	for class in extcon gpio phy regulator rtc; do
 		for device in "/sys/class/$class"/*; do
 			device="$(readlink -f "$device")" \
 				&& sys_walk_mod_add "$device"
@@ -538,15 +538,17 @@ auto_add_modules()
 			copy_modules_dir kernel/drivers/usb/musb
 			copy_modules_dir kernel/drivers/usb/renesas_usbhs
 			# and any extcon drivers for USB
-			modules="$modules extcon-usb-gpio"
+			modules="$modules extcon-usb-gpio extcon-usbc-cros-ec"
 			# Add the axp20x_usb_power power supply driver,
 			# required to initialize the USB host controllers
 			# on a number of armhf systems
 			modules="$modules axp20x_usb_power"
 
-			# Include all HID drivers unless we're sure they
-			# don't support keyboards.  hid-*ff covers various
-			# game controllers with force feedback.
+			# Include all keyboard drivers and all HID drivers
+			# unless we're sure they don't support keyboards.
+			# hid-*ff covers various game controllers with
+			# force feedback.
+			copy_modules_dir kernel/drivers/input/keyboard
 			copy_modules_dir kernel/drivers/hid \
 				'hid-*ff.ko' hid-a4tech.ko hid-cypress.ko \
 				hid-dr.ko hid-elecom.ko hid-gyration.ko \
@@ -560,6 +562,8 @@ auto_add_modules()
 				hid-speedlink.ko hid-tivo.ko hid-twinhan.ko \
 				hid-uclogic.ko hid-wacom.ko hid-waltop.ko \
 				hid-wiimote.ko hid-zydacron.ko
+			# needed to access keyboard on some ChromeOS devices
+			modules="$modules cros_ec_spi"
 
 			# Any of these might be needed by other drivers
 			copy_modules_dir kernel/drivers/bus
@@ -571,6 +575,7 @@ auto_add_modules()
 			copy_modules_dir kernel/drivers/phy
 			copy_modules_dir kernel/drivers/pinctrl
 			copy_modules_dir kernel/drivers/regulator
+			copy_modules_dir kernel/drivers/spi
 			copy_modules_dir kernel/drivers/usb/phy
 
 			# Needed for periodic fsck

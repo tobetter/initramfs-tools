@@ -26,9 +26,9 @@ if ! local_device_setup "${resume}" "suspend/resume device" false; then
 	exit 0
 fi
 
-use_plymouth=false
-if command -v plymouth >/dev/null && plymouth --ping; then
-	use_plymouth=true
+if [ "$(get_fstype "${DEV}")" = suspend ] &&
+   command -v plymouth >/dev/null &&
+   plymouth --ping; then
 	plymouth display-message --text="Resuming from hibernation"
 
 	# The above command does not wait for a framebuffer update to
@@ -43,9 +43,4 @@ if [ -n "${resume_offset?}" ]; then
 	/bin/resume "${DEV}" "${resume_offset}"
 else
 	/bin/resume "${DEV}"
-fi
-
-if "$use_plymouth"; then
-	# plymouth hide-message does not work yet
-	plymouth display-message --text=""
 fi
