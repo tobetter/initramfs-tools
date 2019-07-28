@@ -45,7 +45,7 @@ panic()
 	if [ -n "${panic?}" ]; then
 		echo "Rebooting automatically due to panic= boot argument"
 		sleep "${panic}"
-		reboot
+		reboot -f
 		exit  # in case reboot fails, force kernel panic
 	fi
 

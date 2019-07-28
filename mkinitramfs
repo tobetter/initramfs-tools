@@ -185,8 +185,10 @@ gzip)	# If we're doing a reproducible build, use gzip -n
 	fi
 	;;
 lz4)	compress="lz4 -9 -l" ;;
-lzop)	;;
 xz)	compress="xz --check=crc32" ;;
+bzip2|lzma|lzop)
+	# no parameters needed
+	;;
 *)	echo "W: Unknown compression command ${compress}" >&2 ;;
 esac
 
