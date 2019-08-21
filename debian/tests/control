@@ -1,2 +1,2 @@
-Test-Command: shellcheck -e SC1090,SC1091 -s dash /usr/bin/lsinitramfs /usr/sbin/mkinitramfs /usr/bin/unmkinitramfs /usr/share/initramfs-tools/hook-functions /usr/share/initramfs-tools/init /etc/kernel/postinst.d/initramfs-tools /etc/kernel/postrm.d/initramfs-tools /usr/sbin/update-initramfs $(find /usr/share/initramfs-tools/hooks /usr/share/initramfs-tools/scripts -type f)
+Tests: shellcheck
 Depends: @, shellcheck
