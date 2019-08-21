@@ -670,6 +670,9 @@ hidden_dep_add_modules()
 			nvme)
 				echo vmd
 				;;
+			spi-rockchip)
+				echo pl330
+				;;
 			esac
 		done
 		)
