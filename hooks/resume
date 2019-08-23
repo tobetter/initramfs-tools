@@ -81,7 +81,10 @@ if ! ischroot && [ -r /proc/swaps ]; then
 		$ephemeral || break
 	done
 
-	if [ -n "$resume_auto" ] && ! $ephemeral; then
+	if $ephemeral; then
+		resume_auto=
+	fi
+	if [ -n "$resume_auto" ]; then
 		if [ -n "$dm_name" ]; then
 			resume_auto_canon="/dev/mapper/$dm_name"
 		elif UUID=$(blkid -s UUID -o value "$resume_auto"); then
