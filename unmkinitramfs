@@ -33,7 +33,7 @@ xcpio()
 		gzip -c -d "$archive"
 	elif xzcat -t "$archive" >/dev/null 2>&1 ; then
 		xzcat "$archive"
-	elif lz4cat -t "$archive" >/dev/null 2>&1 ; then
+	elif lz4cat -t < "$archive" >/dev/null 2>&1 ; then
 		lz4cat "$archive"
 	elif bzip2 -t "$archive" >/dev/null 2>&1 ; then
 		bzip2 -c -d "$archive"

@@ -1,3 +1,30 @@
+initramfs-tools (0.133+deb10u1) buster; urgency=medium
+
+  [ Ben Hutchings ]
+  * [998371a] hooks/resume: Disable resume when there are no suitable swap
+    devices. Thanks to Trek <trek00@inbox.ru> (Closes: #916696)
+  * [d653197] hook-functions: Include all keyboard driver modules when
+    MODULES=most. Thanks to Alper Nebi Yasak <alpernebiyasak@gmail.com>
+  * [5681ccb] hook-functions: Include cros_ec_spi and SPI drivers when
+    MODULES=most. Thanks to Alper Nebi Yasak <alpernebiyasak@gmail.com>
+  * [8d62542] resume: Set plymouth status only if there is a suspend image
+    (Closes: #928736)
+  * [073586a] hook-functions: Fix copy_file with target of "/bin"
+    (Closes: #928689)
+  * [a78d9a5] unmkinitramfs: Work around lz4cat filename check.
+    Thanks to Dimitri John Ledkov <xnox@ubuntu.com> (Closes: #930366)
+  * [48a35de] update-initramfs(8): Update description of "-k all" option
+
+  [ Alper Nebi Yasak ]
+  * [1abb6f6] hook-functions: Include extcon-usbc-cros-ec when MODULES=most
+  * [db6d4e2] hook-functions: Include extcon drivers when MODULES=dep
+
+  [ Uwe Kleine-König ]
+  * [360fb48] mkinitramfs: suppress warning when using bzip2 or lzma
+    (Closes: #930754)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Fri, 23 Aug 2019 02:16:37 +0100
+
 initramfs-tools (0.133) unstable; urgency=medium
 
   [ Ben Hutchings ]
