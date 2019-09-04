@@ -1,3 +1,10 @@
+initramfs-tools (0.122ubuntu8.15) xenial; urgency=medium
+
+  * hook-functions: include ehci-platform from HWE kernel.
+    (LP: #1842284)
+
+ -- Ike Panhc <ike.pan@canonical.com>  Wed, 04 Sep 2019 15:24:58 +0800
+
 initramfs-tools (0.122ubuntu8.14) xenial-security; urgency=medium
 
   * scripts/functions: include a new option to skip enslaved network
