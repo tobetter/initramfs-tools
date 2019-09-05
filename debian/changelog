@@ -1,3 +1,9 @@
+initramfs-tools (0.133ubuntu10) eoan; urgency=medium
+
+  * Add support for panic=-1 value (LP: #1831252)
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Thu, 05 Sep 2019 12:31:43 +0200
+
 initramfs-tools (0.133ubuntu9) eoan; urgency=medium
 
   * Add support for creating VLANs via vlan=eth0.1:eth0 on kernel
