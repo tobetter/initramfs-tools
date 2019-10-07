@@ -1,3 +1,9 @@
+initramfs-tools (0.122ubuntu8.16) xenial; urgency=medium
+
+  * Add support for panic=-1 value (LP: #1831252)
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Mon, 07 Oct 2019 12:53:35 +0200
+
 initramfs-tools (0.122ubuntu8.15) xenial; urgency=medium
 
   * hook-functions: include ehci-platform from HWE kernel.
