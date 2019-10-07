@@ -156,6 +156,7 @@ for x in $(cat /proc/cmdline); do
 	panic=*)
 		panic="${x#panic=}"
 		case ${panic} in
+		-1) ;;
 		*[![:digit:].]*)
 			panic=
 			;;

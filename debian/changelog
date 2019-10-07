@@ -1,3 +1,9 @@
+initramfs-tools (0.130ubuntu3.9) bionic; urgency=medium
+
+  * Add support for panic=-1 value (LP: #1831252)
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Mon, 07 Oct 2019 12:53:35 +0200
+
 initramfs-tools (0.130ubuntu3.8) bionic; urgency=medium
 
   * Add modules for nvme path components on multipath nvme. LP: #1778844
