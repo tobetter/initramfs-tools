@@ -1,3 +1,9 @@
+initramfs-tools (0.131ubuntu19.2) disco; urgency=medium
+
+  * Add support for panic=-1 value (LP: #1831252)
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Mon, 07 Oct 2019 12:46:48 +0200
+
 initramfs-tools (0.131ubuntu19.1) disco; urgency=medium
 
   * Patch unmkinitramfs to cat possible lz4 archives first, as lz4 is
