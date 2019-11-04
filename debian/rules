@@ -6,7 +6,7 @@
 # On Debian we can use either busybox or busybox-static, but on Ubuntu
 # and derivatives only busybox-initramfs will work.
 BUSYBOX_PACKAGES := $(shell if dpkg-vendor --derives-from ubuntu; then echo busybox-initramfs; else echo busybox busybox-static; fi)
-BUSYBOX_MIN_VERSION := 1:1.22.0-17~
+BUSYBOX_MIN_VERSION := 1:1.30.1-4ubuntu5~
 
 override_dh_gencontrol:
 	echo >> debian/initramfs-tools-core.substvars "busybox:Breaks=$(wordlist 2,100,$(BUSYBOX_PACKAGES:%=, % (<< $(BUSYBOX_MIN_VERSION))))"

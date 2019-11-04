@@ -1,3 +1,10 @@
+initramfs-tools (0.133ubuntu11) focal; urgency=medium
+
+  * hooks/fixrtc, debian/rules: Stop pulling in coreutils date and hwclock,
+    instead using the slimmer and newly built-in busybox-initramfs applets.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Mon, 04 Nov 2019 10:21:05 -0700
+
 initramfs-tools (0.133ubuntu10) eoan; urgency=medium
 
   * Add support for panic=-1 value (LP: #1831252)
