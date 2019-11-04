@@ -19,7 +19,6 @@ esac
 
 . /usr/share/initramfs-tools/hook-functions
 
-# We use date, hwclock and dumpe2fs
-copy_exec /bin/date /bin
-copy_exec /sbin/hwclock /sbin
+# We use the full dumpe2fs because we basically get it for "free"
+# if we're already on extN due to e2fsck pulling in all the libs:
 copy_exec /sbin/dumpe2fs /sbin
