@@ -36,7 +36,7 @@ log_end_msg()
 add_mountroot_fail_hook()
 {
 	mkdir -p /tmp/mountroot-fail-hooks.d
-	ln -s "$0" /tmp/mountroot-fail-hooks.d/"$1"
+	ln -s "$0" /tmp/mountroot-fail-hooks.d/"$0"
 }
 
 # Run failure hooks.
