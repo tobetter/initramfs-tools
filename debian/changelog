@@ -1,3 +1,11 @@
+initramfs-tools (0.133ubuntu12) focal; urgency=medium
+
+  * debian/{control,rules}: Don't run shellcheck on i386 to avoid pulling
+    ghc into our minimal supported set for the newly-pruned architecture.
+  * scripts/functions: Fix args in the add_mountroot_fail_check function.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Fri, 29 Nov 2019 12:16:07 -0700
+
 initramfs-tools (0.133ubuntu11) focal; urgency=medium
 
   * hooks/fixrtc, debian/rules: Stop pulling in coreutils date and hwclock,
