@@ -388,7 +388,14 @@ fi
 
 if [ "${version}" = "all" ] \
 	|| { [ "${update_initramfs}" = "all" ] && [ -z "${version}" ]; }; then
-	get_sorted_versions
+	case "${mode}" in
+	c)
+		version_list="$(linux-version list)"
+		;;
+	d | u)
+		get_sorted_versions
+		;;
+	esac
 	if [ -z "${version_list}" ]; then
 		verbose "Nothing to do, exiting."
 		exit 0

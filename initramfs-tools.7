@@ -516,7 +516,7 @@ if [ ! \-x "/sbin/frobnicate" ]; then
 fi
 
 force_load frobnicator interval=10
-cp /sbin/frobnicate "${DESTDIR}/sbin"
+copy_exec /sbin/frobnicate /sbin
 exit 0
 .fi
 .RE
