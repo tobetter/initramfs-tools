@@ -1,2 +1,3 @@
 Tests: shellcheck
 Depends: @, shellcheck
+Restrictions: superficial

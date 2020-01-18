@@ -1,3 +1,55 @@
+initramfs-tools (0.136) unstable; urgency=medium
+
+  [ Mathieu Malaterre ]
+  * [90bd459] Update to new name for kernel module therm_pm72
+
+  [ Alper Nebi Yasak ]
+  * [ded7214] hook-functions: Handle dw_mmc-rockchip hidden dependency on
+    rockchip-io-domain
+  * [da85190] hook-functions: Include modules for Chromebook Plus display
+
+  [ Ben Hutchings ]
+  * [afd2668] debian/tests/control: Mark shellcheck test as superficial
+  * [9d8b690] mkinitramfs: Remove workaround for old udev versions
+  * [2b55aca] mkinitramfs: Remove special case for Arm OABI ports
+  * [a9e5169] mkinitramfs: Remove armhf dynamic linker hack
+  * [b19b6f3] debian/rules: Suppress execution of dh_installinitramfs
+  * [8330bcd] mkinitramfs: Use cp -p option for ld.so.conf* instead of -aZ
+  * [15fd713] initramfs-tools(7): Change example to use copy_exec instead of cp
+  * [c2d589e] Revert "mkinitramfs: check if initramfs has a shell"
+  * [835d584] mkinitramfs: Copy modules.builtin.bin into initramfs
+    (Closes: #948257)
+  * [0012977] init: Remove special case for kernel parameter resume=UUID=...
+  * [897ab77] update-initramfs: Make "-c -k all" options useful again
+    (Closes: #926401)
+  * [d6c6eec] init: Mount /dev with "exec" option if v86d is present
+    (Closes: #940171)
+  * [a9e73b5] hook-functions: Drop ext4dev from filesystem module list
+  * [41d9ceb] mkinitramfs: Enable multihreaded xz compression (Closes: #942144)
+
+  [ Alexander Volkov ]
+  * [e34affa] Don't require build dependency on shellcheck when nocheck profile
+    is enabled
+
+  [ Johannes 'josch' Schauer ]
+  * [e2ad678] hook-functions: preloaded libraries should not end up in the
+    initramfs (Closes: #944929)
+
+  [ Debian Janitor ]
+  * [a1e17fc] Bump debhelper from old 9 to 12.
+  * [4d86d1a] Set debhelper-compat version in Build-Depends.
+
+  [ Romain Perier ]
+  * [4df27e2] hook-functions: Add f2fs as base in auto_add_modules
+
+  [ Christian Göttsche ]
+  * [0db5752] Do not copy SELinux context in mkinitramfs (Closes: #948365)
+
+  [ Topi Miettinen ]
+  * [55afeec] Tighten permissions for /run/initramfs
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sat, 18 Jan 2020 18:48:51 +0000
+
 initramfs-tools (0.135) unstable; urgency=medium
 
   [ Topi Miettinen ]
