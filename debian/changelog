@@ -1,3 +1,10 @@
+initramfs-tools (0.133ubuntu13) focal; urgency=medium
+
+  * Cherrypick upstream patch to include libgcc_s for libpthread. LP:
+    #1861757
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Tue, 04 Feb 2020 13:38:20 +0000
+
 initramfs-tools (0.133ubuntu12) focal; urgency=medium
 
   * debian/{control,rules}: Don't run shellcheck on i386 to avoid pulling
