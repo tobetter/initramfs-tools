@@ -1,3 +1,9 @@
+initramfs-tools (0.133ubuntu14) focal; urgency=medium
+
+  * Handle both libgcc1 and libgcc-s1 locations.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Tue, 04 Feb 2020 23:51:00 +0000
+
 initramfs-tools (0.133ubuntu13) focal; urgency=medium
 
   * Cherrypick upstream patch to include libgcc_s for libpthread. LP:
