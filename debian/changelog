@@ -1,3 +1,9 @@
+initramfs-tools (0.133ubuntu15) focal; urgency=medium
+
+  * mkinitramfs: Copy modules.builtin.bin into initramfs (LP: #1863261)
+
+ -- Rafael David Tinoco <rafaeldtinoco@ubuntu.com>  Fri, 14 Feb 2020 15:05:29 +0000
+
 initramfs-tools (0.133ubuntu14) focal; urgency=medium
 
   * Handle both libgcc1 and libgcc-s1 locations.
