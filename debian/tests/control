@@ -1,3 +1,14 @@
 Tests: shellcheck
 Depends: @, shellcheck
 Restrictions: superficial
+
+Tests: net
+Depends: curl,
+         initramfs-tools,
+         isc-dhcp-client,
+         linux-image-generic,
+         lsb-release,
+         parted,
+         python3,
+         qemu-system
+Restrictions: needs-root, allow-stderr
