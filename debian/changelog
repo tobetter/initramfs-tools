@@ -1,3 +1,10 @@
+initramfs-tools (0.136ubuntu2) focal; urgency=medium
+
+  * scripts/functions:_render_netplan(): Make configure_networking()
+    more resilient when called by set -e scripts. LP: #1868310.
+
+ -- dann frazier <dannf@ubuntu.com>  Fri, 20 Mar 2020 14:09:47 -0600
+
 initramfs-tools (0.136ubuntu1) focal; urgency=low
 
   * Merge from Debian unstable.  Remaining changes:
