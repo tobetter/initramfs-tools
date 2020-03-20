@@ -557,8 +557,8 @@ _render_netplan() {
 		echo "      dhcp4: $dhcp4"
 		echo "      dhcp-identifier: mac"
 	fi
-	[ -n "$dhcp6" ] && echo "      dhcp6: $dhcp6"
-	[ -n "$dhcp4$dhcp6" ] && echo "      critical: true"
+	[ -n "$dhcp6" ] && echo "      dhcp6: $dhcp6" || true
+	[ -n "$dhcp4$dhcp6" ] && echo "      critical: true" || true
 	if [ -n "$addrs" ]; then
 		echo "      addresses:"
 		found=","
@@ -569,8 +569,8 @@ _render_netplan() {
 			echo "        - \"$n\""
 		done
 	fi
-	[ -n "$gateway4" ] && echo "      gateway4: \"$gateway4\""
-	[ -n "$gateway6" ] && echo "      gateway6: \"$gateway6\""
+	[ -n "$gateway4" ] && echo "      gateway4: \"$gateway4\"" || true
+	[ -n "$gateway6" ] && echo "      gateway6: \"$gateway6\"" || true
 
 	if [ -n "$ns_addrs" ]; then
 		local alist="[" slist=""
@@ -592,7 +592,7 @@ _render_netplan() {
 		fi
 		echo "      nameservers:"
 		echo "        addresses: $alist"
-		[ -n "$slist" ] && echo "        search: $slist"
+		[ -n "$slist" ] && echo "        search: $slist" || true
 	fi
 }
 
