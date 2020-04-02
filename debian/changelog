@@ -1,3 +1,12 @@
+initramfs-tools (0.136ubuntu3) focal; urgency=medium
+
+  * Revert upstream commit 0012977; Ubuntu's resume script implementation
+    diverges from Debian's and this special-case handling of UUID (which is
+    used as the resume target in the default scenario) is required here.
+    LP: #1869996.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 01 Apr 2020 21:33:18 -0700
+
 initramfs-tools (0.136ubuntu2) focal; urgency=medium
 
   * scripts/functions:_render_netplan(): Make configure_networking()
