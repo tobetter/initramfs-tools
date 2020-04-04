@@ -542,7 +542,7 @@ _render_netplan() {
 	echo "  renderer: networkd"
 	echo "  ethernets:"
 	echo "    $name:"
-	if [ -n "$mac" ]; then
+	if [ -n "$mac" ] && grep -q net.ifnames=0 /proc/cmdline 2>/dev/null; then
 		echo "      match:"
 		echo "        macaddress: \"$mac\""
 		echo "      set-name: $name"
