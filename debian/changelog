@@ -1,3 +1,11 @@
+initramfs-tools (0.136ubuntu5) focal; urgency=medium
+
+  * Emit empty dictionary in the ethernets section, for static vlan
+    configs without any matches, as otherwise it is invalid config. Patch
+    by mwhudson.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 08 Apr 2020 21:22:40 +0100
+
 initramfs-tools (0.136ubuntu4) focal; urgency=medium
 
   * Skip setting mac-address, unless unsupported unpredictable netnames

@@ -546,6 +546,8 @@ _render_netplan() {
 		echo "      match:"
 		echo "        macaddress: \"$mac\""
 		echo "      set-name: $name"
+	elif [ -n "$vname" ]; then
+		echo "      {}"
 	fi
 	if [ -n "$vname" ]; then
 		echo "  vlans:"
