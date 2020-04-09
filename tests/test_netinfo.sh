@@ -64,6 +64,26 @@ run_netinfo_to_netplan() {
    pass_on_nodiff "$tname" "$expected_d" "$found_d"
 }
 
+run_netplan_generate() {
+   local bname="$1" testdir="$2" results_d="$3"
+   local tname="$bname-netplan-generate"
+   shift 3
+   local expected_d="$testdir/netplan"
+   [ -d "$expected_d" ] || return $RET_SKIP
+   type netplan >/dev/null 2>/dev/null || return $RET_SKIP
+
+   mkdir -p $results_d/lib/
+   cp -r $expected_d $results_d/lib
+   netplan generate --root-dir $results_d
+   r=$?
+   if [ $r -eq 0 ]; then
+      logpass "$tname"
+   else
+      logfail "$tname: netplan generate failed"
+      return $RET_FAIL
+   fi
+}
+
 record() {
    local ret="$1"
    case "$ret" in
@@ -86,6 +106,9 @@ for testdir in "${data_dir}"/*; do
    record $?
 
    run_netinfo_to_netplan "$dname" "$testdir" "$results_d" $confs
+   record $?
+
+   run_netplan_generate "$dname" "$testdir" "$results_d" $confs
    record $?
 
    rm -Rf "${results_d}"

@@ -3,6 +3,7 @@ network:
   renderer: networkd
   ethernets:
     example1:
+      {}
   vlans:
     example1.1:
       id: 1

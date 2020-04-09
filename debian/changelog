@@ -1,3 +1,11 @@
+initramfs-tools (0.136ubuntu6) focal; urgency=medium
+
+  * Adjust testsuite for correct expected netplan output.
+  * Add tests to parse netplan.yaml with netplan generate.
+  * Run unittests during autopkgtests.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Thu, 09 Apr 2020 08:35:46 +0100
+
 initramfs-tools (0.136ubuntu5) focal; urgency=medium
 
   * Emit empty dictionary in the ethernets section, for static vlan
