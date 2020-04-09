@@ -2,6 +2,10 @@ Tests: shellcheck
 Depends: @, shellcheck
 Restrictions: superficial
 
+Test-Command: ./tests/run-tests
+Depends: netplan.io
+Restrictions: allow-stderr
+
 Tests: net
 Depends: curl,
          initramfs-tools,
