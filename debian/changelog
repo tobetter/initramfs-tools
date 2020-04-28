@@ -1,3 +1,23 @@
+initramfs-tools (0.137) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * [1b28d25] Document copy_exec as usable for shared libraries
+  * [f2ac13e] hook-functions: copy_exec: Copy libgcc_s.so.1 along with
+    libpthread.so.* (Closes: #950254)
+  * [d96228a] hook-functions: copy_exec: Correct verbose log message for
+    symlinks
+  * [dd5fb36] hook-functions: Factor out device class walking into a function
+  * [14a00af] hook-functions: Don't add backlight modules if we have generic
+    fb device (Closes: #955347)
+  * [f6133e1] Fix new shellcheck warnings around unquoted parameter expansion
+    (Closes: #958851)
+
+  [ AP ]
+  * [857042c] hook-functions: Search for firmware under /lib/firmware/updates
+    (Closes: #956663)
+
+ -- Ben Hutchings <benh@debian.org>  Tue, 28 Apr 2020 04:56:17 +0100
+
 initramfs-tools (0.136) unstable; urgency=medium
 
   [ Mathieu Malaterre ]

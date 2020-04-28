@@ -224,7 +224,7 @@ load_modules
 [ "$quiet" != "y" ] && log_end_msg
 
 if [ "$ROOTDELAY" ]; then
-	sleep $ROOTDELAY
+	sleep "$ROOTDELAY"
 fi
 
 maybe_break premount
