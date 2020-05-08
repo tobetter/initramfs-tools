@@ -1,3 +1,11 @@
+initramfs-tools (0.136ubuntu7) groovy; urgency=medium
+
+  * Cherry-pick changes from Debian
+    - [f6133e1] Fix new shellcheck warnings around unquoted parameter expansion
+      (Closes: #958851)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 08 May 2020 11:49:12 +0200
+
 initramfs-tools (0.136ubuntu6) focal; urgency=medium
 
   * Adjust testsuite for correct expected netplan output.
