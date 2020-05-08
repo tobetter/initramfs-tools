@@ -173,7 +173,7 @@ run_bootloader()
 {
 	# invoke policy conformant bootloader hooks
 	if [ -d /etc/initramfs/post-update.d/ ]; then
-		run-parts --arg=${version} --arg=${initramfs} \
+		run-parts --arg="${version}" --arg="${initramfs}" \
 			/etc/initramfs/post-update.d/
 		return 0
 	fi
