@@ -1,0 +1,8 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    example1:
+      addresses:
+        - "10.0.0.2/24"
+      gateway4: "10.0.0.1"
