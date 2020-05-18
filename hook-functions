@@ -60,7 +60,7 @@ have_module()
 # Add dependent modules + eventual firmware
 manual_add_modules()
 {
-	local prefix kmod options firmware fwloc
+	local prefix kmod options firmware
 
 	if [ $# -eq 0 ]; then
 		return
@@ -83,19 +83,15 @@ manual_add_modules()
 
 		# Add required firmware
 		for firmware in $(modinfo -k "${version}" -F firmware "${kmod}"); do
-			if [ -e "${DESTDIR}/lib/firmware/updates/${version}/${firmware}" ] \
-			|| [ -e "${DESTDIR}/lib/firmware/updates/${firmware}" ] \
-			|| [ -e "${DESTDIR}/lib/firmware/${version}/${firmware}" ] \
-			|| [ -e "${DESTDIR}/lib/firmware/${firmware}" ]; then
+			if [ -e "${DESTDIR}/lib/firmware/${firmware}" ] \
+			|| [ -e "${DESTDIR}/lib/firmware/${version}/${firmware}" ]; then
 				continue
 			fi
 
 			# Only print warning for missing fw of loaded module
 			# or forced loaded module
-			if [ ! -e "/lib/firmware/updates/${version}/${firmware}" ] \
-			&& [ ! -e "/lib/firmware/updates/${firmware}" ] \
-			&& [ ! -e "/lib/firmware/${version}/${firmware}" ] \
-			&& [ ! -e "/lib/firmware/${firmware}" ]; then
+			if [ ! -e "/lib/firmware/${firmware}" ] \
+			&& [ ! -e "/lib/firmware/${version}/${firmware}" ] ; then
 				# Only warn about missing firmware if
 				# /proc/modules exists
 				if [ ! -e /proc/modules ] ; then
@@ -110,15 +106,12 @@ manual_add_modules()
 				continue
 			fi
 
-			for fwloc in "/lib/firmware/updates/${version}/${firmware}" \
-				"/lib/firmware/updates/${firmware}" \
-				"/lib/firmware/${version}/${firmware}" \
-				"/lib/firmware/${firmware}"; do
-				if [ -e "$fwloc" ]; then
-					copy_file firmware "$fwloc"
-					break
-				fi
-			done
+			if [ -e "/lib/firmware/${version}/${firmware}" ]; then
+				copy_file firmware \
+					"/lib/firmware/${version}/${firmware}"
+			else
+				copy_file firmware "/lib/firmware/${firmware}"
+			fi
 		done
 	done
 }
@@ -166,7 +159,7 @@ copy_file() {
 		esac
 
 		if [ "${link_target}" != "${target}" ]; then
-			[ "${verbose?}" = "y" ] && echo "Adding ${type}-link ${target}"
+			[ "${verbose?}" = "y" ] && echo "Adding ${type}-link ${src}"
 
 			# Create a relative link so it always points
 			# to the right place
@@ -184,7 +177,7 @@ copy_file() {
 	cp -pP "${src}" "${DESTDIR}/${target}" || return $(($? + 1))
 }
 
-# $1 = executable/shared library to copy to initramfs, with dependencies
+# $1 = executable to copy to initramfs, with library dependencies
 # $2 (optional) Name for the file on the initramfs
 # Location of the image dir is assumed to be $DESTDIR
 # We never overwrite the target if it exists.
@@ -216,11 +209,11 @@ copy_exec() {
 		# Handle common dlopen() dependency (Debian bug #950254)
 		case "${x}" in
 		*/libpthread.so.*)
-			copy_exec "${x%/*}/libgcc_s.so.1" || return
+			copy_exec "/lib/libgcc_s.so.1" || copy_exec "${x%/*}/libgcc_s.so.1" || return
 			;;
 		esac
 
-		copy_file binary "${x}" || {
+		copy_file library "${x}" || {
 			ret=$?
 			[ ${ret} = 1 ] || return $((ret - 1))
 		}
@@ -481,16 +474,6 @@ dep_add_modules_mount()
 	block_dev_mod_add "$dev_node"
 }
 
-class_add_modules()
-{
-	local device
-
-	for device in "/sys/class/$1"/*; do
-		device="$(readlink -f "$device")" \
-			&& sys_walk_mod_add "$device"
-	done
-}
-
 dep_add_modules()
 {
 	local device dev_node
@@ -507,8 +490,11 @@ dep_add_modules()
 	fi
 
 	# sys walk some important device classes
-	for class in extcon gpio phy pwm regulator rtc; do
-		class_add_modules "$class"
+	for class in backlight extcon gpio phy pwm regulator rtc; do
+		for device in "/sys/class/$class"/*; do
+			device="$(readlink -f "$device")" \
+				&& sys_walk_mod_add "$device"
+		done
 	done
 
 	# clk, USB-PHY and pinctrl devices are outside the device model (!) so
@@ -542,8 +528,10 @@ dep_add_modules()
 	done
 
 	if [ "$walk_graphics" = "yes" ]; then
-		class_add_modules backlight
-		class_add_modules graphics
+		for device in /sys/class/graphics/*; do
+			device="$(readlink -f "$device")" \
+				&& sys_walk_mod_add "$device"
+		done
 	fi
 
 	# catch old-style IDE

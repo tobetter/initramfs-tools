@@ -1,3 +1,9 @@
+initramfs-tools (0.137ubuntu2) groovy; urgency=medium
+
+  * Revert for now to 0.136ubuntu7, this version doesn't boot
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 18 May 2020 17:17:37 +0200
+
 initramfs-tools (0.137ubuntu1) groovy; urgency=low
 
   * Merge from Debian unstable.  Remaining changes:
