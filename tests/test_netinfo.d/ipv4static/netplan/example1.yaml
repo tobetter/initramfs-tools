@@ -1,6 +1,5 @@
 network:
   version: 2
-  renderer: networkd
   ethernets:
     example1:
       addresses:
