@@ -539,7 +539,6 @@ _render_netplan() {
 	fi
 	echo "network:"
 	echo "  version: 2"
-	echo "  renderer: networkd"
 	echo "  ethernets:"
 	echo "    $name:"
 	if [ -n "$mac" ] && grep -q net.ifnames=0 /proc/cmdline 2>/dev/null; then
