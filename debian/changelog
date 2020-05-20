@@ -1,3 +1,11 @@
+initramfs-tools (0.137ubuntu4) groovy; urgency=medium
+
+  * Drop renderer from netplan yaml, such that netplan uses the default
+    rendered for the target system, i.e. NetworkManager on the
+    desktop. LP: #1876884
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 20 May 2020 23:50:52 +0200
+
 initramfs-tools (0.137ubuntu3) groovy; urgency=low
 
   * Merge from Debian unstable.  Remaining changes:
@@ -137,6 +145,14 @@ initramfs-tools (0.137) unstable; urgency=medium
     (Closes: #956663)
 
  -- Ben Hutchings <benh@debian.org>  Tue, 28 Apr 2020 04:56:17 +0100
+
+initramfs-tools (0.136ubuntu8) groovy; urgency=medium
+
+  * Drop renderer from netplan yaml, such that netplan uses the default
+    rendered for the target system, i.e. NetworkManager on the
+    desktop. LP: #1876884
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 20 May 2020 15:41:09 +0100
 
 initramfs-tools (0.136ubuntu7) groovy; urgency=medium
 
