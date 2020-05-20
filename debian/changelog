@@ -1,3 +1,11 @@
+initramfs-tools (0.136ubuntu8) groovy; urgency=medium
+
+  * Drop renderer from netplan yaml, such that netplan uses the default
+    rendered for the target system, i.e. NetworkManager on the
+    desktop. LP: #1876884
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 20 May 2020 15:41:09 +0100
+
 initramfs-tools (0.136ubuntu7) groovy; urgency=medium
 
   * Cherry-pick changes from Debian
