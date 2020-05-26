@@ -318,6 +318,8 @@ configure_networking()
 
 	# activate non-autoconfigured s390x devices
 	for dev in $DEVICE $DEVICE6 $IP6 $VLAN_LINK; do
+		# skip $DEVICE which is processed in $VLAN_LINK
+		echo ${VLAN} | grep -q ${dev} && continue
 		case ${dev} in
 		enc*)
 			zdev=${dev#enc}
