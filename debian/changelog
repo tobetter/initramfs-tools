@@ -1,3 +1,9 @@
+initramfs-tools (0.137ubuntu6) groovy; urgency=medium
+
+  * Fixup previous commit to fix build failure
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 27 May 2020 09:57:57 +0200
+
 initramfs-tools (0.137ubuntu5) groovy; urgency=medium
 
   * Skip attempting to chzdev enable VLAN device LP: #1880735
