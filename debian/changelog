@@ -1,3 +1,10 @@
+initramfs-tools (0.136ubuntu6.2) focal; urgency=medium
+
+  * Trim leading whitespaces in dumpe2fs output so date command
+    is happy in the fixrtc script (LP: #1880968)
+
+ -- Alfonso Sanchez-Beato (email Canonical) <alfonso.sanchez-beato@canonical.com>  Wed, 27 May 2020 16:52:16 +0200
+
 initramfs-tools (0.136ubuntu6.1) focal; urgency=medium
 
   * SRU changes from Dimitri John Ledkov into focal:
