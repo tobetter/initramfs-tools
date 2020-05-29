@@ -1,3 +1,10 @@
+initramfs-tools (0.137ubuntu7) groovy; urgency=medium
+
+  * Fix copying libgcc_s when there is optimized pthreads installed.
+    LP: #1880853
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 29 May 2020 20:06:32 +0100
+
 initramfs-tools (0.137ubuntu6) groovy; urgency=medium
 
   * Fixup previous commit to fix build failure

@@ -216,7 +216,7 @@ copy_exec() {
 		# Handle common dlopen() dependency (Debian bug #950254)
 		case "${x}" in
 		*/libpthread.so.*)
-			copy_exec "${x%/*}/libgcc_s.so.1" || return
+			copy_exec "${x%/*}/libgcc_s.so.1" || copy_exec "${x%/*}/../libgcc_s.so.1" || return
 			;;
 		esac
 
