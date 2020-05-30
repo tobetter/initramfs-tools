@@ -1,8 +1,14 @@
+initramfs-tools (0.137ubuntu9) groovy; urgency=medium
+
+  * Document add_mountroot_fail_hook correctly.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Sat, 30 May 2020 16:33:08 +0100
+
 initramfs-tools (0.137ubuntu8) groovy; urgency=medium
 
   * Partially revert 0.133ubuntu12 upload:
     "* scripts/functions: Fix args in the add_mountroot_fail_check function."
-    The arguments were correct, as used by lvm2 hook.
+    The arguments were correct, as used by lvm2 hook. LP: #1871154
 
  -- Dimitri John Ledkov <xnox@ubuntu.com>  Sat, 30 May 2020 14:31:59 +0100
 

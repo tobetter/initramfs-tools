@@ -41,7 +41,7 @@ esac
 
 . /scripts/functions
 
-add_mountroot_fail_hook
+add_mountroot_fail_hook 20-example-script
 
 echo "Got here!"
 
