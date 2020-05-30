@@ -1,3 +1,11 @@
+initramfs-tools (0.137ubuntu8) groovy; urgency=medium
+
+  * Partially revert 0.133ubuntu12 upload:
+    "* scripts/functions: Fix args in the add_mountroot_fail_check function."
+    The arguments were correct, as used by lvm2 hook.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Sat, 30 May 2020 14:31:59 +0100
+
 initramfs-tools (0.137ubuntu7) groovy; urgency=medium
 
   * Fix copying libgcc_s when there is optimized pthreads installed.
