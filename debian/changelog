@@ -1,3 +1,15 @@
+initramfs-tools (0.136ubuntu6.1) focal; urgency=medium
+
+  * SRU changes from Dimitri John Ledkov into focal:
+    - Partially revert 0.133ubuntu12 upload:
+      "* scripts/functions: Fix args in the add_mountroot_fail_check function."
+      The arguments were correct, as used by lvm2 hook.
+      LP: #1871154
+    - Fix copying libgcc_s when there is optimized pthreads installed.
+      LP: #1880853
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 01 Jun 2020 11:03:12 +0200
+
 initramfs-tools (0.136ubuntu6) focal; urgency=medium
 
   * Adjust testsuite for correct expected netplan output.
