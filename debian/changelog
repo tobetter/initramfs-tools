@@ -1,3 +1,19 @@
+initramfs-tools (0.122ubuntu8.17) xenial; urgency=medium
+
+  * scripts/functions: Prevent printf error carry over if the wrong
+    console is set. (LP: #1879987)
+      The function _log_msg() is "void" typed, returning whatever its
+      last command returns. This function is the basic building block
+      for all error/warning messages in initramfs-tools. If a bad console
+      is provided to kernel on command-line, printf returns error, and so
+      this error is carried over in _log_msg(). Happens that checkfs()
+      function has a loop that runs forever in this scenario (*if* fsck
+      is not present in initramfs and "quiet" is not passed in the
+      command-line). If that happens, boot is stuck and cannot progress.
+      The simple fix hereby merged is to return zero on _log_msg().
+
+ -- Guilherme G. Piccoli <gpiccoli@canonical.com>  Thu, 23 Jul 2020 13:20:14 -0300
+
 initramfs-tools (0.122ubuntu8.16) xenial; urgency=medium
 
   * Add support for panic=-1 value (LP: #1831252)
