@@ -1,3 +1,28 @@
+initramfs-tools (0.137ubuntu11) groovy; urgency=medium
+
+  * scripts/functions: Prevent printf error carry over if the wrong
+    console is set. (LP: #1879987)
+      The function _log_msg() is "void" typed, returning whatever its
+      last command returns. This function is the basic building block
+      for all error/warning messages in initramfs-tools. If a bad console
+      is provided to kernel on command-line, printf returns error, and so
+      this error is carried over in _log_msg(). Happens that checkfs()
+      function has a loop that runs forever in this scenario (*if* fsck
+      is not present in initramfs and "quiet" is not passed in the
+      command-line). If that happens, boot is stuck and cannot progress.
+      The simple fix hereby merged is to return zero on _log_msg().
+
+  * scripts/local: Re-execute cryptroot local-block script. (LP: #1879980)
+      Currently, if an encrypted rootfs is configured on top of a MD RAID1
+      array and such array gets degraded (like a member is removed/failed),
+      initramfs-tools cannot mount the rootfs and the boot fails. We fix
+      that issue here by allowing cryptroot script to re-run on local-block
+      stage, given that mdadm is able to activate a degraded array in that
+      point. There is a cryptsetup counter-part for this fix, but alone the
+      initramfs-tools portion is innocuous.
+
+ -- Guilherme G. Piccoli <gpiccoli@canonical.com>  Mon, 03 Aug 2020 18:04:00 -0300
+
 initramfs-tools (0.137ubuntu10) groovy; urgency=medium
 
   * Trim leading whitespaces in dumpe2fs output so date command
