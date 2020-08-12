@@ -4,6 +4,7 @@ _log_msg()
 {
 	if [ "$quiet" = "y" ]; then return; fi
 	printf "$@"
+	return 0 # Prevents error carry over in case of unavailable console
 }
 
 log_success_msg()
@@ -509,19 +510,64 @@ _declare_ip_info() {
 	fi
 }
 
+# If the following are all true, this device is a net_failover master:
+#  1 /sys/class/net/[ifname]/device links to a virtio device; note that
+#    the master's actual device driver (ethtool -i) is net_failover
+#  2 device does NOT have the 'master' sysfs attribute (master is
+#    a link to the device's master, so it's a slave if it has this)
+#  3 device has 'standby' virtio feature bit set (bit 62 counting from 0
+#    in /sys/class/net/[ifname]/device/features).  net_failover master
+#    and virtio_net slaves both get this as sysfs device attribute
+#
+# As of kernel 5.3, net_failover is only implemented for virtio_net
+#
+is_net_failover_master() {
+       local ifname="$1" driver
+       local sysfspath="/sys/class/net/${ifname}"
+       local virtio_features virtio_standby
+
+       if [ ! -e "${sysfspath}" -o ! -e "${sysfspath}/device" ]; then
+               return 1
+       fi
+
+       driver="$(basename $(readlink ${sysfspath}/device/driver))"
+       if [ "${driver}" != "virtio_net" ]; then
+               return 1
+       fi
+
+       if [ -e "${sysfspath}/master" ]; then
+               return 1
+       fi
+
+       virtio_features=$(cat "${sysfspath}/device/features")
+       virtio_standby="$(expr substr $virtio_features 63 1)"
+       if [ "${virtio_standby}" = "0" ]; then
+               return 1
+       fi
+       return 0
+}
+
 _render_netplan() {
 	# write a netplan stanza for the given device.
 	local name="$1" mac="$2" dhcp4="$3" dhcp6="$4" addrs="$5" \
 		gateway4="$6" gateway6="$7" ns_addrs="$8" ns_search="$9"
 	local n found=""
+	local nfm=0
 	echo "network:"
 	echo "  version: 2"
 	echo "  renderer: networkd"
 	echo "  ethernets:"
 	echo "    $name:"
+	# if $name is a net_failover master, do not use match: macaddress
+	if is_net_failover_master "$name"; then
+		nfm=1
+	fi
+
 	if [ -n "$mac" ]; then
-		echo "      match:"
-		echo "        macaddress: \"$mac\""
+		if [ "$nfm" -ne 1 ]; then
+			echo "      match:"
+			echo "        macaddress: \"$mac\""
+		fi
 		echo "      set-name: $name"
 	fi
 	if [ -n "$dhcp4" ]; then

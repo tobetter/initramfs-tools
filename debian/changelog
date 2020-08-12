@@ -1,3 +1,40 @@
+initramfs-tools (0.130ubuntu3.11) bionic; urgency=medium
+
+  [ Guilherme G. Piccoli ]
+  * scripts/functions: Prevent printf error carry over if the wrong
+    console is set. (LP: #1879987)
+      The function _log_msg() is "void" typed, returning whatever its
+      last command returns. This function is the basic building block
+      for all error/warning messages in initramfs-tools. If a bad console
+      is provided to kernel on command-line, printf returns error, and so
+      this error is carried over in _log_msg(). Happens that checkfs()
+      function has a loop that runs forever in this scenario (*if* fsck
+      is not present in initramfs and "quiet" is not passed in the
+      command-line). If that happens, boot is stuck and cannot progress.
+      The simple fix hereby merged is to return zero on _log_msg().
+
+  * scripts/local: Re-execute cryptroot local-block script. (LP: #1879980)
+      Currently, if an encrypted rootfs is configured on top of a MD RAID1
+      array and such array gets degraded (like a member is removed/failed),
+      initramfs-tools cannot mount the rootfs and the boot fails. We fix
+      that issue here by allowing cryptroot script to re-run on local-block
+      stage, given that mdadm is able to activate a degraded array in that
+      point. There is a cryptsetup counter-part for this fix, but alone the
+      initramfs-tools portion is innocuous.
+
+  [ Jay Vosburgh ]
+  * scripts/functions: Change netplan render for net_failover master
+    devices. (LP: #1820929)
+      Modify the _render_netplan function to check for network interfaces
+      that are net_failover master devices. When found, such devices are
+      matched only by name, not by MAC address, as the MAC is not a unique
+      identifier for the net_failover case. In the net_failover architecture,
+      the MAC address is used to manage the membership of the net_failover
+      interface set, thus multiple interfaces will be assigned the same MAC
+      address.
+
+ -- Guilherme G. Piccoli <gpiccoli@canonical.com>  Wed, 12 Aug 2020 17:12:11 -0300
+
 initramfs-tools (0.130ubuntu3.10) bionic; urgency=medium
 
   * Cherrypick upstream commit to copy libgcc_s, as a dependency of
