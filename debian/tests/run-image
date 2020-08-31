@@ -43,6 +43,7 @@ timeout --foreground 10m \
         -netdev user,id=net0 -device virtio-net-pci,netdev=net0,bus=pci.0,addr="$NICSLOT"
 
 dev=$(losetup -Pf --show "$IMAGE")
+partprobe
 mount "${dev}p1" mnt
 rm -rf "$OUTPUT"
 cp -aT mnt/result "$OUTPUT"
