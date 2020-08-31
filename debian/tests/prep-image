@@ -25,6 +25,7 @@ rm -f "$IMAGE" "${IMAGE}-uuid"
 truncate -s 1G "$IMAGE"
 parted --script --align optimal "$IMAGE" -- mklabel gpt mkpart primary ext4 1MiB -2048s
 dev="$(losetup -Pf --show "$IMAGE")"
+partprobe
 mke2fs -q "${dev}p1"
 blkid --output=value "${dev}p1" | head -n1 > "${IMAGE}-uuid"
 mkdir -p mnt

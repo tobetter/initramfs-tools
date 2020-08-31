@@ -124,6 +124,7 @@ local_device_setup()
 			# If mdadm's local-block script counts the
 			# number of times it is run, make sure to
 			# run it the expected number of times.
+			mdadm_exec=0
 			while true; do
 				if [ -f /run/count.mdadm.initrd ]; then
 					count="$(cat /run/count.mdadm.initrd)"
@@ -137,8 +138,31 @@ local_device_setup()
 				if [ ${count} -ge ${time_elapsed} ]; then
 					break;
 				fi
+
+				# Track that mdadm was executed to force
+				# cryptroot execution after the loop, see
+				# LP #1879980.
+				mdadm_exec=1
 				/scripts/local-block/mdadm "${dev_id}"
+
+				# Cryptroot must run here, see LP #1879980.
+				# The counter is inc/dec on cryptroot script!
+				if [ -f /run/cryptroot.initrd.cnt ]; then
+					crypt_cnt=$(cat /run/cryptroot.initrd.cnt)
+					if [ "${crypt_cnt}" -gt 0 ]; then
+						/scripts/local-block/cryptroot "${dev_id}"
+					fi
+				fi
 			done
+
+			# Extra cryptroot run after mdadm loop in order to
+			# start encrypted volumes on top of RAID arrays.
+			if [ -f /run/cryptroot.initrd.cnt ]; then
+				crypt_cnt=$(cat /run/cryptroot.initrd.cnt)
+				if [ "${crypt_cnt}" -gt 0 ] || [ ${mdadm_exec} -ne 0 ]; then
+					/scripts/local-block/cryptroot "${dev_id}"
+				fi
+			fi
 
 			if real_dev=$(resolve_device "${dev_id}") &&
 			   get_fstype "${real_dev}" >/dev/null; then
