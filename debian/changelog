@@ -1,3 +1,10 @@
+initramfs-tools (0.137ubuntu12) groovy; urgency=medium
+
+  * d/tests: Add explicit call to partprobe on net test, specially in
+    prep-image and run-image. (LP: #1893675)
+
+ -- Guilherme G. Piccoli <gpiccoli@canonical.com>  Mon, 31 Aug 2020 18:04:00 -0300
+
 initramfs-tools (0.137ubuntu11) groovy; urgency=medium
 
   * scripts/functions: Prevent printf error carry over if the wrong
