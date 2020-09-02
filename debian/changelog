@@ -1,3 +1,11 @@
+initramfs-tools (0.130ubuntu3.10) bionic; urgency=medium
+
+  * Cherrypick upstream commit to copy libgcc_s, as a dependency of
+    libpthread including when there is optimized pthreads installed. LP:
+    #1880853
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 02 Sep 2020 15:53:41 +0100
+
 initramfs-tools (0.130ubuntu3.9) bionic; urgency=medium
 
   * Add support for panic=-1 value (LP: #1831252)

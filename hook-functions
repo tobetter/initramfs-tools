@@ -194,6 +194,13 @@ copy_exec() {
 			x="${nonoptlib}"
 		fi
 
+		# Handle common dlopen() dependency (Debian bug #950254)
+		case "${x}" in
+		*/libpthread.so.*)
+			copy_exec "${x%/*}/libgcc_s.so.1" || copy_exec "${x%/*}/../libgcc_s.so.1" || return
+			;;
+		esac
+
 		copy_file library "${x}" || {
 			ret=$?
 			[ ${ret} = 1 ] || return $((ret - 1))
