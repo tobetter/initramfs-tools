@@ -1,3 +1,21 @@
 Tests: shellcheck
 Depends: @, shellcheck
 Restrictions: superficial
+
+Tests: amd64-klibc
+Depends: @, qemu-system-x86, linux-image-amd64, klibc-utils, genext2fs
+
+Tests: amd64-busybox
+Depends: @, qemu-system-x86, linux-image-amd64, klibc-utils, busybox | busybox-initramfs, genext2fs
+
+Tests: amd64-ata-only
+Depends: @, qemu-system-x86, linux-image-amd64, klibc-utils, genext2fs
+
+Tests: amd64-virtio-only
+Depends: @, qemu-system-x86, linux-image-amd64, klibc-utils, genext2fs
+
+Tests: amd64-separate-usr
+Depends: @, qemu-system-x86, linux-image-amd64, klibc-utils, genext2fs
+
+Tests: amd64-panic-shell
+Depends: @, qemu-system-x86, linux-image-amd64, klibc-utils, genext2fs

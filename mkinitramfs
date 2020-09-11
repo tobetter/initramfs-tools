@@ -171,8 +171,7 @@ unset COMPRESS
 
 if ! command -v "${compress}" >/dev/null 2>&1; then
 	compress=gzip
-	[ "${verbose}" = y ] && \
-		echo "No ${compress} in ${PATH}, using gzip"
+	echo "No ${compress} in ${PATH}, using gzip"
 fi
 
 case "${compress}" in
@@ -185,6 +184,7 @@ gzip)	# If we're doing a reproducible build, use gzip -n
 	fi
 	;;
 lz4)	compress="lz4 -9 -l" ;;
+zstd)	compress="zstd -q -19 -T0" ;;
 xz)	compress="xz --check=crc32"
 	# If we're not doing a reproducible build, enable multithreading
 	test -z "${SOURCE_DATE_EPOCH}" && compress="$compress --threads=0"
@@ -247,6 +247,7 @@ export KEYMAP
 export MODULES
 export BUSYBOX
 export RESUME
+export FSTYPE
 
 # Private, used by 'catenate_cpiogz'.
 export __TMPCPIOGZ
@@ -304,6 +305,9 @@ esac
 
 # Resolve hidden dependencies
 hidden_dep_add_modules
+
+# Add firmware for built-in code
+add_builtin_firmware
 
 # First file executed by linux
 cp -p /usr/share/initramfs-tools/init "${DESTDIR}/init"
