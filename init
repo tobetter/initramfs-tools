@@ -135,11 +135,6 @@ for x in $(cat /proc/cmdline); do
 		;;
 	panic=*)
 		panic="${x#panic=}"
-		case ${panic} in
-		*[![:digit:].]*)
-			panic=
-			;;
-		esac
 		;;
 	ro)
 		readonly=y

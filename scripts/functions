@@ -5,6 +5,7 @@ _log_msg()
 	if [ "${quiet?}" = "y" ]; then return; fi
 	# shellcheck disable=SC2059
 	printf "$@"
+	return 0 # Prevents error carry over in case of unavailable console
 }
 
 log_success_msg()
@@ -41,11 +42,30 @@ panic()
 	fi
 
 	echo "$@"
-	# Disallow console access
+
+	# The panic= parameter implies we should disallow console access
 	if [ -n "${panic?}" ]; then
-		echo "Rebooting automatically due to panic= boot argument"
-		sleep "${panic}"
-		reboot -f
+		delay=
+		case "${panic?}" in
+		-*[![:digit:].]*)	# invalid: wait forever
+			;;
+		-*)			# timeout < 0: reboot immediately
+			delay=0
+			;;
+		0 | *[![:digit:].]*)	# timeout = 0 or invalid: wait forever
+			;;
+		*)			# timeout > 0: seconds before rebooting
+			delay="${panic}"
+			;;
+		esac
+		if [ -n "${delay}" ]; then
+			echo "Rebooting automatically due to panic= boot argument"
+			sleep "${delay}"
+			reboot -f
+		else
+			echo "Halting automatically due to panic= boot argument"
+			halt -f
+		fi
 		exit  # in case reboot fails, force kernel panic
 	fi
 

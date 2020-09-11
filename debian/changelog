@@ -1,3 +1,51 @@
+initramfs-tools (0.138) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * [0b034b4] docs/maintainer-notes.md: Delete the horizontal rules
+  * [ba883cb] docs/maintainer-notes.md: Use Gitlab markup for table of contents
+  * [5284a00] docs/maintainer-notes.md: Use Gitlab markup for definition table
+  * [a469b7e] docs/maintainer-notes.md: Use archive.org URL for Daniel Baumann
+    doc
+  * [424260e] debian/control, docs/maintainer-notes.md: Use my @debian.org
+    address
+  * [181a35c] update-initramfs: Remove test for direct invocation from kernel
+    package
+  * [6ebe41b] Remove obsolete update-initramfs state in
+    /var/lib/initramfs-tools
+  * [2f2ad0d] hook-functions: copy_exec: Copy libgcc_s.so with any soversion up
+    to 9 (Closes: #959768)
+  * [0f24cc1] Add CI configuration for salsa.debian.org
+  * [9877542] initramfs.conf: Delete "NFS Section" comment
+  * [4309c3b] Add FSTYPE config parameter to allow overriding filesystem type
+    detection (Closes: #923400)
+  * [6300aa1] Change "panic" parameter handling to work more like the kernel
+  * [90d64bd] debian/tests: Add common test preparation code
+  * [3dd2984] debian/tests: Add basic test for amd64 using klibc and not
+    busybox
+  * [69240b1] debian/tests: Add basic test for amd64 using busybox
+  * [3d834c8] debian/tests: Add basic tests for amd64 with only ata/virtio
+    driver
+  * [c14b760] debian/tests: Add test for separate /usr device
+  * [6b3b361] debian/tests: Add test of the panic shell and parameter handling
+
+  [ Vagrant Cascadian ]
+  * [482897b] hook-functions: Add modules needed for Pinebook LCD display.
+
+  [ Guilherme G. Piccoli ]
+  * [c3cbf35] scripts/functions: Prevents printf error carry over if wrong
+    console is set (Closes: #960355)
+
+  [ Unit 193 ]
+  * [3b82099] When overriding configured compressor, warn the user.
+
+  [ Norbert Lange ]
+  * [e94f410] un-,mkinitramfs: add support for zstd (Closes: #955469)
+
+  [ Jann Horn ]
+  * [a7718dc] Add firmware for built-in drivers (Closes: #857054)
+
+ -- Ben Hutchings <benh@debian.org>  Fri, 11 Sep 2020 20:37:29 +0100
+
 initramfs-tools (0.137) unstable; urgency=medium
 
   [ Ben Hutchings ]

@@ -1,0 +1,19 @@
+#!/bin/sh -e
+
+LOCALVERSION=-amd64
+. debian/tests/test-common
+
+cat >>"${CONFDIR}/initramfs.conf" <<EOF
+MODULES=most
+BUSYBOX=n
+FSTYPE=ext2
+EOF
+build_initramfs
+! lsinitramfs "${INITRAMFS}" | grep -qw busybox
+
+build_rootfs_ext2
+
+run_qemu_amd64
+
+# Check that fsck ran
+grep -q "^/dev/${ROOTDISK_LINUX_NAME}: clean," "${OUTPUT}"
