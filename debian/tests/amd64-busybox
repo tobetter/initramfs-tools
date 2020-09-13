@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-LOCALVERSION=-amd64
+SUPPORTED_FLAVOURS='amd64 generic'
 . debian/tests/test-common
 
 cat >>"${CONFDIR}/initramfs.conf" <<EOF

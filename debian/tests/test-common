@@ -1,5 +1,18 @@
 # -*- mode: sh -*-
 
+# Find kernel flavour and release
+KVER=
+for flavour in $SUPPORTED_FLAVOURS; do
+	KVER="$(dpkg-query -Wf '${Depends}' "linux-image-${flavour}" 2>/dev/null | tr ',' '\n' | sed -n 's/^ *linux-image-\([-a-z0-9+.]*\).*/\1/p')"
+	if [ "$KVER" ]; then
+		break
+	fi
+done
+if [ -z "$KVER" ]; then
+	echo >&2 "E: Test must set SUPPORTED_FLAVOURS and depend on those flavours"
+	exit 2
+fi
+
 if [ -n "${AUTOPKGTEST_TMP}" ]; then
 	export TMPDIR="${AUTOPKGTEST_TMP}"
 fi
@@ -41,13 +54,6 @@ chmod a+x "${ROOTDIR}/sbin/init"
 cp /usr/lib/klibc/bin/sh "${ROOTDIR}/bin/sh"
 cp /usr/lib/klibc/bin/poweroff "${ROOTDIR}/bin/poweroff"
 cp "$(dpkg -L libklibc | grep '^/lib/klibc.*\.so$')" "${ROOTDIR}/lib/"
-
-# Kernel version (really release) string
-if [ -z "${LOCALVERSION}" ]; then
-	echo >&2 "E: Test must set LOCALVERSION to the kernel version suffix, e.g. -amd64"
-	exit 2
-fi
-KVER="$(dpkg-query -Wf '${Depends}' "linux-image${LOCALVERSION}" | sed 's/^linux-image-//; s/ .*//')"
 
 # VM output file
 OUTPUT="$(mktemp)"
