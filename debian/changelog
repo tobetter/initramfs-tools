@@ -1,3 +1,12 @@
+initramfs-tools (0.139) unstable; urgency=medium
+
+  * [9679f0c] debian/tests: Run amd64 tests on either amd64 or generic flavour
+  * [0099040] debian/tests/control: Mark all amd64 tests as
+    skip-not-installable (Closes: #970184)
+  * [3616c8f] conf/initramfs.conf: Fix typo "filesytem" (Closes: #970235)
+
+ -- Ben Hutchings <benh@debian.org>  Sun, 13 Sep 2020 19:28:00 +0100
+
 initramfs-tools (0.138) unstable; urgency=medium
 
   [ Ben Hutchings ]
