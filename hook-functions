@@ -84,14 +84,18 @@ manual_add_modules()
 		# Add required firmware
 		for firmware in $(modinfo -k "${version}" -F firmware "${kmod}"); do
 			if [ -e "${DESTDIR}/lib/firmware/${firmware}" ] \
-			|| [ -e "${DESTDIR}/lib/firmware/${version}/${firmware}" ]; then
+			   || [ -e "${DESTDIR}/lib/firmware/${version}/${firmware}" ] \
+			   || [ -e "${DESTDIR}/lib/firmware/updates/${firmware}" ] \
+			   || [ -e "${DESTDIR}/lib/firmware/updates/${version}/${firmware}" ]; then
 				continue
 			fi
 
 			# Only print warning for missing fw of loaded module
 			# or forced loaded module
 			if [ ! -e "/lib/firmware/${firmware}" ] \
-			&& [ ! -e "/lib/firmware/${version}/${firmware}" ] ; then
+			   && [ ! -e "/lib/firmware/${version}/${firmware}" ] \
+			   && [ ! -e "/lib/firmware/updates/${firmware}" ] \
+			   && [ ! -e "/lib/firmware/updates/${version}/${firmware}" ]; then
 				# Only warn about missing firmware if
 				# /proc/modules exists
 				if [ ! -e /proc/modules ] ; then
@@ -106,12 +110,15 @@ manual_add_modules()
 				continue
 			fi
 
-			if [ -e "/lib/firmware/${version}/${firmware}" ]; then
-				copy_file firmware \
-					"/lib/firmware/${version}/${firmware}"
-			else
-				copy_file firmware "/lib/firmware/${firmware}"
-			fi
+			for fwloc in "/lib/firmware/updates/${version}/${firmware}" \
+				"/lib/firmware/updates/${firmware}" \
+				"/lib/firmware/${version}/${firmware}" \
+				"/lib/firmware/${firmware}"; do
+				if [ -e "$fwloc" ]; then
+					copy_file firmware "$fwloc"
+					break
+				fi
+			done
 		done
 	done
 }
