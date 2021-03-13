@@ -661,9 +661,11 @@ auto_add_modules()
 			copy_modules_dir kernel/drivers/i2c/busses
 			copy_modules_dir kernel/drivers/i2c/muxes
 			copy_modules_dir kernel/drivers/mfd
+			copy_modules_dir kernel/drivers/pci/controller
 			copy_modules_dir kernel/drivers/phy
 			copy_modules_dir kernel/drivers/pinctrl
 			copy_modules_dir kernel/drivers/regulator
+			copy_modules_dir kernel/drivers/reset
 			copy_modules_dir kernel/drivers/spi
 			copy_modules_dir kernel/drivers/usb/phy
 

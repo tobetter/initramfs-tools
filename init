@@ -33,8 +33,7 @@ export quiet
 
 # Note that this only becomes /dev on the real filesystem if udev's scripts
 # are used; which they will be, but it's worth pointing out
-test -x /usr/sbin/v86d && dev_exec="exec" || dev_exec="noexec"
-mount -t devtmpfs -o $dev_exec,nosuid,mode=0755 udev /dev
+mount -t devtmpfs -o nosuid,mode=0755 udev /dev
 mkdir /dev/pts
 mount -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts || true
 
@@ -218,6 +217,10 @@ maybe_break modules
 load_modules
 [ "$quiet" != "y" ] && log_end_msg
 
+starttime="$(_uptime)"
+starttime=$((starttime + 1)) # round up
+export starttime
+
 if [ "$ROOTDELAY" ]; then
 	sleep "$ROOTDELAY"
 fi
@@ -310,6 +313,7 @@ unset noresume
 unset fastboot
 unset forcefsck
 unset fsckfix
+unset starttime
 
 # Move virtual filesystems over to the real filesystem
 mount -n -o move /sys ${rootmnt}/sys
