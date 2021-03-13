@@ -1,3 +1,23 @@
+initramfs-tools (0.140) unstable; urgency=medium
+
+  [ Norbert Lange ]
+  * mkinitramfs: use temporary file for uncompressed cpio
+
+  [ Michael Prokop ]
+  * mkinitramfs: report actually requested compress util if it's not present
+
+  [ Ben Hutchings ]
+  * init: Mount /dev without the noexec option
+
+  [ dann frazier ]
+  * configure_networking(): Wait for specified network device (Closes: #965935)
+
+  [ Bastian Blank ]
+  * Include all PCI controller modules
+  * Include all reset controller modules
+
+ -- Bastian Blank <waldi@debian.org>  Sat, 13 Mar 2021 19:13:18 +0100
+
 initramfs-tools (0.139) unstable; urgency=medium
 
   * [9679f0c] debian/tests: Run amd64 tests on either amd64 or generic flavour

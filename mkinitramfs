@@ -170,8 +170,8 @@ fi
 unset COMPRESS
 
 if ! command -v "${compress}" >/dev/null 2>&1; then
-	compress=gzip
 	echo "No ${compress} in ${PATH}, using gzip"
+	compress=gzip
 fi
 
 case "${compress}" in
@@ -213,12 +213,16 @@ fi
 # Prepare to clean up temporary files on exit
 DESTDIR=
 __TMPCPIOGZ=
+__TMPMAINCPIO=
 __TMPEARLYCPIO=
 clean_on_exit() {
 	if [ "${keep}" = "y" ]; then
-		echo "Working files in ${DESTDIR:-<not yet created>}, early initramfs in ${__TMPEARLYCPIO:-<not yet created>} and overlay in ${__TMPCPIOGZ:-<not yet created>}"
+		echo "Working files in ${DESTDIR:-<not yet created>}," \
+			"early initramfs in ${__TMPEARLYCPIO:-<not yet created>}," \
+			"main initramfs in ${__TMPMAINCPIO:-<not yet created>} and" \
+			"overlay in ${__TMPCPIOGZ:-<not yet created>}"
 	else
-		for path in "${DESTDIR}" "${__TMPCPIOGZ}" "${__TMPEARLYCPIO}"; do
+		for path in "${DESTDIR}" "${__TMPCPIOGZ}" "${__TMPMAINCPIO}" "${__TMPEARLYCPIO}"; do
 			test -z "${path}" || rm -rf "${path}"
 		done
 	fi
@@ -231,6 +235,7 @@ trap "exit 1" INT TERM	# makes the EXIT trap effective even when killed
 DESTDIR="$(mktemp -d "${TMPDIR:-/var/tmp}/mkinitramfs_XXXXXX")" || exit 1
 chmod 755 "${DESTDIR}"
 __TMPCPIOGZ="$(mktemp "${TMPDIR:-/var/tmp}/mkinitramfs-OL_XXXXXX")" || exit 1
+__TMPMAINCPIO="$(mktemp "${TMPDIR:-/var/tmp}/mkinitramfs-MAIN_XXXXXX")" || exit 1
 __TMPEARLYCPIO="$(mktemp "${TMPDIR:-/var/tmp}/mkinitramfs-FW_XXXXXX")" || exit 1
 
 DPKG_ARCH=$(dpkg --print-architecture)
@@ -390,13 +395,6 @@ fi
 
 [ "${verbose}" = y ] && echo "Building cpio ${outfile} initramfs"
 
-if [ -s "${__TMPEARLYCPIO}" ]; then
-	cat "${__TMPEARLYCPIO}" >"${outfile}" || exit 1
-else
-	# truncate
-	true > "${outfile}"
-fi
-
 (
 # preserve permissions if root builds the image, see #633582
 [ "$(id -ru)" != 0 ] && cpio_owner_root="-R 0:0"
@@ -412,10 +410,9 @@ if [ -n "${SOURCE_DATE_EPOCH}" ]; then
 fi
 
 # work around lack of "set -o pipefail" for the following pipe:
-# cd "${DESTDIR}" && find . | LC_ALL=C sort | cpio --quiet $cpio_owner_root $cpio_reproducible -o -H newc | gzip >>"${outfile}" || exit 1
+# cd "${DESTDIR}" && find . | LC_ALL=C sort | cpio --quiet $cpio_owner_root $cpio_reproducible -o -H newc >>"${outfile}" || exit 1
 ec1=1
 ec2=1
-ec3=1
 exec 3>&1
 eval "$(
 	# http://cfaj.freeshell.org/shell/cus-faq-2.html
@@ -427,26 +424,31 @@ eval "$(
 		LC_ALL=C sort
 	} | {
 		# shellcheck disable=SC2086
-		cpio --quiet $cpio_owner_root $cpio_reproducible -o -H newc 4>&-; echo "ec2=$?;" >&4
-	} | ${compress} >>"${outfile}"
-	echo "ec3=$?;" >&4
+		cpio --quiet $cpio_owner_root $cpio_reproducible -o -H newc 4>&- >"${__TMPMAINCPIO}"
+		echo "ec2=$?;" >&4
+	}
 )"
 if [ "$ec1" -ne 0 ]; then
-	echo "E: mkinitramfs failure find $ec1 cpio $ec2 $compress $ec3" >&2
+	echo "E: mkinitramfs failure find $ec1 cpio $ec2" >&2
 	exit "$ec1"
 fi
 if [ "$ec2" -ne 0 ]; then
-	echo "E: mkinitramfs failure cpio $ec2 $compress $ec3" >&2
+	echo "E: mkinitramfs failure cpio $ec2" >&2
 	exit "$ec2"
-fi
-if [ "$ec3" -ne 0 ]; then
-	echo "E: mkinitramfs failure $compress $ec3" >&2
-	exit "$ec3"
 fi
 ) || exit 1
 
-if [ -s "${__TMPCPIOGZ}" ]; then
-	cat "${__TMPCPIOGZ}" >>"${outfile}" || exit 1
+{
+if [ -s "${__TMPEARLYCPIO}" ]; then
+	cat "${__TMPEARLYCPIO}" || exit 1
 fi
+
+$compress -c "${__TMPMAINCPIO}" ||
+	{ echo "E: mkinitramfs failure $compress $?" >&2; exit 1; }
+
+if [ -s "${__TMPCPIOGZ}" ]; then
+	cat "${__TMPCPIOGZ}" || exit 1
+fi
+} >"${outfile}" || exit 1
 
 exit 0
