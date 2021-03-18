@@ -1,3 +1,17 @@
+initramfs-tools (0.130ubuntu3.12) bionic; urgency=medium
+
+  * scripts/local-premount/resume:
+    - Use readlink -f to correctly handle non-symlink $resume
+      (LP: #1876570)
+  * hooks/fsck:
+    - don't check PASSNO, always include fsck
+      (LP: #1917780)
+  * hook-functions:
+    - include firmware from /lib/firmware/updates
+      (LP: #1571506)
+
+ -- Dan Streetman <ddstreet@canonical.com>  Thu, 18 Mar 2021 14:48:17 -0400
+
 initramfs-tools (0.130ubuntu3.11) bionic; urgency=medium
 
   [ Guilherme G. Piccoli ]
