@@ -32,7 +32,7 @@ if ! local_device_setup "${resume}" "suspend/resume device" false; then
 	exit 0
 fi
 
-DEV=$(readlink "$resume")
+DEV=$(readlink -f "$resume")
 DEV=/sys/class/block/${DEV##*/}/dev
 if [ -r "$DEV" ]; then
         read -r MAJMIN < "$DEV"
