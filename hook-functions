@@ -731,7 +731,9 @@ hidden_dep_add_modules()
 	manual_add_modules $(
 		{
 			cat "${DESTDIR}/lib/modules/${version}/modules.builtin"
-			find "${DESTDIR}/lib/modules/${version}/kernel" -name '*.ko*'
+			if [ -d "${DESTDIR}/lib/modules/${version}/kernel" ]; then
+				find "${DESTDIR}/lib/modules/${version}/kernel" -name '*.ko*'
+			fi
 		} |
 		while read -r module; do
 			module="${module##*/}"

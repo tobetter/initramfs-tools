@@ -1,3 +1,18 @@
+initramfs-tools (0.136ubuntu6.5) focal; urgency=medium
+
+  * scripts/local-premount/resume:
+    - Use readlink -f to correctly handle non-symlink $resume
+      (LP: #1876570)
+  * hook-functions:
+    - when MODULES=list there will be no 'kernel' dir, so don't try
+      to find anything there, as it will log an error
+      (LP: #1927779)
+  * hooks/fsck:
+    - don't check PASSNO, always include fsck
+      (LP: #1917780)
+
+ -- Dan Streetman <ddstreet@canonical.com>  Thu, 18 Mar 2021 14:48:17 -0400
+
 initramfs-tools (0.136ubuntu6.4) focal; urgency=medium
 
   * hook-functions: Search for firmware under /lib/firmware/updates
