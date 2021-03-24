@@ -1,3 +1,11 @@
+initramfs-tools (0.139ubuntu3) hirsute; urgency=medium
+
+  * hooks/fsck: always include fsck binaries irrespective of PASSNO value,
+    otherwise initrds fail to mount rootfs and have no ability to fix the
+    rootfs. LP: #1917780
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 24 Mar 2021 15:21:50 +0000
+
 initramfs-tools (0.139ubuntu2) hirsute; urgency=medium
 
   * scripts/local-premount/resume:
