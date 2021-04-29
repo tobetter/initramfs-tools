@@ -50,13 +50,6 @@ will build an initramfs without busybox.
 Beware that many boot scripts need busybox utilities.
 
 .TP
-\fB KEYMAP
-If set to 'y', the console keymap will be loaded during the initramfs stage.
-The keymap will anyway be loaded by the initscripts later, and the packages
-that might need input will normally set this variable automatically, so there
-should normally be no need to set this.
-
-.TP
 \fB COMPRESS
 Specifies the compression method used for the initramfs image.
 .B mkinitramfs
@@ -104,6 +97,11 @@ automatically detect the current root and \fI/usr\fP filesystem types.
 \fB DEVICE
 Specifies the default network interface to use, like eth0.  The \fIip\fP or
 \fIBOOTIF\fP bootargs may override this.
+
+.TP
+\fB VLAN
+Specifies the VLAN tag id to setup, e.g. VLAN=eth0.1:eth0.  The \fIvlan\fP
+bootarg may override this.
 
 .TP
 \fB ROOT

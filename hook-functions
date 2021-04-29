@@ -246,7 +246,7 @@ copy_exec() {
 		# Handle common dlopen() dependency (Debian bug #950254)
 		case "${x}" in
 		*/libpthread.so.*)
-			copy_libgcc "${x%/*}" || return
+			copy_libgcc "${x%/*}" || copy_libgcc "${x%/*}/.." || return
 			;;
 		esac
 
@@ -332,6 +332,21 @@ sys_walk_mod_add()
 	done
 }
 
+nvme_dev_sys_walk_mod_add()
+{
+	local dev_sys_path component nvme_sys_path
+	dev_sys_path="$(readlink -f "$1")"
+	if ! echo "$dev_sys_path" | grep -q "nvme-subsys"; then
+		return
+	fi
+	for component in "$dev_sys_path"/nvme* ; do
+		if [ -L "$component" ] ; then
+			nvme_sys_path=$(readlink -f "$component")
+			sys_walk_mod_add "$nvme_sys_path"
+		fi
+	done
+}
+
 block_dev_sys_walk_mod_add()
 {
 	local dev_sys_path disk_sys_path component
@@ -350,6 +365,7 @@ block_dev_sys_walk_mod_add()
 	find "$disk_sys_path/slaves" -mindepth 1 -maxdepth 1 | while read -r component; do
 		block_dev_sys_walk_mod_add "$component"
 	done
+	nvme_dev_sys_walk_mod_add "$disk_sys_path/device"
 
 	sys_walk_mod_add "${dev_sys_path}"
 }
@@ -434,6 +450,22 @@ dep_add_modules_mount()
 		return
 	fi
 
+	if [ "${FSTYPE}" = "zfs" ]; then
+		manual_add_modules "${FSTYPE}"
+ 
+		# ZFS uses the name of a filesystem instead of a device. Find
+		# the devices that make up the pool containing the specified
+		# filesystem, and add the appropriate driver for each device.
+		local poolname="${dev_node%%/*}"
+		# shellcheck disable=SC2034
+		zpool list -vPL "$poolname" | while read -r dev ignored; do
+			# Ignore non-leaf vdevs by skipping anything that doesn't
+			# look like an absolute path
+			echo "$dev" | grep -q '^/' && block_dev_mod_add "$dev"
+		done
+		return
+	fi
+
 	if [ "$dir" = / ] && [ "${dev_node}" = "/dev/root" ] ; then
 		if [ -b "${dev_node}" ]; then
 			# Match it to the canonical device name by UUID
@@ -474,17 +506,12 @@ dep_add_modules_mount()
 	fi
 
 	# do not trust mount, check superblock
-	eval "$(/usr/lib/klibc/bin/fstype "${dev_node}")"
-
-	# check that fstype fs recognition
-	if [ "${FSTYPE}" = "unknown" ]; then
-		FSTYPE=$(blkid -o value -s TYPE "${dev_node}")
-		if [  -z "${FSTYPE}" ]; then
-			echo "mkinitramfs: unknown fstype on device ${dev_node}" >&2
-			echo "mkinitramfs: workaround is MODULES=most" >&2
-			echo "Error please report bug on initramfs-tools" >&2
-			exit 1
-		fi
+	FSTYPE=$(blkid -o value -s TYPE "${dev_node}")
+	if [  -z "${FSTYPE}" ]; then
+		echo "mkinitramfs: unknown fstype on device ${dev_node}" >&2
+		echo "mkinitramfs: workaround is MODULES=most" >&2
+		echo "Error please report bug on initramfs-tools" >&2
+		exit 1
 	fi
 
 	# Add filesystem
@@ -603,17 +630,19 @@ auto_add_modules()
 	local modules=
 
 	if [ "$#" -eq 0 ] ; then
-		set -- base net ide scsi block ata i2o dasd ieee1394 firewire mmc usb_storage fb
+		set -- base net ide scsi block ata i2o dasd ieee1394 firewire mmc usb_storage fb virtual nx
 	fi
 
 	for arg in "$@" ; do
 		case "$arg" in
 		base)
 			modules="$modules btrfs ext2 ext3 ext4 f2fs"
-			modules="$modules isofs jfs reiserfs udf xfs"
+			modules="$modules isofs jfs reiserfs squashfs udf xfs"
 			modules="$modules nfs nfsv2 nfsv3 nfsv4"
 			modules="$modules af_packet atkbd i8042 psmouse"
 			modules="$modules virtio_pci virtio_mmio"
+			# nls not automatically pulled in as ubuntu has built-in vfat
+			modules="$modules vfat nls_cp437 nls_iso8859-1"
 
 			# Include most USB host and dual-role drivers
 			copy_modules_dir kernel/drivers/usb/host \
@@ -679,6 +708,7 @@ auto_add_modules()
 				macvtap.ko pcmcia sb1000.ko team tokenring \
 				tun.ko usb veth.ko wan wimax wireless \
 				xen-netback.ko
+			modules="$modules 8021q"
 		;;
 		ide)
 			copy_modules_dir kernel/drivers/ide
@@ -721,6 +751,15 @@ auto_add_modules()
 			modules="$modules rockchipdrm pwm-cros-ec pwm_bl panel-simple"
 			modules="$modules analogix-anx6345 pwm-sun4i sun4i-drm sun8i-mixer"
 		;;
+		virtual)
+			# Hyper-V
+			modules="$modules hv_vmbus hv_utils hv_netvsc hv_mouse hv_storvsc hyperv-keyboard"
+		;;
+		nx)
+			# PowerPC NX Crypto Coprocessor
+			modules="$modules nx-compress nx-compress-crypto nx-compress-platform"
+			modules="$modules nx-compress-pseries nx-compress-powernv 842-decompress"
+		;;
 		esac
 	done
 
@@ -739,7 +778,9 @@ hidden_dep_add_modules()
 	manual_add_modules $(
 		{
 			cat "${DESTDIR}/lib/modules/${version}/modules.builtin"
-			find "${DESTDIR}/lib/modules/${version}/kernel" -name '*.ko*'
+			if [ -d "${DESTDIR}/lib/modules/${version}/kernel" ]; then
+				find "${DESTDIR}/lib/modules/${version}/kernel" -name '*.ko*'
+			fi
 		} |
 		while read -r module; do
 			module="${module##*/}"
@@ -872,6 +913,12 @@ call_scripts()
 	set -e
 	for cs_x in ${runlist}; do
 		[ -f "${initdir}/${cs_x}" ] || continue
+		if [ x"$call_scripts_optional" = "xy" ]; then
+			option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${initdir}/${cs_x}")
+			# shellcheck disable=SC1083,2086
+			[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+		fi
+
 		# mkinitramfs verbose output
 		if [ "${verbose}" = "y" ]; then
 			echo "Calling hook ${cs_x}"
@@ -899,4 +946,40 @@ run_scripts()
 
 	runlist=$(get_prereq_pairs | tsort)
 	call_scripts "$scriptdir"
+}
+
+run_scripts_optional()
+{
+	call_scripts_optional=y
+	run_scripts "$@"
+}
+
+add_dns() {
+	local destdir="$1" nsswitch="" lib="" libdir="" f="" d=""
+	# find the multiarch lib dir (for example /lib/x86_64-linux-gnu)
+	# by finding a directory with libc.so.6.
+	for d in /lib/* /lib; do
+		for f in "$d"/libc.so.?; do [ -f "$f" ] && break; done
+		[ -f "$f" ] && libdir="$d" && break
+	done
+	if [ -z "$libdir" ]; then
+		echo "WARNING: no libdir found for adding dns." 1>&2
+		return
+	fi
+	nsswitch="$destdir/etc/nsswitch.conf"
+	if ! grep -qs "^hosts:" "$nsswitch"; then
+		echo "hosts: files dns" >> "$nsswitch"
+	fi
+	local found=""
+	for lib in libnss_files libnss_dns libresolv; do
+		found=""
+		for f in "$libdir/$lib.so".?; do
+			[ -e "$f" ] || continue
+			[ "$verbose" = "y" ] && echo "dns: $lib: $f"
+			copy_file library "$f"
+			found="$f"
+		done
+		[ -n "$found" ] || echo "WARNING: no $libdir/$lib.? file" 1>&2
+	done
+	return 0
 }
