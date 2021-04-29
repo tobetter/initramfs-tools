@@ -88,6 +88,12 @@ done
 . /usr/share/initramfs-tools/scripts/functions
 . /usr/share/initramfs-tools/hook-functions
 
+# Auto-export any variables set in the conf snippets such that
+# initramfs hooks can configure each other
+# i.e. initramfs-tools-ubuntu-core affecting
+# intel-microcode/amd-microcode hook defaults
+set -a
+
 . "${CONFDIR}/initramfs.conf"
 
 EXTRA_CONF=''
@@ -122,6 +128,9 @@ for i in /usr/share/initramfs-tools/conf-hooks.d/*; do
 		. "${i}"
 	fi
 done
+
+# Finish loading conf snippets
+set +a
 
 # Check busybox dependency
 if [ "${BUSYBOX}" = "y" ] && [ -z "${BUSYBOXDIR}" ]; then
@@ -248,7 +257,6 @@ export CONFDIR
 export DESTDIR
 export DPKG_ARCH
 export verbose
-export KEYMAP
 export MODULES
 export BUSYBOX
 export RESUME
@@ -320,6 +328,10 @@ cp -p /usr/share/initramfs-tools/init "${DESTDIR}/init"
 # add existant boot scripts
 for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
 	-regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "/usr/share/initramfs-tools/scripts/${b}")
+	# shellcheck disable=SC1083,SC2086
+	[ -z "$option" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
+
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "/usr/share/initramfs-tools/scripts/${b}" \
@@ -328,6 +340,9 @@ done
 # Prune dot-files/directories and limit depth to exclude VCS files
 for b in $(cd "${CONFDIR}/scripts" && find . -maxdepth 2 -name '.?*' -prune -o \
 	-regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f -print); do
+	option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${CONFDIR}/scripts/${b}")
+	# shellcheck disable=SC1083,SC2086
+	[ -z "$option" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue
 	[ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] \
 		|| mkdir -p "${DESTDIR}/scripts/$(dirname "${b}")"
 	cp -p "${CONFDIR}/scripts/${b}" "${DESTDIR}/scripts/$(dirname "${b}")/"
@@ -353,6 +368,9 @@ fi
 touch "${DESTDIR}/etc/fstab"
 ln -s /proc/mounts "${DESTDIR}/etc/mtab"
 
+# install wait-for-root binary.
+copy_exec /usr/lib/initramfs-tools/bin/wait-for-root /sbin
+
 # module-init-tools
 copy_exec /sbin/modprobe /sbin
 copy_exec /sbin/rmmod /sbin
@@ -363,8 +381,8 @@ for file in /etc/modprobe.d/*.conf /lib/modprobe.d/*.conf ; do
 	fi
 done
 
-run_scripts /usr/share/initramfs-tools/hooks
-run_scripts "${CONFDIR}"/hooks
+run_scripts_optional /usr/share/initramfs-tools/hooks
+run_scripts_optional "${CONFDIR}"/hooks
 
 # cache boot run order
 for b in $(cd "${DESTDIR}/scripts" && find . -mindepth 1 -type d); do
@@ -392,6 +410,15 @@ fi
 if [ -e "${CONFDIR}/DSDT.aml" ]; then
 	copy_file DSDT "${CONFDIR}/DSDT.aml"
 fi
+
+case "${MODULES}" in
+	netboot|most) add_dns "${DESTDIR}/";;
+esac
+
+# Remove any looping or broken symbolic links, since they break cpio.
+[ "${verbose}" = y ] && xargs_verbose="-t"
+(cd "${DESTDIR}" && find . -type l -printf '%p %Y\n' | sed -n 's/ [LN]$//p' \
+	| xargs ${xargs_verbose:-} -rL1 rm -f)
 
 [ "${verbose}" = y ] && echo "Building cpio ${outfile} initramfs"
 

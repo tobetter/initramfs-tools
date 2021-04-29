@@ -45,13 +45,30 @@ The recommended usage is to specify the UUID as followed "root=UUID=xxx".
 set the root file system type.
 
 .TP
+\fB\fI roottimeout
+set timeout in seconds. Determines how long mountroot waits for root to appear.
+The default is 30 seconds.
+
+.TP
 \fB\fI rootdelay
-set delay in seconds. Determines how long mountroot waits for root to appear.
-The default is 180 seconds.
+alias for roottimeout.
 
 .TP
 \fB\fI rootflags
 set the file system mount option string.
+
+.TP
+\fB\fI loop= "<path to image>"
+path within the original root file system to loop-mount and use as the real
+root file system.
+
+.TP
+\fB\fI loopfstype
+set the loop file system type, if applicable.
+
+.TP
+\fB\fI loopflags
+set the loop file system mount option string, if applicable.
 
 .TP
 \fB\fI nfsroot
@@ -65,6 +82,12 @@ Use root=/dev/nfs for NFS to kick to in. NFSOPTS can be looked up in
 tells how to configure the ip address. Allows one to specify an different
 NFS server than the DHCP server. See Documentation/filesystems/nfsroot.txt
 in any recent Linux source for details. Optional parameter for NFS root.
+
+.TP
+\fB\fI vlan
+tells to create a VLAN tagged device. Allows one to configure one or
+multiple VLAN tagged devices using the "vlan=$name.$id:$parent"
+syntax. E.g. "vlan=eth0.1:eth0" Optional parameter for NFS root.
 
 .TP
 \fB\fI BOOTIF
@@ -315,7 +338,7 @@ allows arch specific hook additions.
 \fB\fI verbose
 corresponds to the verbosity of the update-initramfs run.
 .TP
-\fB\fI BUSYBOX, KEYMAP, MODULES
+\fB\fI BUSYBOX, MODULES
 are as described in \fIinitramfs.conf\fR(5).
 .TP
 \fB\fI BUSYBOXDIR
@@ -422,7 +445,16 @@ user to investigate the situation.
 .PP
 .B Example:
 panic "Frobnication failed"
+.fi
 .RE
+.RE
+
+.TP
+\fB\fI
+add_mountroot_fail_hook NN-name
+\fBDeprecated\fR: This function is now a stub which is effectively a no-op. It
+will be removed in a future version; please remove mountroot failure hooks from
+existing packages accordingly.
 
 .SS Subdirectories
 Both /usr/share/initramfs-tools/scripts and /etc/initramfs-tools/scripts
