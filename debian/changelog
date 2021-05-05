@@ -1,3 +1,9 @@
+initramfs-tools (0.140ubuntu4) impish; urgency=medium
+
+  * Pacify shellcheck to fix ftbfs. 
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Thu, 06 May 2021 10:57:14 +1200
+
 initramfs-tools (0.140ubuntu3) impish; urgency=medium
 
   * scripts/functions: Fix the fix for bug #1880735, fixing setting up vlans
