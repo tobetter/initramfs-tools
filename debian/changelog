@@ -1,3 +1,10 @@
+initramfs-tools (0.140ubuntu3) impish; urgency=medium
+
+  * scripts/functions: Fix the fix for bug #1880735, fixing setting up vlans
+    from the kernel commandline. LP: #1924794
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Wed, 05 May 2021 14:09:08 +1200
+
 initramfs-tools (0.140ubuntu2) impish; urgency=medium
 
   * Set +x bit on init again, missed again in merge despite best efforts.
