@@ -329,12 +329,17 @@ configure_networking()
 
 	for v in $VLAN; do
 		VLAN_LINK="$VLAN_LINK ${v##*:}"
+		VLAN_NAMES="$VLAN_NAMES ${v%:*}"
 	done
 
 	# activate non-autoconfigured s390x devices
 	for dev in $DEVICE $DEVICE6 $IP6 $VLAN_LINK; do
-		# skip $DEVICE which is processed in $VLAN_LINK
-		echo "${VLAN}" | grep -q "${dev}" && continue
+		# do not chzdev $dev if it is a not-yet-created vlan interface
+		for vlan_name in $VLAN_NAMES; do
+			if [ $dev = $vlan_name ]; then
+				continue 2
+			fi
+		done
 		case ${dev} in
 		enc*)
 			zdev=${dev#enc}
