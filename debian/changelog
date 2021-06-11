@@ -1,3 +1,10 @@
+initramfs-tools (0.140ubuntu5) impish; urgency=medium
+
+  * Switch default initramfs compression to zstd, as it produces the lower
+    overall boot time. LP: #1931725
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 11 Jun 2021 16:55:30 +0100
+
 initramfs-tools (0.140ubuntu4) impish; urgency=medium
 
   * Pacify shellcheck to fix ftbfs. 
