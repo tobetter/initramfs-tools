@@ -1,3 +1,9 @@
+initramfs-tools (0.140ubuntu6) impish; urgency=medium
+
+  * Change dependencies to depend on zstd, instead of lz4. LP: #1931725
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Mon, 14 Jun 2021 17:18:41 +0100
+
 initramfs-tools (0.140ubuntu5) impish; urgency=medium
 
   * Switch default initramfs compression to zstd, as it produces the lower
