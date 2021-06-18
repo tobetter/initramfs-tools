@@ -1,3 +1,9 @@
+initramfs-tools (0.136ubuntu6.6) focal; urgency=medium
+
+  * Cherrypick zstd support from upstream. LP: #1932542
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 18 Jun 2021 14:22:25 +0100
+
 initramfs-tools (0.136ubuntu6.5) focal; urgency=medium
 
   * scripts/local-premount/resume:

@@ -194,6 +194,7 @@ gzip)	# If we're doing a reproducible build, use gzip -n
 	fi
 	;;
 lz4)	compress="lz4 -9 -l" ;;
+zstd)	compress="zstd -q -19 -T0" ;;
 xz)	compress="xz --check=crc32"
 	# If we're not doing a reproducible build, enable multithreading
 	test -z "${SOURCE_DATE_EPOCH}" && compress="$compress --threads=0"
