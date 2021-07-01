@@ -1,3 +1,9 @@
+initramfs-tools (0.130ubuntu3.13) bionic; urgency=medium
+
+  * Backport zstd and lz4 support from focal. LP: #1932542
+
+ -- Dimitri John Ledkov <dimitri.ledkov@canonical.com>  Thu, 01 Jul 2021 14:11:48 +0100
+
 initramfs-tools (0.130ubuntu3.12) bionic; urgency=medium
 
   * scripts/local-premount/resume:
