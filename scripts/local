@@ -242,6 +242,7 @@ able to reboot again and resume the installation.
 		done
 
 		# Get the loop filesystem type if not set
+		# shellcheck disable=SC2153
 		FSTYPE="$LOOPFSTYPE"
 		if [ -z "$FSTYPE" ] || [ "$FSTYPE" = "unknown" ]; then
 			FSTYPE=$(/sbin/blkid -s TYPE -o value "/host/${LOOP#/}")

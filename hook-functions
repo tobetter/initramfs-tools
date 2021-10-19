@@ -78,6 +78,17 @@ add_firmware()
 		fi
 	done
 
+	for fwloc in "/lib/firmware/updates/${version}/${firmware}.xz" \
+		"/lib/firmware/updates/${firmware}.xz" \
+		"/lib/firmware/${version}/${firmware}.xz" \
+		"/lib/firmware/${firmware}.xz"; do
+		if [ -e "$fwloc" ]; then
+			copy_file firmware "$fwloc"
+			xz -d "${DESTDIR}/${fwloc}"
+			return 0
+		fi
+	done
+
 	# We can't figure out where to get that firmware from.
 	return 1
 }
@@ -913,7 +924,7 @@ call_scripts()
 	set -e
 	for cs_x in ${runlist}; do
 		[ -f "${initdir}/${cs_x}" ] || continue
-		if [ x"$call_scripts_optional" = "xy" ]; then
+		if [ "$call_scripts_optional" = "y" ]; then
 			option=$(sed '/^OPTION=/!d;$d;s/^OPTION=//;s/[[:space:]]*$//' "${initdir}/${cs_x}")
 			# shellcheck disable=SC1083,2086
 			[ -z "${option}" ] || eval test -n \"\${$option}\" -a \"\${$option}\" != \"n\" || continue

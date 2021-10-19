@@ -36,7 +36,7 @@ if [ "$1" = configure ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt 0.123~
 fi
 
 # Regenerate initramfs whenever we go to dpkg state `installed'
-if [ "x$1" != xtriggered ]; then
+if [ "$1" != triggered ]; then
 	# this activates the trigger, if triggers are working
 	update-initramfs -u
 else
@@ -50,7 +50,7 @@ fi
 # - bug only affected users that were upgrading packages
 # - new users are not affected
 # - LP: #1515513 took care of removing old dkms together with the kernel
-if [ "x$1" = xconfigure ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt "0.131ubuntu11"; then
+if [ "$1" = configure ] && [ -n "$2" ] && dpkg --compare-versions "$2" lt "0.131ubuntu11"; then
 	for old_dkms_file in /boot/initrd-*.img.old-dkms \
 			     /boot/initramfs-*.img.old-dkms \
 			     /boot/initrd.img-*.old-dkms \

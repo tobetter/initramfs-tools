@@ -209,7 +209,7 @@ for x in $(cat /proc/cmdline); do
 		;;
 	netconsole=*)
 		netconsole=${x#netconsole=}
-		[ "x$debug" = "xy" ] && log_output=/dev/kmsg
+		[ "$debug" = "y" ] && log_output=/dev/kmsg
 		;;
 	BOOTIF=*)
 		BOOTIF=${x#BOOTIF=}
