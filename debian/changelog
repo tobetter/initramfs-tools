@@ -1,3 +1,13 @@
+initramfs-tools (0.140ubuntu7) jammy; urgency=medium
+
+  * Cherry-pick merge request !26 to support xz compressed
+    firmware. Uncompressed firmware is preffered, with a fallback to use
+    compressed firmware files. LP: #1942260
+  * Cherry-pick merge request !51 to decompress compressed kernel modules
+    for boot speed performance. LP: #1932329
+
+ -- Dimitri John Ledkov <dimitri.ledkov@canonical.com>  Tue, 19 Oct 2021 11:49:38 +0100
+
 initramfs-tools (0.140ubuntu6) impish; urgency=medium
 
   * Change dependencies to depend on zstd, instead of lz4. LP: #1931725
