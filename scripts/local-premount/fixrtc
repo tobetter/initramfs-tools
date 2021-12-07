@@ -79,7 +79,7 @@ if [ -n "$BROKEN_CLOCK" ] && [ -n "$ROOTDEV" ]; then
         # need udev settle for /dev/disk/by-* symlinks to be added
         udevadm settle
 
-        wait-for-root "$ROOTDEV" "${ROOTDELAY:-180}"
+        wait-for-root "$ROOTDEV" "${ROOTDELAY:-180}" >/dev/null
 
         ROOTDISK=$(readlink -f "$ROOTDEV")
 
@@ -102,7 +102,7 @@ if [ -n "$BROKEN_CLOCK" ] && [ -n "$ROOTDEV" ]; then
 
         # make sure we're also compatible with busybox, if available
         DATE="/bin/date -D%c"
-        date -D%c 2>/dev/null || DATE=/bin/date
+        date -D%c 2>/dev/null 2>&1 || DATE=/bin/date
 
         if [ "$MOUNTDATE" = "n/a" ]; then
             # some versions of mkfs set n/a now, date is not happy with this so
