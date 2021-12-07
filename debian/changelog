@@ -1,3 +1,10 @@
+initramfs-tools (0.140ubuntu9) jammy; urgency=medium
+
+  * scripts/local-premount/fixrtc: ensure that the fixrtc script doesn't
+    produce extraneous output from wait-for-root and date (LP: #1953521)
+
+ -- Dave Jones <dave.jones@canonical.com>  Tue, 07 Dec 2021 15:35:22 +0000
+
 initramfs-tools (0.140ubuntu8) jammy; urgency=medium
 
   * Cherry-pick merge request !26 to support xz compressed
