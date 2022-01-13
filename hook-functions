@@ -854,7 +854,7 @@ set_initlist()
 		[ "${si_x}" = "${initdir}/*" ] && return
 
 		# only allow variable name chars
-		case ${si_x#${initdir}/} in
+		case ${si_x#"${initdir}"/} in
 		*[![:alnum:]\._-]*)
 			[ "${verbose}" = "y" ] \
 			&& echo "$si_x ignored: not alphanumeric or '_' file" >&2
@@ -869,7 +869,7 @@ set_initlist()
 			continue
 		fi
 
-		si_x="$(get_source "${si_x#${initdir}/}")"
+		si_x="$(get_source "${si_x#"${initdir}"/}")"
 
 		# skip non executable scripts
 		if [ ! -x "${si_x}" ]; then

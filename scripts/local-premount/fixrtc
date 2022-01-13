@@ -86,12 +86,12 @@ if [ -n "$BROKEN_CLOCK" ] && [ -n "$ROOTDEV" ]; then
         MOUNTDATESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Last mount time")
         # Trim whitespace for busybox
         MOUNTDATE="${MOUNTDATESTR#*:}"
-        MOUNTDATE="${MOUNTDATE#${MOUNTDATE%%[![:space:]]*}}"
+	MOUNTDATE="${MOUNTDATE#"${MOUNTDATE%%[![:space:]]*}"}"
 
         CREATEDATESTR=$(dumpe2fs -h "$ROOTDISK" 2>/dev/null|grep "Filesystem created") || true
         # Trim whitespace for busybox
         CREATEDATE="${CREATEDATESTR#*:}"
-        CREATEDATE="${CREATEDATE#${CREATEDATE%%[![:space:]]*}}"
+	CREATEDATE="${CREATEDATE#"${CREATEDATE%%[![:space:]]*}"}"
 
         # Hide stderr to avoid ugly message:
         #  can't open '/dev/misc/rtc': No such file or directory
