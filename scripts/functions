@@ -524,7 +524,7 @@ mask2cidr() {
 	# Assumes there's no "255." after a non-255 byte in the mask
 	local x=${1##*255.}
 	set -- 0^^^128^192^224^240^248^252^254^ $(( (${#1} - ${#x})*2 )) "${x%%.*}"
-	x=${1%%$3*}
+	x=${1%%"$3"*}
 	echo $(( $2 + (${#x}/4) ))
 }
 
@@ -602,7 +602,7 @@ _render_netplan() {
 		found=","
 		for n in $addrs; do
 			# remove dups
-			[ "${found#*,$n,}" = "${found}" ] || continue
+			[ "${found#*,"$n",}" = "${found}" ] || continue
 			found="${found}$n,"
 			echo "        - \"$n\""
 		done
@@ -614,7 +614,7 @@ _render_netplan() {
 		local alist="[" slist=""
 		for n in $ns_addrs; do
 			# do not put in duplicates
-			[ "${alist#*\"$n\"}" = "$alist" ] || continue
+			[ "${alist#*\""$n"\"}" = "$alist" ] || continue
 			alist="${alist}\"$n\", ";
 		done
 		alist="${alist%, }]"
@@ -623,7 +623,7 @@ _render_netplan() {
 			slist="["
 			for n in ${ns_search}; do
 				# do not put in duplicates
-				[ "${slist#*\"$n\"}" = "$slist" ] || continue
+				[ "${slist#*\""$n"\"}" = "$slist" ] || continue
 				slist="${slist}\"$n\", ";
 			done
 			slist="${slist%, }]"
