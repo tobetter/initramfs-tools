@@ -1,3 +1,9 @@
+initramfs-tools (0.140ubuntu11) jammy; urgency=medium
+
+  * Increase image file to 2GB in autopkgtest (LP: #1958904)
+
+ -- Andrea Righi <andrea.righi@canonical.com>  Tue, 25 Jan 2022 15:03:39 +0000
+
 initramfs-tools (0.140ubuntu10) jammy; urgency=medium
 
   * Improve shell scripts to conform to standards in shellcheck > 8.0
