@@ -22,7 +22,7 @@ if [ ! -f images/"$filename" ]; then
         fi
 fi
 rm -f "$IMAGE" "${IMAGE}-uuid"
-truncate -s 1G "$IMAGE"
+truncate -s 2G "$IMAGE"
 parted --script --align optimal "$IMAGE" -- mklabel gpt mkpart primary ext4 1MiB -2048s
 dev="$(losetup -Pf --show "$IMAGE")"
 partprobe
