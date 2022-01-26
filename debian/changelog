@@ -1,3 +1,9 @@
+initramfs-tools (0.140ubuntu6.1) impish; urgency=medium
+
+  * Increase image file to 2GB in autopkgtest (LP: #1958904)
+
+ -- Kleber Sacilotto de Souza <kleber.souza@canonical.com>  Wed, 26 Jan 2022 17:03:17 +0100
+
 initramfs-tools (0.140ubuntu6) impish; urgency=medium
 
   * Change dependencies to depend on zstd, instead of lz4. LP: #1931725
