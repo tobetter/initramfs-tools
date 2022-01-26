@@ -1,3 +1,9 @@
+initramfs-tools (0.136ubuntu6.7) focal; urgency=medium
+
+  * Increase image file to 2GB in autopkgtest (LP: #1958904)
+
+ -- Kleber Sacilotto de Souza <kleber.souza@canonical.com>  Wed, 26 Jan 2022 18:11:24 +0100
+
 initramfs-tools (0.136ubuntu6.6) focal; urgency=medium
 
   * Cherrypick zstd support from upstream. LP: #1932542
