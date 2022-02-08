@@ -368,6 +368,9 @@ fi
 touch "${DESTDIR}/etc/fstab"
 ln -s /proc/mounts "${DESTDIR}/etc/mtab"
 
+# Install libc6, pthreads, and dlopened gcc_s.so.1 (Debian bug #950254) LP: #1880853 LP: #1958594
+copy_exec /usr/lib/initramfs-tools/bin/gcc_s1-stub /usr/lib/initramfs-tools/bin/gcc_s1-stub
+
 # install wait-for-root binary.
 copy_exec /usr/lib/initramfs-tools/bin/wait-for-root /sbin
 
@@ -389,16 +392,22 @@ for b in $(cd "${DESTDIR}/scripts" && find . -mindepth 1 -type d); do
 	cache_run_scripts "${DESTDIR}" "/scripts/${b#./}"
 done
 
-# decompress modules for boot speed
+# decompress modules for boot speed, if possible
 find "${DESTDIR}/${MODULESDIR}" -name '*.ko.*' | while read -r ko; do
-        case "$ko" in
-        *.xz)
-                xz -d "${ko}"
-                ;;
-        *.zst)
-                zstd -q -d --rm "${ko}"
-                ;;
-        esac
+	case "$ko" in
+	*.xz)
+		if ! command -v xz >/dev/null 2>&1; then
+			break
+		fi
+		xz -d "${ko}"
+		;;
+	*.zst)
+		if ! command -v zstd >/dev/null 2>&1; then
+			break
+		fi
+		zstd -q -d --rm "${ko}"
+		;;
+	esac
 done
 
 # generate module deps

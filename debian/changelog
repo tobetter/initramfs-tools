@@ -1,3 +1,33 @@
+initramfs-tools (0.140ubuntu12) jammy; urgency=medium
+
+  * Force copy pthread and libgcc_s libraries via a stub binary.
+
+    To avoid circular shared library dependencies between compiler and
+    libc, libpthreads chooses to dlopen libgcc_s, instead of linking
+    against it. However, we have no way to parse/know what it
+    needs. And even when we hardcode to include libgcc_s1, we don't
+    have a way to know which libgcc_s1 is needed on a given system and
+    from which path to include it. But there is a hook-function to
+    copy a binary and all of its shared library dependencies. Thus
+    create a stub empty executable, with shared linking against
+    pthreads and gcc_s1 and always include it in the initrd. This way
+    at initrd creation time, ldd is used to correctly resolve these
+    shared library dependencies and correctly copy them into the
+    initrd. This removes hardcoding paths as to where these libraries
+    must be copied from on the host. LP: #1958594 LP: #1880853
+
+  * For net boot include most of net/usb modules, except niche modems. LP:
+    #1950996
+
+  * Cherry-pick updated merge request !26 to support xz compressed
+    firmware. Uncompressed firmware is preffered, with a fallback to use
+    compressed firmware files. LP: #1942260
+
+  * Cherry-pick updated merge request !51 to decompress compressed kernel
+    modules for boot speed performance. LP: #1932329
+
+ -- Dimitri John Ledkov <dimitri.ledkov@canonical.com>  Tue, 08 Feb 2022 20:43:02 +0000
+
 initramfs-tools (0.140ubuntu11) jammy; urgency=medium
 
   * Increase image file to 2GB in autopkgtest (LP: #1958904)
