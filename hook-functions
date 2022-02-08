@@ -62,29 +62,28 @@ add_firmware()
 	firmware="${1}"
 
 	if [ -e "${DESTDIR}/lib/firmware/updates/${version?}/${firmware}" ] \
+	|| [ -e "${DESTDIR}/lib/firmware/updates/${version?}/${firmware}.xz" ] \
 	|| [ -e "${DESTDIR}/lib/firmware/updates/${firmware}" ] \
+	|| [ -e "${DESTDIR}/lib/firmware/updates/${firmware}.xz" ] \
 	|| [ -e "${DESTDIR}/lib/firmware/${version}/${firmware}" ] \
-	|| [ -e "${DESTDIR}/lib/firmware/${firmware}" ]; then
-		return 0
+	|| [ -e "${DESTDIR}/lib/firmware/${version}/${firmware}.xz" ] \
+	|| [ -e "${DESTDIR}/lib/firmware/${firmware}" ] \
+	|| [ -e "${DESTDIR}/lib/firmware/${firmware}.xz" ]; then
+            return 0
 	fi
 
 	for fwloc in "/lib/firmware/updates/${version}/${firmware}" \
 		"/lib/firmware/updates/${firmware}" \
 		"/lib/firmware/${version}/${firmware}" \
 		"/lib/firmware/${firmware}"; do
-		if [ -e "$fwloc" ]; then
-			copy_file firmware "$fwloc"
+		if [ -e "${fwloc}" ]; then
+			copy_file firmware "${fwloc}"
 			return 0
-		fi
-	done
-
-	for fwloc in "/lib/firmware/updates/${version}/${firmware}.xz" \
-		"/lib/firmware/updates/${firmware}.xz" \
-		"/lib/firmware/${version}/${firmware}.xz" \
-		"/lib/firmware/${firmware}.xz"; do
-		if [ -e "$fwloc" ]; then
-			copy_file firmware "$fwloc"
-			xz -d "${DESTDIR}/${fwloc}"
+		elif [ -e "${fwloc}.xz" ]; then
+			copy_file firmware "${fwloc}.xz"
+			if command -v xz >/dev/null 2>&1; then
+				xz -d "${DESTDIR}/${fwloc}.xz"
+			fi
 			return 0
 		fi
 	done
@@ -717,7 +716,10 @@ auto_add_modules()
 				appletalk arcnet bonding can dummy.ko \
 				hamradio hippi ifb.ko irda macvlan.ko \
 				macvtap.ko pcmcia sb1000.ko team tokenring \
-				tun.ko usb veth.ko wan wimax wireless \
+				tun.ko veth.ko wan wimax wireless \
+				cdc_mbim.ko cdc-phonet.ko hso.ko huawei_cdc_ncm.ko ipheth.ko kalmia.ko \
+				lg-vl600.ko qmi_wwan.ko sierra_net.ko cdc_subset.ko gl620a.ko \
+				net1080.ko plusb.ko cx82310_eth.ko zaurus.ko \
 				xen-netback.ko
 			modules="$modules 8021q"
 		;;
