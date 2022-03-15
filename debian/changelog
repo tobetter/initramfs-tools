@@ -1,3 +1,14 @@
+initramfs-tools (0.140ubuntu13) jammy; urgency=medium
+
+  * Lower the compression levels for zstd and lz4 (LP: #1958148)
+    Following the discussion on the mailing list, we have reached
+    a conclusion to lower the default compression levels:
+    - For lz4, the compression level is lowered to 2 from 9
+    - For zstd, the compression level is lowered to 1 from 19
+
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Tue, 15 Mar 2022 16:00:55 +0100
+
 initramfs-tools (0.140ubuntu12) jammy; urgency=medium
 
   * Force copy pthread and libgcc_s libraries via a stub binary.
